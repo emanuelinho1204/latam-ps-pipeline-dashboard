@@ -271,6 +271,10 @@
     </div>
   </div>
   <p class="text-xs mb-3" style="color:#706E6B;" data-i18n="sssm_view_desc">Grouped view: SSSM → Stage → Status · matches org62 report</p>
+  <div class="card-panel mb-3" style="padding:0.65rem 1rem;">
+    <div class="text-xs font-semibold mb-2" style="color:#706E6B;letter-spacing:0.04em;text-transform:uppercase;">Carga del Equipo</div>
+    <div id="sssmLoadBars"></div>
+  </div>
   <div id="sssmGroupedContainer"></div>
 </div>
 
@@ -4656,7 +4660,32 @@ function applySSSmFilters() {
   let data = [...filtered];
   if (sssmF) data = data.filter(d => d.sssm === sssmF);
   if (terrF) data = data.filter(d => getTerritory(d.country) === terrF);
+  renderSSSmLoadBars();
   renderSSSmGroupedView(data);
+}
+
+function renderSSSmLoadBars() {
+  const el = document.getElementById('sssmLoadBars');
+  if (!el) return;
+  const counts = {}, arrs = {};
+  filtered.forEach(d => {
+    counts[d.sssm] = (counts[d.sssm]||0)+1;
+    arrs[d.sssm] = (arrs[d.sssm]||0)+d.amount;
+  });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1]||1;
+  el.innerHTML = sorted.map(([name, count]) => {
+    const pct = Math.round(count/max*100);
+    const color = count > 15 ? '#C23934' : count > 12 ? '#C56200' : '#04844B';
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+      <div style="width:140px;font-size:0.72rem;color:#3E3E3C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${name}">${name}</div>
+      <div style="flex:1;background:#F3F3F3;border-radius:3px;height:11px;overflow:hidden;">
+        <div style="width:${pct}%;height:100%;background:${color};border-radius:3px;"></div>
+      </div>
+      <div style="width:50px;text-align:right;font-size:0.71rem;font-weight:600;color:${color};">${count} DSRs</div>
+      <div style="width:58px;text-align:right;font-size:0.69rem;color:#706E6B;">${fmt$(arrs[name]||0)}</div>
+    </div>`;
+  }).join('');
 }
 
 function resetSSSmFilters() {
