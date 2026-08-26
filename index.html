@@ -4667,25 +4667,18 @@ function applySSSmFilters() {
 function renderSSSmLoadBars() {
   const el = document.getElementById('sssmLoadBars');
   if (!el) return;
-  const counts = {}, arrs = {};
-  filtered.forEach(d => {
-    counts[d.sssm] = (counts[d.sssm]||0)+1;
-    arrs[d.sssm] = (arrs[d.sssm]||0)+d.amount;
-  });
+  const counts = {};
+  filtered.forEach(d => counts[d.sssm] = (counts[d.sssm]||0)+1);
   const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const max = sorted[0]?.[1]||1;
-  el.innerHTML = sorted.map(([name, count]) => {
-    const pct = Math.round(count/max*100);
-    const color = count > 15 ? '#C23934' : count > 12 ? '#C56200' : '#04844B';
-    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
-      <div style="width:140px;font-size:0.72rem;color:#3E3E3C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${name}">${name}</div>
-      <div style="flex:1;background:#F3F3F3;border-radius:3px;height:11px;overflow:hidden;">
-        <div style="width:${pct}%;height:100%;background:${color};border-radius:3px;"></div>
-      </div>
-      <div style="width:50px;text-align:right;font-size:0.71rem;font-weight:600;color:${color};">${count} DSRs</div>
-      <div style="width:58px;text-align:right;font-size:0.69rem;color:#706E6B;">${fmt$(arrs[name]||0)}</div>
-    </div>`;
-  }).join('');
+  const overloaded = sorted.filter(([,c])=>c>15);
+  const warned = sorted.filter(([,c])=>c>12&&c<=15);
+  const top = sorted[0];
+  const parts = [];
+  if (top) parts.push(`<span>Top: <strong style="color:#032D60;">${top[0].split(' ')[0]}</strong> (${top[1]} DSRs)</span>`);
+  if (overloaded.length) parts.push(`<span style="color:#C23934;">🔴 ${overloaded.length} sobrecargado${overloaded.length>1?'s':''} &gt;15</span>`);
+  if (warned.length) parts.push(`<span style="color:#C56200;">🟡 ${warned.length} en atención 13–15</span>`);
+  if (!overloaded.length && !warned.length) parts.push(`<span style="color:#04844B;">✅ Carga normal</span>`);
+  el.innerHTML = `<span style="font-size:0.75rem;color:#706E6B;">${sorted.length} SSSMs &nbsp;·&nbsp; ${parts.join(' &nbsp;·&nbsp; ')}</span>`;
 }
 
 function resetSSSmFilters() {
@@ -4979,8 +4972,9 @@ function renderTab1() {
     const q = QUALI_MAP[d.dsr];
     const hs = heatScore(d,q);
     const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
+    const dsrLink = d.dsrId ? `https://org62.my.salesforce.com/${d.dsrId}` : '#';
     return `<tr class="table-row">
-      <td><a href="${link}" target="_blank" class="opp-link font-mono text-xs">${d.dsr}</a></td>
+      <td><a href="${dsrLink}" target="_blank" class="opp-link font-mono text-xs">${d.dsr}</a></td>
       <td>${d.account}</td>
       <td><a href="${link}" target="_blank" class="opp-link" title="${d.oppName}">${d.oppName.length>45?d.oppName.substring(0,45)+'…':d.oppName}</a></td>
       <td style="color:#706E6B;">${d.sssm}</td>
@@ -5111,8 +5105,9 @@ function renderTab4() {
   document.getElementById('aiTop10Body').innerHTML = top10.map(d => {
     const q = QUALI_MAP[d.dsr];
     const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
+    const dsrLink = d.dsrId ? `https://org62.my.salesforce.com/${d.dsrId}` : '#';
     return `<tr class="table-row">
-      <td style="color:#0176D3;" class="font-mono text-xs"><a href="${link}" target="_blank" class="opp-link">${d.dsr}</a></td>
+      <td style="color:#0176D3;" class="font-mono text-xs"><a href="${dsrLink}" target="_blank" class="opp-link">${d.dsr}</a></td>
       <td style="color:#706E6B;">${d.sssm.split(' ')[0]}</td>
       <td>${d.account}</td>
       <td class="text-right font-bold" style="color:#032D60;">${q.score}</td>
@@ -5232,6 +5227,7 @@ function renderTab6() {
     const q = d._quali;
     const hs = d._heat;
     const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
+    const dsrLink = d.dsrId ? `https://org62.my.salesforce.com/${d.dsrId}` : '#';
     const qualBadge = !q ? '<span style="color:#706E6B;">Pendiente</span>' : q.qualified==='YES' ? '<span style="color:#04844B;">✅ Sí</span>' : '<span style="color:#C23934;">❌ No</span>';
     const copyText = `DSR: ${d.dsr} | ${d.account} | ${d.oppName} | ${d.country} | ${fmt$(d.amount)} | ${d.stage} | ${d.status} | AP: ${d.ap||''} | Tipo: ${d.requestTypeDetail||''} | Score: ${q?.score||'N/A'} | ${q?.deliveryModel||'Pendiente'}`;
     const oppNameShort = d.oppName && d.oppName.length > 40 ? d.oppName.substring(0,40)+'…' : (d.oppName||'--');
@@ -5239,7 +5235,7 @@ function renderTab6() {
     const estCell = est ? `<a href="https://org62.my.salesforce.com/${est.id}" target="_blank" title="${est.name}" class="opp-link" style="font-size:0.72rem;">📋</a>` : '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
     return `<tr class="table-row">
       <td class="px-2 text-center">${heatBadge(hs)}</td>
-      <td class="px-2"><a href="${link}" target="_blank" class="opp-link font-mono text-xs">${d.dsr}</a></td>
+      <td class="px-2"><a href="${dsrLink}" target="_blank" class="opp-link font-mono text-xs">${d.dsr}</a></td>
       <td class="px-2 text-center">${estCell}</td>
       <td class="px-2 whitespace-nowrap" style="color:#0176D3;font-size:0.72rem;cursor:pointer;text-decoration:underline;" onclick="selectSSSM('${d.sssm}')" title="${d.sssm}">${d.sssm.split(' ')[0]}</td>
       <td class="px-2 max-w-xs truncate" title="${d.account}">${d.account}</td>
@@ -5395,12 +5391,13 @@ function renderSSSmGroupedView(data) {
           const q = QUALI_MAP[d.dsr];
           const hs = heatScore(d, q);
           const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
+          const dsrLink = d.dsrId ? `https://org62.my.salesforce.com/${d.dsrId}` : '#';
           const oppShort = d.oppName && d.oppName.length > 50 ? d.oppName.substring(0,50)+'…' : (d.oppName||'--');
           const estV = d.oppId ? ESTIMATE_MAP[d.oppId] : null;
           const estCellV = estV ? `<a href="https://org62.my.salesforce.com/${estV.id}" target="_blank" title="${estV.name}" class="opp-link" style="font-size:0.72rem;">📋</a>` : '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
           tbodyHtml += `<tr class="inner-row">
             <td>${heatBadge(hs)}</td>
-            <td><a href="${link}" target="_blank" class="opp-link font-mono" style="font-size:0.72rem;">${d.dsr}</a></td>
+            <td><a href="${dsrLink}" target="_blank" class="opp-link font-mono" style="font-size:0.72rem;">${d.dsr}</a></td>
             <td class="text-center">${estCellV}</td>
             <td class="truncate" title="${d.oppName}"><a href="${link}" target="_blank" class="opp-link" style="font-size:0.72rem;">${oppShort}</a></td>
             <td class="truncate">${d.account}</td>
