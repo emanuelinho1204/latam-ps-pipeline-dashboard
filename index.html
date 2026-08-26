@@ -397,6 +397,7 @@
       <th class="sort-btn" onclick="sortTable('status')">Status ▲▼</th>
       <th data-i18n="th_ap">Account Partner</th>
       <th data-i18n="th_type">Type</th>
+      <th>Contract</th>
       <th class="text-right sort-btn" onclick="sortTable('score')">Score ▲▼</th>
       <th>Delivery</th>
       <th data-i18n="th_qualified">Qualified</th>
@@ -5144,6 +5145,7 @@ function renderTab6() {
       <td class="px-2 whitespace-nowrap">${statusBadge(d.status)}</td>
       <td class="px-2 max-w-xs truncate" style="color:#3E3E3C;font-size:0.72rem;" title="${d.ap||''}">${d.ap||'--'}</td>
       <td class="px-2" style="color:#706E6B;font-size:0.72rem;">${d.requestTypeDetail||'--'}</td>
+      <td class="px-2 whitespace-nowrap" style="color:#706E6B;font-size:0.72rem;">${d.contractType||'--'}</td>
       <td class="px-2 text-right font-bold" style="color:#032D60;">${q?.score||'--'}</td>
       <td class="px-2 whitespace-nowrap">${deliveryBadge(q?.deliveryModel)}</td>
       <td class="px-2">${qualBadge}</td>
@@ -5247,7 +5249,7 @@ function renderSSSmGroupedView(data) {
             <td class="truncate" title="${d.oppName}"><a href="${link}" target="_blank" class="opp-link" style="font-size:0.72rem;">${oppShort}</a></td>
             <td class="truncate">${d.account}</td>
             <td style="color:#706E6B;font-size:0.72rem;">${d.country||'--'}</td>
-            <td class="text-right font-semibold">${fmt$(d.amount)}</td>
+            <td class="text-right"><span class="font-semibold">${fmt$(d.amount)}</span>${d.contractType?`<br><span style="color:#706E6B;font-size:0.67rem;">${d.contractType}</span>`:''}</td>
             <td>${forecastBadge(d.forecast)}</td>
             <td class="text-center">${mgrJudgeBadge(d.mgrJudgement)}</td>
             <td style="color:#706E6B;font-size:0.72rem;">${d.closeDate}</td>
