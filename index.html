@@ -100,6 +100,37 @@
 </div>
 <div id="copyToast" class="hidden">✅ <span data-i18n="toast_copied">Copied! Paste in Slack: @Claude ps-dashboard</span></div>
 
+<!-- Refresh Modal -->
+<div id="refreshModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;" onclick="if(event.target===this)closeRefreshModal()">
+  <div style="background:#fff;border-radius:12px;padding:1.75rem;width:520px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,0.25);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+      <h2 style="font-size:1.1rem;font-weight:700;color:#032D60;">🔄 Actualizar datos del dashboard</h2>
+      <button onclick="closeRefreshModal()" style="color:#706E6B;font-size:1.25rem;background:none;border:none;cursor:pointer;">✕</button>
+    </div>
+    <div style="font-size:0.82rem;color:#706E6B;margin-bottom:1rem;">Última actualización: <strong style="color:#032D60;" id="rm-lastDate"></strong></div>
+
+    <!-- Offline state -->
+    <div id="rm-offline" style="background:#FFF3CD;border-radius:8px;padding:1rem;margin-bottom:1rem;">
+      <div style="font-weight:600;color:#C56200;margin-bottom:0.5rem;">⚠️ Servidor local no detectado</div>
+      <div style="font-size:0.8rem;color:#706E6B;margin-bottom:0.75rem;">Para activar el refresh automático, ejecuta en una terminal:</div>
+      <code style="display:block;background:#032D60;color:#4FC3F7;padding:0.6rem 0.9rem;border-radius:6px;font-size:0.82rem;margin-bottom:0.75rem;">python3 /Users/a.moreno/ps-pipeline-dashboard/refresh-server.py</code>
+      <div style="font-size:0.78rem;color:#706E6B;">O para refrescar ahora, ejecuta <code style="background:#F3F2F2;padding:1px 5px;border-radius:3px;">@Claude ps-dashboard</code> en Claude Code.</div>
+      <button onclick="checkRefreshServer()" style="margin-top:0.75rem;padding:0.4rem 1rem;background:#0176D3;color:white;border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;">↺ Reintentar conexión</button>
+    </div>
+
+    <!-- Online state -->
+    <div id="rm-online" class="hidden">
+      <div style="background:#D4EDDA;border-radius:8px;padding:0.6rem 0.9rem;margin-bottom:1rem;font-size:0.8rem;color:#04844B;font-weight:600;">✅ Servidor activo — listo para refrescar</div>
+      <button id="rm-btnRefresh" onclick="startRefresh()" style="width:100%;padding:0.65rem;background:#032D60;color:white;border:none;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;margin-bottom:0.75rem;">🔄 Actualizar datos</button>
+      <pre id="rm-log" style="background:#1A1A2E;color:#A8E6CF;padding:0.75rem;border-radius:6px;font-size:0.72rem;min-height:60px;max-height:180px;overflow-y:auto;margin:0;white-space:pre-wrap;"></pre>
+      <div id="rm-done" class="hidden" style="margin-top:0.75rem;text-align:center;">
+        <div style="color:#04844B;font-weight:600;margin-bottom:0.5rem;">✅ Datos actualizados</div>
+        <button onclick="location.reload()" style="padding:0.5rem 1.5rem;background:#04844B;color:white;border:none;border-radius:6px;font-size:0.85rem;cursor:pointer;">↺ Recargar dashboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- FILTER BAR -->
 <div class="bg-white border-b border-[#DDDBDA] px-6 py-3 shadow-sm">
   <div class="flex flex-wrap gap-3 items-end">
@@ -1718,15 +1749,62 @@ function territoryBadge(country) {
 
 // ── Refresh → clipboard copy + toast ──────────────────
 function refreshCopy() {
-  navigator.clipboard.writeText('@Claude ps-dashboard').then(() => {
-    const toast = document.getElementById('copyToast');
-    toast.classList.remove('hidden');
-    const btn = toast.querySelector('[data-i18n="btn_refresh"]') || toast;
-    setTimeout(() => toast.classList.add('hidden'), 3000);
-  }).catch(() => {
-    const t = i18n[currentLang] || i18n.en;
-    alert(t.toast_copied);
-  });
+  const modal = document.getElementById('refreshModal');
+  modal.classList.remove('hidden');
+  const ld = document.getElementById('rm-lastDate');
+  if (ld) {
+    const d = new Date(GENERATED);
+    const days = Math.floor((Date.now() - d)/86400000);
+    ld.textContent = GENERATED + (days > 0 ? ` (hace ${days} día${days>1?'s':''})` : ' (hoy)');
+  }
+  document.getElementById('rm-done').classList.add('hidden');
+  checkRefreshServer();
+}
+function closeRefreshModal() {
+  document.getElementById('refreshModal').classList.add('hidden');
+}
+let _refreshPoll = null;
+function checkRefreshServer() {
+  fetch('http://localhost:3001/health', {signal: AbortSignal.timeout(1500)})
+    .then(r => r.json())
+    .then(() => {
+      document.getElementById('rm-offline').classList.add('hidden');
+      document.getElementById('rm-online').classList.remove('hidden');
+      pollStatus();
+    })
+    .catch(() => {
+      document.getElementById('rm-offline').classList.remove('hidden');
+      document.getElementById('rm-online').classList.add('hidden');
+    });
+}
+function startRefresh() {
+  document.getElementById('rm-btnRefresh').disabled = true;
+  document.getElementById('rm-btnRefresh').textContent = 'Actualizando...';
+  document.getElementById('rm-log').textContent = '';
+  fetch('http://localhost:3001/refresh', {method:'POST'})
+    .then(r=>r.json())
+    .then(d => { if(d.ok) pollStatus(); })
+    .catch(e => { document.getElementById('rm-log').textContent = 'Error: '+e; });
+}
+function pollStatus() {
+  clearInterval(_refreshPoll);
+  _refreshPoll = setInterval(() => {
+    fetch('http://localhost:3001/status', {signal: AbortSignal.timeout(2000)})
+      .then(r=>r.json())
+      .then(d => {
+        const log = document.getElementById('rm-log');
+        if (log) log.textContent = (d.log||[]).slice(-12).join('\n');
+        const btn = document.getElementById('rm-btnRefresh');
+        if (!d.running) {
+          clearInterval(_refreshPoll);
+          if (btn) { btn.disabled = false; btn.textContent = '🔄 Actualizar datos'; }
+          if (d.last) {
+            const done = document.getElementById('rm-done');
+            if(done) { done.classList.remove('hidden'); }
+          }
+        }
+      }).catch(()=>clearInterval(_refreshPoll));
+  }, 1500);
 }
 
 // ── SSSM View local filters ────────────────────────────
