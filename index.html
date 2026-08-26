@@ -4397,6 +4397,7 @@ let sortDir = -1;
 let currentPage = 1;
 const PAGE_SIZE = 25;
 let charts = {};
+let sssmChartEntries = [];
 
 // ── i18n ──────────────────────────────────────────────
 let currentLang = 'en';
@@ -4529,6 +4530,9 @@ function resetSSSmFilters() {
 
 // ── DSR Detail local filters ───────────────────────────
 function selectSSSM(name) {
+  // Reset territory filter to avoid conflicts
+  const terrEl = document.getElementById('terrF');
+  if (terrEl) terrEl.value = '';
   // Set Vista SSSM filter
   const sel = document.getElementById('sssmF');
   if (sel) sel.value = name;
@@ -4827,11 +4831,14 @@ function renderTab2() {
     </tr>`;
   }).join('');
 
+  sssmChartEntries = entries;
   const labels = entries.map(([n]) => n.split(' ')[0]);
   const counts = entries.map(([,m]) => m.total);
   const arrs = entries.map(([,m]) => +(m.arr/1e6).toFixed(2));
-  makeChart('chartSSSM','bar',labels,[{label:'DSRs',data:counts,backgroundColor:'#0176D3',borderRadius:3}]);
-  makeChart('chartSSSMArr','bar',labels,[{label:'ARR ($M)',data:arrs,backgroundColor:'#04844B',borderRadius:3}]);
+  const sssmChartClick = (e, els) => { if (els.length > 0) selectSSSM(sssmChartEntries[els[0].index][0]); };
+  const sssmChartHover = (e, els) => { e.native.target.style.cursor = els.length > 0 ? 'pointer' : 'default'; };
+  makeChart('chartSSSM','bar',labels,[{label:'DSRs',data:counts,backgroundColor:'#0176D3',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover});
+  makeChart('chartSSSMArr','bar',labels,[{label:'ARR ($M)',data:arrs,backgroundColor:'#04844B',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover});
 }
 
 function renderTab3() {
