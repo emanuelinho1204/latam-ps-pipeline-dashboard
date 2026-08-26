@@ -186,11 +186,23 @@
 <!-- ALERT BAR -->
 <div id="alertBar" class="px-6 py-2 bg-white border-b border-[#DDDBDA] min-h-10"></div>
 
+<!-- KPI STRIP -->
+<div id="kpiStrip" class="px-6 py-2 border-b border-[#DDDBDA]" style="background:#F8FAFC;">
+  <div class="flex flex-wrap items-center gap-x-5 gap-y-1">
+    <span class="text-xs font-semibold tracking-wide" style="color:#A8BBD0;">PIPELINE</span>
+    <div class="flex items-center gap-1.5"><span class="text-xs" style="color:#706E6B;">DSRs</span><span id="sk1" class="text-sm font-bold" style="color:#032D60;"></span></div>
+    <div class="flex items-center gap-1.5"><span class="text-xs" style="color:#706E6B;">Pipeline</span><span id="sk2" class="text-sm font-bold" style="color:#0176D3;"></span></div>
+    <div class="flex items-center gap-1.5"><span class="text-xs" style="color:#706E6B;">Commit</span><span id="sk3" class="text-sm font-bold" style="color:#04844B;"></span></div>
+    <div class="flex items-center gap-1.5"><span class="text-xs" style="color:#706E6B;">Best Case</span><span id="sk6" class="text-sm font-bold" style="color:#C56200;"></span></div>
+    <div class="flex items-center gap-1.5"><span class="text-xs" style="color:#706E6B;">Qualified</span><span id="sk4" class="text-sm font-bold" style="color:#C56200;"></span></div>
+    <div class="flex items-center gap-1.5"><span class="text-xs" style="color:#706E6B;">Avg Score</span><span id="sk5" class="text-sm font-bold" style="color:#7B5EA7;"></span></div>
+  </div>
+</div>
+
 <!-- TABS -->
 <div class="bg-white border-b border-[#DDDBDA] px-6 shadow-sm">
   <div class="flex gap-0 overflow-x-auto">
-    <button class="tab-btn active px-5 py-3 text-sm font-medium" onclick="showTab('t1',this)"><span data-i18n="tab_summary">📋 Summary</span></button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('tsssm',this)"><span data-i18n="tab_sssm_view">👤 SSSM View</span></button>
+    <button class="tab-btn active px-5 py-3 text-sm font-medium" onclick="showTab('tsssm',this)"><span data-i18n="tab_sssm_view">👤 SSSM View</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t2',this)"><span data-i18n="tab_sssm_coverage">👥 SSSM Coverage</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t3',this)"><span data-i18n="tab_funnel">🔻 Funnel</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t4',this)"><span data-i18n="tab_ai">🤖 AI Readiness</span></button>
@@ -202,8 +214,8 @@
 <!-- TAB CONTENTS -->
 <div class="p-6">
 
-<!-- TAB 1: EXECUTIVE SUMMARY -->
-<div id="t1" class="tab-content">
+<!-- TAB 1: EXECUTIVE SUMMARY (hidden — KPIs surfaced in strip above tabs) -->
+<div id="t1" class="tab-content hidden">
   <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
     <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;" data-i18n="kpi_active_dsrs">Active DSRs</div><div id="k1" class="text-2xl font-bold" style="color:#032D60;"></div></div>
     <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;" data-i18n="kpi_total_pipeline">Total Pipeline</div><div id="k2" class="text-2xl font-bold" style="color:#0176D3;"></div></div>
@@ -224,7 +236,7 @@
 </div>
 
 <!-- TAB: VISTA SSSM (grouped) -->
-<div id="tsssm" class="tab-content hidden">
+<div id="tsssm" class="tab-content">
   <div class="local-filter-bar flex flex-wrap gap-3 items-end">
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_sssm">SSSM</label>
@@ -4749,6 +4761,15 @@ function renderTab1() {
   document.getElementById('k3').textContent = fmt$(commitArr);
   document.getElementById('k4').textContent = pctQual + '%';
   document.getElementById('k5').textContent = avgScore + '/27';
+
+  // KPI strip (always visible)
+  const bestCaseArr = filtered.filter(d => d.forecast==='Best Case').reduce((s,d) => s+d.amount, 0);
+  document.getElementById('sk1').textContent = total;
+  document.getElementById('sk2').textContent = fmt$(totalArr);
+  document.getElementById('sk3').textContent = fmt$(commitArr);
+  document.getElementById('sk6').textContent = fmt$(bestCaseArr);
+  document.getElementById('sk4').textContent = pctQual + '%';
+  document.getElementById('sk5').textContent = avgScore + '/27';
 
   // Forecast chart
   const fCnt = {Commit:0,'Best Case':0,Pipeline:0,Omitted:0};
