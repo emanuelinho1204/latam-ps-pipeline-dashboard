@@ -4356,11 +4356,18 @@ function resetSSSmFilters() {
 
 // ── DSR Detail local filters ───────────────────────────
 function selectSSSM(name) {
+  // Set Vista SSSM filter
   const sel = document.getElementById('sssmF');
   if (sel) sel.value = name;
-  const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => (b.getAttribute('onclick')||'').includes("'tsssm'"));
-  if (btn) showTab('tsssm', btn);
-  setTimeout(() => applySSSmFilters(), 100);
+  // Switch to tsssm tab manually (avoids setTimeout race with showTab)
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const tabEl = document.getElementById('tsssm');
+  if (tabEl) tabEl.classList.remove('hidden');
+  const tabBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => (b.getAttribute('onclick')||'').includes("'tsssm'"));
+  if (tabBtn) tabBtn.classList.add('active');
+  // Apply filter synchronously
+  applySSSmFilters();
 }
 
 function resetDetailFilters() {
