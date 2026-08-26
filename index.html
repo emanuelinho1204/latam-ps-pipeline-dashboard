@@ -5283,11 +5283,9 @@ function renderSSSmGroupedView(data) {
     if (!activeSSSM) {
       const sssmRows = Object.values(stages).reduce((a, st) => a.concat(Object.values(st).flat()), []);
       const sssmArr = sssmRows.reduce((s, d) => s + d.amount, 0);
-      tbodyHtml += `<tr><td colspan="13" style="padding:0;">
-        <div style="background:#032D60;color:#fff;font-weight:700;font-size:0.8rem;padding:0.4rem 0.75rem;display:flex;justify-content:space-between;align-items:center;">
-          <span>${sssm}</span>
-          <span style="font-weight:400;opacity:0.65;font-size:0.71rem;">${sssmRows.length} DSRs · ${fmt$(sssmArr)}</span>
-        </div>
+      tbodyHtml += `<tr style="background:#fff;"><td colspan="13" style="padding:0.5rem 0.75rem 0.15rem;border-top:2px solid #DDDBDA;">
+        <span style="font-weight:700;font-size:0.77rem;color:#032D60;">${sssm}</span>
+        <span style="font-size:0.69rem;color:#AEACAB;margin-left:8px;">${sssmRows.length} DSRs · ${fmt$(sssmArr)}</span>
       </td></tr>`;
     }
 
