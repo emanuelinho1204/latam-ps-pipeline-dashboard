@@ -265,7 +265,7 @@
     <table class="w-full text-sm"><thead><tr>
       <th>SSSM</th>
       <th class="text-right">Total</th>
-      <th class="text-right">ARR ($M)</th>
+      <th class="text-right">ARR</th>
       <th class="text-right">Working</th>
       <th class="text-right">On Hold</th>
       <th class="text-right">In Queue</th>
@@ -4236,7 +4236,7 @@ const i18n = {
     opt_all: 'All', opt_all_sssms: 'All SSSMs', opt_all_territories: 'All Territories', opt_all_aps: 'All APs',
     opt_qualified: 'Qualified', opt_not_qualified: 'Not Qualified', opt_pending: 'Pending',
     btn_reset: '↺ Reset', btn_expand_all: '⊞ Expand all', btn_collapse_all: '⊟ Collapse all',
-    tab_summary: '📋 Summary', tab_sssm_view: '👤 SSSM View', tab_sssm_coverage: '👥 SSSM Coverage',
+    tab_summary: '📋 Summary', tab_sssm_view: '👤 SSSM View', tab_sssm_coverage: '👥 Workload',
     tab_funnel: '🔻 Funnel', tab_ai: '🤖 AI Readiness', tab_risk: '🚨 Risk Radar', tab_detail: '📄 DSR Detail',
     kpi_active_dsrs: 'Active DSRs', kpi_total_pipeline: 'Total Pipeline', kpi_commit_arr: 'Commit ARR',
     kpi_pct_qualified: '% Qualified', kpi_avg_score: 'Avg PS Score',
@@ -4254,7 +4254,7 @@ const i18n = {
     opt_all: 'Todos', opt_all_sssms: 'Todos los SSSM', opt_all_territories: 'Todos los Territorios', opt_all_aps: 'Todos los APs',
     opt_qualified: 'Calificado', opt_not_qualified: 'No Calificado', opt_pending: 'Pendiente',
     btn_reset: '↺ Reset', btn_expand_all: '⊞ Expandir todo', btn_collapse_all: '⊟ Colapsar todo',
-    tab_summary: '📋 Resumen', tab_sssm_view: '👤 Vista SSSM', tab_sssm_coverage: '👥 Cobertura SSSM',
+    tab_summary: '📋 Resumen', tab_sssm_view: '👤 Vista SSSM', tab_sssm_coverage: '👥 Carga',
     tab_funnel: '🔻 Funnel', tab_ai: '🤖 AI Readiness', tab_risk: '🚨 Risk Radar', tab_detail: '📄 Detalle DSR',
     kpi_active_dsrs: 'DSRs Activos', kpi_total_pipeline: 'Pipeline Total', kpi_commit_arr: 'Commit ARR',
     kpi_pct_qualified: '% Calificados', kpi_avg_score: 'Avg PS Score',
@@ -4272,7 +4272,7 @@ const i18n = {
     opt_all: 'Todos', opt_all_sssms: 'Todos os SSSMs', opt_all_territories: 'Todos os Territórios', opt_all_aps: 'Todos os APs',
     opt_qualified: 'Qualificado', opt_not_qualified: 'Não Qualificado', opt_pending: 'Pendente',
     btn_reset: '↺ Reset', btn_expand_all: '⊞ Expandir tudo', btn_collapse_all: '⊟ Recolher tudo',
-    tab_summary: '📋 Resumo', tab_sssm_view: '👤 Visão SSSM', tab_sssm_coverage: '👥 Cobertura SSSM',
+    tab_summary: '📋 Resumo', tab_sssm_view: '👤 Visão SSSM', tab_sssm_coverage: '👥 Carga',
     tab_funnel: '🔻 Funil', tab_ai: '🤖 AI Readiness', tab_risk: '🚨 Risk Radar', tab_detail: '📄 Detalhe DSR',
     kpi_active_dsrs: 'DSRs Ativos', kpi_total_pipeline: 'Pipeline Total', kpi_commit_arr: 'Commit ARR',
     kpi_pct_qualified: '% Qualificados', kpi_avg_score: 'Avg PS Score',
@@ -4355,6 +4355,14 @@ function resetSSSmFilters() {
 }
 
 // ── DSR Detail local filters ───────────────────────────
+function selectSSSM(name) {
+  const sel = document.getElementById('sssmF');
+  if (sel) sel.value = name;
+  const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => (b.getAttribute('onclick')||'').includes("'tsssm'"));
+  if (btn) showTab('tsssm', btn);
+  setTimeout(() => applySSSmFilters(), 100);
+}
+
 function resetDetailFilters() {
   const s = document.getElementById('dSSSM');
   const a = document.getElementById('dAP');
@@ -4617,7 +4625,7 @@ function renderTab2() {
     const warn = m.total > 15;
     const rowStyle = overload ? 'color:#C23934;font-weight:600;' : warn ? 'color:#C56200;font-weight:600;' : '';
     return `<tr class="table-row">
-      <td style="${rowStyle}">${name}${warn?' ⚠️':''}</td>
+      <td style="${rowStyle};cursor:pointer;text-decoration:underline;color:${overload?'#C23934':warn?'#C56200':'#0176D3'};" onclick="selectSSSM('${name}')" title="Ver detalle · ${name}">${name}${warn?' ⚠️':''}</td>
       <td class="text-right font-bold" style="${rowStyle}">${m.total}</td>
       <td class="text-right">${fmt$(m.arr)}</td>
       <td class="text-right" style="color:#04844B;">${m.working}</td>
@@ -4805,7 +4813,7 @@ function renderTab6() {
     return `<tr class="table-row">
       <td class="px-2 text-center">${heatBadge(hs)}</td>
       <td class="px-2"><a href="${link}" target="_blank" class="opp-link font-mono text-xs">${d.dsr}</a></td>
-      <td class="px-2 whitespace-nowrap" style="color:#706E6B;font-size:0.72rem;">${d.sssm.split(' ')[0]}</td>
+      <td class="px-2 whitespace-nowrap" style="color:#0176D3;font-size:0.72rem;cursor:pointer;text-decoration:underline;" onclick="selectSSSM('${d.sssm}')" title="${d.sssm}">${d.sssm.split(' ')[0]}</td>
       <td class="px-2 max-w-xs truncate" title="${d.account}">${d.account}</td>
       <td class="px-2" title="${d.oppName}"><a href="${link}" target="_blank" class="opp-link" style="font-size:0.72rem;">${oppNameShort}</a></td>
       <td class="px-2 text-center font-mono" style="color:#706E6B;font-size:0.72rem;">${d.country||'--'}</td>
