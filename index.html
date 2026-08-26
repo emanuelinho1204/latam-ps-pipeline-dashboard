@@ -5227,9 +5227,9 @@ function renderSSSmGroupedView(data) {
       const stageTotal = stageRows.length;
       const stageArr = stageRows.reduce((a, d) => a + d.amount, 0);
 
-      const statusHtml = Object.keys(statuses).sort().map(status => {
+      const stageTbodyRows = Object.keys(statuses).sort().map(status => {
         const rows = statuses[status];
-        const rowsHtml = rows.map(d => {
+        const dataRows = rows.map(d => {
           const q = QUALI_MAP[d.dsr];
           const hs = heatScore(d, q);
           const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
@@ -5240,35 +5240,30 @@ function renderSSSmGroupedView(data) {
             <td>${heatBadge(hs)}</td>
             <td><a href="${link}" target="_blank" class="opp-link font-mono" style="font-size:0.72rem;">${d.dsr}</a></td>
             <td class="text-center">${estCellV}</td>
-            <td title="${d.oppName}"><a href="${link}" target="_blank" class="opp-link" style="font-size:0.72rem;">${oppShort}</a></td>
-            <td>${d.account}</td>
+            <td class="truncate" title="${d.oppName}"><a href="${link}" target="_blank" class="opp-link" style="font-size:0.72rem;">${oppShort}</a></td>
+            <td class="truncate">${d.account}</td>
             <td style="color:#706E6B;font-size:0.72rem;">${d.country||'--'}</td>
             <td class="text-right font-semibold">${fmt$(d.amount)}</td>
             <td>${forecastBadge(d.forecast)}</td>
+            <td class="text-center">${mgrJudgeBadge(d.mgrJudgement)}</td>
             <td style="color:#706E6B;font-size:0.72rem;">${d.closeDate}</td>
-            <td style="color:#706E6B;font-size:0.72rem;" class="max-w-xs truncate" title="${d.ap||''}">${d.ap||'--'}</td>
+            <td class="truncate" style="color:#706E6B;font-size:0.72rem;" title="${d.ap||''}">${d.ap||'--'}</td>
             <td>${deliveryBadge(q?.deliveryModel)}</td>
             <td class="text-right" style="color:#032D60;font-weight:600;">${q?.score||'--'}</td>
           </tr>`;
         }).join('');
-        return `<tr><td colspan="12" style="padding:4px 0 2px 0;">
+        return `<tr><td colspan="13" style="padding:4px 0 0 0;">
           <span class="status-label">${status}</span>
           <span style="color:#706E6B;font-size:0.72rem;margin-left:8px;">(${rows.length})</span>
-        </td></tr>${rowsHtml}`;
+        </td></tr>${dataRows}`;
       }).join('');
 
-      return `<div class="stage-group-header">
-        <span>${st}</span>
-        <span style="color:#706E6B;font-size:0.75rem;margin-left:8px;">${stageTotal} DSRs · ${fmt$(stageArr)}</span>
-      </div>
-      <table class="inner-table w-full" style="font-size:0.78rem;">
-        <thead><tr>
-          <th>Heat</th><th>DSR</th><th>Est.</th><th>Oportunidad</th><th>Cuenta</th>
-          <th>País</th><th class="text-right">Monto</th><th>Forecast</th>
-          <th>Cierre</th><th>Account Partner</th><th>Delivery</th><th class="text-right">Score</th>
-        </tr></thead>
-        <tbody>${statusHtml}</tbody>
-      </table>`;
+      return `<tr><td colspan="13" style="padding:0;">
+        <div class="stage-group-header" style="margin:0;border-radius:0;">
+          <span>${st}</span>
+          <span style="color:#706E6B;font-size:0.75rem;margin-left:8px;">${stageTotal} DSRs · ${fmt$(stageArr)}</span>
+        </div>
+      </td></tr>${stageTbodyRows}`;
     }).join('');
 
     return `<div class="sssm-group card-panel mb-4">
@@ -5277,7 +5272,20 @@ function renderSSSmGroupedView(data) {
         <span style="font-size:0.8rem;font-weight:400;">${sssmTotal} DSRs · ${fmt$(sssmArr)}</span>
       </div>
       <div class="sssm-group-body" style="padding:0 1rem 1rem;">
-        ${stageHtml}
+        <table class="inner-table w-full" style="font-size:0.78rem;table-layout:fixed;">
+          <colgroup>
+            <col style="width:38px"><col style="width:88px"><col style="width:32px">
+            <col style="width:22%"><col style="width:14%"><col style="width:34px">
+            <col style="width:68px"><col style="width:80px"><col style="width:50px">
+            <col style="width:78px"><col style="width:13%"><col style="width:90px"><col style="width:38px">
+          </colgroup>
+          <thead><tr>
+            <th>Heat</th><th>DSR</th><th>Est.</th><th>Oportunidad</th><th>Cuenta</th>
+            <th>País</th><th class="text-right">Monto</th><th>Forecast</th><th>Mgr</th>
+            <th>Cierre</th><th>Account Partner</th><th>Delivery</th><th class="text-right">Score</th>
+          </tr></thead>
+          <tbody>${stageHtml}</tbody>
+        </table>
       </div>
     </div>`;
   }).join('');
