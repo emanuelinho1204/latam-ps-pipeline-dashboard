@@ -4971,8 +4971,8 @@ function renderTab1() {
   document.getElementById('top5Body').innerHTML = sorted.map(d => {
     const q = QUALI_MAP[d.dsr];
     const hs = heatScore(d,q);
-    const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
-    const dsrLink = d.dsrId ? `https://org62.my.salesforce.com/${d.dsrId}` : '#';
+    const link = d.oppId ? `https://org62.lightning.force.com/lightning/r/Opportunity/${d.oppId}/view` : '#';
+    const dsrLink = d.dsrId ? `https://org62.lightning.force.com/lightning/r/Deal_Support_Request__c/${d.dsrId}/view` : '#';
     return `<tr class="table-row">
       <td><a href="${dsrLink}" target="_blank" class="opp-link font-mono text-xs">${d.dsr}</a></td>
       <td>${d.account}</td>
@@ -5104,8 +5104,8 @@ function renderTab4() {
   const top10 = qualified.sort((a,b) => (QUALI_MAP[b.dsr]?.score||0)-(QUALI_MAP[a.dsr]?.score||0)).slice(0,10);
   document.getElementById('aiTop10Body').innerHTML = top10.map(d => {
     const q = QUALI_MAP[d.dsr];
-    const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
-    const dsrLink = d.dsrId ? `https://org62.my.salesforce.com/${d.dsrId}` : '#';
+    const link = d.oppId ? `https://org62.lightning.force.com/lightning/r/Opportunity/${d.oppId}/view` : '#';
+    const dsrLink = d.dsrId ? `https://org62.lightning.force.com/lightning/r/Deal_Support_Request__c/${d.dsrId}/view` : '#';
     return `<tr class="table-row">
       <td style="color:#0176D3;" class="font-mono text-xs"><a href="${dsrLink}" target="_blank" class="opp-link">${d.dsr}</a></td>
       <td style="color:#706E6B;">${d.sssm.split(' ')[0]}</td>
@@ -5226,13 +5226,13 @@ function renderTab6() {
   document.getElementById('detailBody').innerHTML = pageData.map(d => {
     const q = d._quali;
     const hs = d._heat;
-    const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
-    const dsrLink = d.dsrId ? `https://org62.my.salesforce.com/${d.dsrId}` : '#';
+    const link = d.oppId ? `https://org62.lightning.force.com/lightning/r/Opportunity/${d.oppId}/view` : '#';
+    const dsrLink = d.dsrId ? `https://org62.lightning.force.com/lightning/r/Deal_Support_Request__c/${d.dsrId}/view` : '#';
     const qualBadge = !q ? '<span style="color:#706E6B;">Pendiente</span>' : q.qualified==='YES' ? '<span style="color:#04844B;">✅ Sí</span>' : '<span style="color:#C23934;">❌ No</span>';
     const copyText = `DSR: ${d.dsr} | ${d.account} | ${d.oppName} | ${d.country} | ${fmt$(d.amount)} | ${d.stage} | ${d.status} | AP: ${d.ap||''} | Tipo: ${d.requestTypeDetail||''} | Score: ${q?.score||'N/A'} | ${q?.deliveryModel||'Pendiente'}`;
     const oppNameShort = d.oppName && d.oppName.length > 40 ? d.oppName.substring(0,40)+'…' : (d.oppName||'--');
     const est = d.oppId ? ESTIMATE_MAP[d.oppId] : null;
-    const estCell = est ? `<a href="https://org62.my.salesforce.com/${est.id}" target="_blank" title="${est.name}" class="opp-link" style="font-size:0.72rem;">📋</a>` : '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
+    const estCell = est ? `<a href="https://org62.lightning.force.com/lightning/r/ffscpq__Estimate__c/${est.id}/view" target="_blank" title="${est.name}" class="opp-link" style="font-size:0.72rem;">📋</a>` : '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
     return `<tr class="table-row">
       <td class="px-2 text-center">${heatBadge(hs)}</td>
       <td class="px-2"><a href="${dsrLink}" target="_blank" class="opp-link font-mono text-xs">${d.dsr}</a></td>
@@ -5390,11 +5390,11 @@ function renderSSSmGroupedView(data) {
         rows.forEach(d => {
           const q = QUALI_MAP[d.dsr];
           const hs = heatScore(d, q);
-          const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
-          const dsrLink = d.dsrId ? `https://org62.my.salesforce.com/${d.dsrId}` : '#';
+          const link = d.oppId ? `https://org62.lightning.force.com/lightning/r/Opportunity/${d.oppId}/view` : '#';
+          const dsrLink = d.dsrId ? `https://org62.lightning.force.com/lightning/r/Deal_Support_Request__c/${d.dsrId}/view` : '#';
           const oppShort = d.oppName && d.oppName.length > 50 ? d.oppName.substring(0,50)+'…' : (d.oppName||'--');
           const estV = d.oppId ? ESTIMATE_MAP[d.oppId] : null;
-          const estCellV = estV ? `<a href="https://org62.my.salesforce.com/${estV.id}" target="_blank" title="${estV.name}" class="opp-link" style="font-size:0.72rem;">📋</a>` : '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
+          const estCellV = estV ? `<a href="https://org62.lightning.force.com/lightning/r/ffscpq__Estimate__c/${estV.id}/view" target="_blank" title="${estV.name}" class="opp-link" style="font-size:0.72rem;">📋</a>` : '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
           tbodyHtml += `<tr class="inner-row">
             <td>${heatBadge(hs)}</td>
             <td><a href="${dsrLink}" target="_blank" class="opp-link font-mono" style="font-size:0.72rem;">${d.dsr}</a></td>
