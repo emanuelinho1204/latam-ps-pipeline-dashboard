@@ -330,6 +330,30 @@
     <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>DSR</th><th>SSSM</th><th>Cuenta</th><th class="text-right">Score</th><th>Delivery Model</th><th>Offering</th></tr></thead><tbody id="aiTop10Body"></tbody></table></div>
   </div>
   <div id="aiNote" class="text-xs italic" style="color:#706E6B;"></div>
+  <!-- AI TOOL IMPACT SECTION -->
+  <div class="card-panel mt-6 mb-4">
+    <h3 class="text-sm font-semibold mb-4" style="color:#032D60;">🛠️ PS Tool Adoption &amp; AI Impact</h3>
+    <div class="grid grid-cols-3 gap-4 mb-5">
+      <div style="text-align:center;padding:0.75rem;background:#F8FAFC;border-radius:0.5rem;border:1px solid #DDDBDA;">
+        <div class="text-xs mb-1" style="color:#706E6B;">Deals con AI Tools</div>
+        <div id="aiTool1" class="text-2xl font-bold" style="color:#0176D3;">--</div>
+      </div>
+      <div style="text-align:center;padding:0.75rem;background:#F8FAFC;border-radius:0.5rem;border:1px solid #DDDBDA;">
+        <div class="text-xs mb-1" style="color:#706E6B;">Horas Ahorradas</div>
+        <div id="aiTool2" class="text-2xl font-bold" style="color:#04844B;">--</div>
+      </div>
+      <div style="text-align:center;padding:0.75rem;background:#F8FAFC;border-radius:0.5rem;border:1px solid #DDDBDA;">
+        <div class="text-xs mb-1" style="color:#706E6B;">$ Optimizado</div>
+        <div id="aiTool3" class="text-2xl font-bold" style="color:#7B5EA7;">--</div>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr><th>Herramienta</th><th class="text-right">Deals</th><th class="text-right">Horas</th><th class="text-right">% Opt. Prom.</th><th class="text-right">$ Ahorrado</th></tr></thead>
+        <tbody id="aiToolBody"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <!-- TAB 5: RISK RADAR -->
@@ -5068,6 +5092,38 @@ function renderTab4() {
     </tr>`;
   }).join('');
   document.getElementById('aiNote').textContent = `Solo muestra ${qualified.length} oportunidades calificadas de ${filtered.length} totales filtradas.`;
+
+  // AI Tool Impact
+  const aiDeals = filtered.filter(d => {
+    const q = QUALI_MAP[d.dsr];
+    return q && q.psTools && q.psTools !== 'None' && q.psTools !== '';
+  });
+  const toolMap = {};
+  aiDeals.forEach(d => {
+    const q = QUALI_MAP[d.dsr];
+    (q.psTools||'').split(',').map(t=>t.trim()).filter(Boolean).forEach(tool => {
+      if (!toolMap[tool]) toolMap[tool] = {deals:0, hours:0, dollars:0, pctSum:0};
+      toolMap[tool].deals++;
+      toolMap[tool].hours += Number(q.hoursSaved)||0;
+      toolMap[tool].dollars += Number(q.dollarSaved)||0;
+      toolMap[tool].pctSum += Number(q.pctOptimization)||0;
+    });
+  });
+  const totalHours = aiDeals.reduce((s,d) => s+(Number(QUALI_MAP[d.dsr]?.hoursSaved)||0), 0);
+  const totalDollars = aiDeals.reduce((s,d) => s+(Number(QUALI_MAP[d.dsr]?.dollarSaved)||0), 0);
+  document.getElementById('aiTool1').textContent = aiDeals.length;
+  document.getElementById('aiTool2').textContent = totalHours ? totalHours+'h' : '--';
+  document.getElementById('aiTool3').textContent = totalDollars ? fmt$(totalDollars) : '--';
+  const toolsSorted = Object.entries(toolMap).sort((a,b)=>b[1].deals-a[1].deals);
+  document.getElementById('aiToolBody').innerHTML = toolsSorted.length
+    ? toolsSorted.map(([tool, t]) => `<tr class="table-row">
+        <td class="font-medium">${tool}</td>
+        <td class="text-right">${t.deals}</td>
+        <td class="text-right">${t.hours ? t.hours+'h' : '--'}</td>
+        <td class="text-right">${t.deals ? Math.round(t.pctSum/t.deals)+'%' : '--'}</td>
+        <td class="text-right" style="color:#7B5EA7;font-weight:600;">${t.dollars ? fmt$(t.dollars) : '--'}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="5" class="text-center py-3" style="color:#706E6B;">Sin datos de herramientas — se capturan en Skill 3 Phase 4C</td></tr>';
 }
 
 function renderTab5() {
