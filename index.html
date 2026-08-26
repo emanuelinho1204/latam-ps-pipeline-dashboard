@@ -1,0 +1,4752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LATAM PS Pipeline Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  body { background-color: #F3F3F3; color: #032D60; font-family: 'Salesforce Sans', 'Inter', system-ui, sans-serif; }
+  .tab-btn { transition: all 0.2s; border-bottom: 2px solid transparent; color: #706E6B; }
+  .tab-btn.active { border-bottom-color: #0176D3; color: #0176D3; font-weight: 600; }
+  .tab-btn:hover { color: #0176D3; }
+  .kpi-card { background: #FFFFFF; border: 1px solid #DDDBDA; border-radius: 0.75rem; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .table-row:hover { background: #EAF5FE; }
+  select, input[type=date], input[type=number] { background: #FFFFFF; border: 1px solid #DDDBDA; color: #032D60; border-radius: 0.375rem; padding: 0.375rem 0.625rem; font-size: 0.875rem; }
+  select:focus, input:focus { outline: none; border-color: #0176D3; box-shadow: 0 0 0 2px #EAF5FE; }
+  .alert-chip { border-radius: 9999px; padding: 0.25rem 0.75rem; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.5rem; border: 1px solid transparent; }
+  .heat-high { background: #EFFFEE; color: #04844B; border: 1px solid rgba(4,132,75,0.2); }
+  .heat-mid { background: #FFF3E0; color: #C56200; border: 1px solid rgba(197,98,0,0.2); }
+  .heat-low { background: #FEEFEE; color: #C23934; border: 1px solid rgba(194,57,52,0.2); }
+  .sort-btn { cursor: pointer; user-select: none; color: #0176D3; }
+  .sort-btn:hover { color: #014486; }
+  .chart-container { position: relative; height: 260px; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #F3F3F3; }
+  ::-webkit-scrollbar-thumb { background: #DDDBDA; border-radius: 3px; }
+  table { border-collapse: collapse; }
+  th { background: #F3F3F3; color: #706E6B; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #DDDBDA; padding: 0.625rem 0.75rem; text-align: left; }
+  td { border-bottom: 1px solid #F3F3F3; padding: 0.5rem 0.75rem; font-size: 0.875rem; color: #3E3E3C; }
+  a.opp-link { color: #0176D3; text-decoration: none; font-weight: 500; }
+  a.opp-link:hover { text-decoration: underline; }
+  .badge-commit { background: #EAF5FE; color: #0176D3; border-radius: 4px; padding: 1px 6px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .badge-bestcase { background: #FFF3E0; color: #C56200; border-radius: 4px; padding: 1px 6px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .badge-pipeline { background: #F3F3F3; color: #706E6B; border-radius: 4px; padding: 1px 6px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .badge-working { background: #EFFFEE; color: #04844B; border-radius: 4px; padding: 1px 6px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .badge-onhold { background: #FEEFEE; color: #C23934; border-radius: 4px; padding: 1px 6px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .badge-inqueue { background: #F3F3F3; color: #706E6B; border-radius: 4px; padding: 1px 6px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .badge-ainative { background: #EFFFEE; color: #04844B; border-radius: 4px; padding: 1px 6px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .badge-aiaugmented { background: #FFF3E0; color: #C56200; border-radius: 4px; padding: 1px 6px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .badge-notqualified { background: #FEEFEE; color: #C23934; border-radius: 4px; padding: 1px 6px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .badge-pending { background: #F3F3F3; color: #706E6B; border-radius: 4px; padding: 1px 6px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+  .sssm-group-header { background: #032D60; color: #FFFFFF; font-weight: 700; padding: 0.625rem 1rem; font-size: 0.9rem; border-radius: 0.5rem 0.5rem 0 0; }
+  .stage-group-header { background: #EAF5FE; color: #0176D3; font-weight: 600; padding: 0.375rem 1rem; font-size: 0.8rem; border-left: 3px solid #0176D3; }
+  .status-label { font-size: 0.75rem; font-weight: 600; color: #706E6B; padding: 0.375rem 1rem 0.25rem; background: #FAFAFA; }
+  .card-panel { background: #FFFFFF; border: 1px solid #DDDBDA; border-radius: 0.75rem; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .sssm-group { border: 1px solid #DDDBDA; border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.25rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .sssm-group-body { background: #FFFFFF; }
+  .stage-section { border-bottom: 1px solid #F3F3F3; }
+  .stage-section:last-child { border-bottom: none; }
+  .inner-table th { background: #FAFAFA; font-size: 0.7rem; padding: 0.375rem 0.625rem; border-bottom: 1px solid #DDDBDA; text-transform: uppercase; letter-spacing: 0.04em; color: #706E6B; }
+  .inner-table td { font-size: 0.8rem; padding: 0.375rem 0.625rem; border-bottom: 1px solid #F3F3F3; color: #3E3E3C; }
+  .inner-table tr:last-child td { border-bottom: none; }
+  .inner-row:hover { background: #EAF5FE; }
+  .inner-row td { padding: 0.3rem 0.625rem; }
+  .sssm-group-header { display: flex; justify-content: space-between; align-items: center; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- HEADER -->
+<div class="border-b border-[#DDDBDA] px-6 py-4 flex items-center justify-between" style="background:#032D60;">
+  <div class="flex items-center gap-3">
+    <svg width="36" height="25" viewBox="0 0 36 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 2.5a6.5 6.5 0 0 1 4.6 1.9 9.1 9.1 0 0 1 4.5-1 9.2 9.2 0 0 1 8.8 12 6.5 6.5 0 0 1-1.3 12.8H7.3a7.3 7.3 0 0 1-1-14.5A7.9 7.9 0 0 1 15 2.5z" fill="#FFFFFF"/>
+    </svg>
+    <div>
+      <h1 class="text-xl font-bold text-white">LATAM PS Pipeline Dashboard</h1>
+      <p class="text-sm mt-0.5" style="color:#A8C8E8;">Professional Services SSSM Team &middot; Generado: <span id="genDate"></span></p>
+    </div>
+  </div>
+  <button onclick="refreshAlert()" class="text-sm font-medium px-4 py-2 rounded-lg transition-colors border border-white text-white hover:bg-white" style="hover:color:#032D60;" onmouseover="this.style.color='#032D60'" onmouseout="this.style.color='white'">
+    🔄 Actualizar datos
+  </button>
+</div>
+
+<!-- FILTER BAR -->
+<div class="bg-white border-b border-[#DDDBDA] px-6 py-3 shadow-sm">
+  <div class="flex flex-wrap gap-3 items-end">
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">SSSM</label>
+      <select id="fSSSM" onchange="applyFilters()" class="min-w-32">
+        <option value="">Todos</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Stage</label>
+      <select id="fStage" onchange="applyFilters()" class="min-w-36">
+        <option value="">Todos</option>
+        <option>01 - Discovery</option>
+        <option>02 - Scoping</option>
+        <option>03 - Initial Proposal</option>
+        <option>04 - Active Negotiation</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Forecast</label>
+      <select id="fForecast" onchange="applyFilters()">
+        <option value="">Todos</option>
+        <option>Commit</option>
+        <option>Best Case</option>
+        <option>Pipeline</option>
+        <option>Omitted</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Status</label>
+      <select id="fStatus" onchange="applyFilters()">
+        <option value="">Todos</option>
+        <option>Working</option>
+        <option>On Hold</option>
+        <option>In Queue</option>
+        <option>Waiting on Requestor</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Cierre Desde</label>
+      <input type="date" id="fDateFrom" onchange="applyFilters()">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Cierre Hasta</label>
+      <input type="date" id="fDateTo" onchange="applyFilters()">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Monto Mín ($K)</label>
+      <input type="number" id="fAmtMin" onchange="applyFilters()" placeholder="0" style="width:80px">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Monto Máx ($M)</label>
+      <input type="number" id="fAmtMax" onchange="applyFilters()" placeholder="30" style="width:80px">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Calificación</label>
+      <select id="fQual" onchange="applyFilters()">
+        <option value="">Todos</option>
+        <option value="qualified">Calificado</option>
+        <option value="not_qualified">No Calificado</option>
+        <option value="pending">Pendiente</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Delivery Model</label>
+      <select id="fDelivery" onchange="applyFilters()" class="min-w-36">
+        <option value="">Todos</option>
+        <option>AI-Native Agentic</option>
+        <option>AI-Augmented</option>
+        <option>Traditional</option>
+        <option>Not Qualified</option>
+        <option value="pending_dm">Pendiente</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">País</label>
+      <select id="fCountry" onchange="applyFilters()">
+        <option value="">Todos</option>
+      </select>
+    </div>
+    <div class="flex items-end">
+      <button onclick="resetFilters()" class="text-sm px-3 py-1.5 rounded transition-colors border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]">↺ Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- ALERT BAR -->
+<div id="alertBar" class="px-6 py-2 bg-white border-b border-[#DDDBDA] min-h-10"></div>
+
+<!-- TABS -->
+<div class="bg-white border-b border-[#DDDBDA] px-6 shadow-sm">
+  <div class="flex gap-0 overflow-x-auto">
+    <button class="tab-btn active px-5 py-3 text-sm font-medium" onclick="showTab('t1',this)">📋 Resumen</button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('tsssm',this)">👤 Vista SSSM</button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t2',this)">👥 Cobertura SSSM</button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t3',this)">🔻 Funnel</button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t4',this)">🤖 AI Readiness</button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t5',this)">🚨 Risk Radar</button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t6',this)">📄 Detalle DSR</button>
+  </div>
+</div>
+
+<!-- TAB CONTENTS -->
+<div class="p-6">
+
+<!-- TAB 1: EXECUTIVE SUMMARY -->
+<div id="t1" class="tab-content">
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">DSRs Activos</div><div id="k1" class="text-2xl font-bold" style="color:#032D60;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">Pipeline Total</div><div id="k2" class="text-2xl font-bold" style="color:#0176D3;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">Commit ARR</div><div id="k3" class="text-2xl font-bold" style="color:#04844B;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">% Calificados</div><div id="k4" class="text-2xl font-bold" style="color:#C56200;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">Avg PS Score</div><div id="k5" class="text-2xl font-bold" style="color:#7B5EA7;"></div></div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Forecast Category</h3><div class="chart-container"><canvas id="chartForecast"></canvas></div></div>
+    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Delivery Model</h3><div class="chart-container"><canvas id="chartDelivery"></canvas></div></div>
+    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">DSRs por Stage</h3><div class="chart-container"><canvas id="chartStage"></canvas></div></div>
+  </div>
+  <div class="card-panel">
+    <h3 class="text-sm font-semibold mb-3" style="color:#032D60;">🏆 Top 5 Oportunidades por Monto</h3>
+    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>DSR</th><th>Cuenta</th><th>Oportunidad</th><th>SSSM</th><th class="text-right">Monto</th><th>Stage</th><th>Forecast</th><th class="text-center">Heat</th></tr></thead><tbody id="top5Body"></tbody></table></div>
+  </div>
+  <div class="mt-4 text-xs italic" style="color:#706E6B;">📅 Comparativa semanal disponible en la próxima actualización.</div>
+</div>
+
+<!-- TAB: VISTA SSSM (grouped) -->
+<div id="tsssm" class="tab-content hidden">
+  <div class="flex items-center justify-between mb-4">
+    <p class="text-sm" style="color:#706E6B;">Vista agrupada por SSSM → Stage → Status · igual al reporte org62</p>
+    <div class="flex gap-2">
+      <button onclick="toggleAllGroups(true)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#0176D3] hover:bg-[#EAF5FE]">⊞ Expandir todo</button>
+      <button onclick="toggleAllGroups(false)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#706E6B] hover:bg-[#F3F3F3]">⊟ Colapsar todo</button>
+    </div>
+  </div>
+  <div id="sssmGroupedContainer"></div>
+</div>
+
+<!-- TAB 2: SSSM COVERAGE -->
+<div id="t2" class="tab-content hidden">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">DSRs por SSSM</h3><div class="chart-container"><canvas id="chartSSSM"></canvas></div></div>
+    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">ARR por SSSM ($M)</h3><div class="chart-container"><canvas id="chartSSSMArr"></canvas></div></div>
+  </div>
+  <div class="card-panel">
+    <div class="overflow-x-auto">
+    <table class="w-full text-sm"><thead><tr>
+      <th>SSSM</th>
+      <th class="text-right">Total</th>
+      <th class="text-right">ARR ($M)</th>
+      <th class="text-right">Working</th>
+      <th class="text-right">On Hold</th>
+      <th class="text-right">In Queue</th>
+      <th class="text-right">Calificados</th>
+      <th class="text-right">Avg Score</th>
+      <th class="text-right">AI-Native</th>
+      <th class="text-right">AI-Aug</th>
+    </tr></thead><tbody id="sssmBody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: PIPELINE FUNNEL -->
+<div id="t3" class="tab-content hidden">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">DSRs y ARR por Stage</h3><div class="chart-container"><canvas id="chartFunnel"></canvas></div></div>
+    <div class="card-panel">
+      <h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Stage × Forecast</h3>
+      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>Stage</th><th class="text-right">Commit</th><th class="text-right">Best Case</th><th class="text-right">Pipeline</th><th class="text-right">Total</th></tr></thead><tbody id="stageForecastBody"></tbody></table></div>
+    </div>
+  </div>
+  <div class="card-panel">
+    <h3 class="text-sm font-semibold mb-3" style="color:#032D60;">📅 Cierre por Mes</h3>
+    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>Mes</th><th class="text-right">DSRs</th><th class="text-right">ARR ($M)</th><th class="text-right">Commit ($M)</th></tr></thead><tbody id="closeMonthBody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- TAB 4: AI READINESS -->
+<div id="t4" class="tab-content hidden">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">AI-Native Agentic</div><div id="aiK1" class="text-2xl font-bold" style="color:#04844B;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">AI-Augmented</div><div id="aiK2" class="text-2xl font-bold" style="color:#C56200;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">Not Qualified</div><div id="aiK3" class="text-2xl font-bold" style="color:#C23934;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">Avg PS Score</div><div id="aiK4" class="text-2xl font-bold" style="color:#7B5EA7;"></div></div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Delivery Model Distribution</h3><div class="chart-container"><canvas id="chartAIDelivery"></canvas></div></div>
+    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Top Offerings</h3><div class="chart-container"><canvas id="chartOffering"></canvas></div></div>
+  </div>
+  <div class="card-panel mb-4">
+    <h3 class="text-sm font-semibold mb-3" style="color:#032D60;">🏆 Top 10 — PS Score más Alto</h3>
+    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>DSR</th><th>SSSM</th><th>Cuenta</th><th class="text-right">Score</th><th>Delivery Model</th><th>Offering</th></tr></thead><tbody id="aiTop10Body"></tbody></table></div>
+  </div>
+  <div id="aiNote" class="text-xs italic" style="color:#706E6B;"></div>
+</div>
+
+<!-- TAB 5: RISK RADAR -->
+<div id="t5" class="tab-content hidden">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div class="card-panel">
+      <h3 class="text-base font-semibold mb-3" style="color:#C23934;">⚡ Cierre Inminente (&lt;14 días)</h3>
+      <div id="imminentCards" class="space-y-2"></div>
+    </div>
+    <div class="card-panel">
+      <h3 class="text-base font-semibold mb-3" style="color:#C56200;">💰 Alto Valor Sin Calificar (&gt;$500K)</h3>
+      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>DSR</th><th>Cuenta</th><th class="text-right">Monto</th><th>SSSM</th></tr></thead><tbody id="highValueBody"></tbody></table></div>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="card-panel">
+      <h3 class="text-base font-semibold mb-3" style="color:#C56200;">📊 SSSM con Carga Alta (&gt;15 DSRs)</h3>
+      <div id="overloadedSSSM" class="space-y-2"></div>
+    </div>
+    <div class="card-panel">
+      <h3 class="text-base font-semibold mb-3" style="color:#032D60;">🚩 Risk Flags D1–D5 (en calificados)</h3>
+      <table class="w-full text-sm"><thead><tr><th>Flag</th><th class="text-right">✅ YES</th><th class="text-right">❌ NO</th><th class="text-right">% Risk</th></tr></thead><tbody id="riskFlagsBody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 6: DSR DETAIL -->
+<div id="t6" class="tab-content hidden">
+  <div class="flex items-center justify-between mb-4">
+    <div class="text-sm" style="color:#706E6B;">Mostrando <span id="detailCount">0</span> DSRs · Página <span id="curPage">1</span>/<span id="totalPages">1</span></div>
+    <div class="flex gap-2">
+      <button onclick="prevPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]">← Prev</button>
+      <button onclick="nextPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]">Sig →</button>
+    </div>
+  </div>
+  <div class="overflow-x-auto bg-white border border-[#DDDBDA] rounded-xl shadow-sm">
+  <table class="w-full" style="font-size:0.78rem;">
+    <thead><tr>
+      <th class="text-center sort-btn" onclick="sortTable('heat')">Heat ▲▼</th>
+      <th class="sort-btn" onclick="sortTable('dsr')">DSR ▲▼</th>
+      <th class="sort-btn" onclick="sortTable('sssm')">SSSM ▲▼</th>
+      <th class="sort-btn" onclick="sortTable('account')">Cuenta ▲▼</th>
+      <th>Oportunidad</th>
+      <th>País</th>
+      <th class="sort-btn" onclick="sortTable('stage')">Stage ▲▼</th>
+      <th class="text-right sort-btn" onclick="sortTable('amount')">Monto ▲▼</th>
+      <th class="sort-btn" onclick="sortTable('forecast')">Forecast ▲▼</th>
+      <th class="sort-btn" onclick="sortTable('closeDate')">Cierre ▲▼</th>
+      <th class="sort-btn" onclick="sortTable('status')">Status ▲▼</th>
+      <th>Account Partner</th>
+      <th>Tipo</th>
+      <th class="text-right sort-btn" onclick="sortTable('score')">Score ▲▼</th>
+      <th>Delivery</th>
+      <th>Calificado</th>
+      <th>Offering</th>
+      <th>Copiar</th>
+    </tr></thead>
+    <tbody id="detailBody"></tbody>
+  </table>
+  </div>
+</div>
+
+</div><!-- end p-6 -->
+
+<script>
+const DSR_DATA = [
+  {
+    "dsr": "DS-1622733",
+    "sssm": "Aaron Araiza",
+    "oppName": "AVAL (COL) - Agentic Banking Implementation - New Business",
+    "account": "Grupo AVAL",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 2000000,
+    "closeDate": "2026-11-12",
+    "forecast": "Commit",
+    "ap": "Eliana Rueda",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000Jwx3FAAR"
+  },
+  {
+    "dsr": "DS-1730363",
+    "sssm": "Advait Moholé",
+    "oppName": "Bancolombia-COL- Net Zero Cloud RFP-Capacity Comsumption",
+    "account": "Bancolombia S.A.",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-09-25",
+    "forecast": "Pipeline",
+    "ap": "Eliana Rueda",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000hEt2IAAS"
+  },
+  {
+    "dsr": "DS-1643702",
+    "sssm": "Alejandra Acuña",
+    "oppName": "Oriental Bank - Puerto Rico - CTO",
+    "account": "ORIENTAL BANK",
+    "country": "PR",
+    "stage": "02 - Scoping",
+    "amount": 154000,
+    "closeDate": "2026-09-18",
+    "forecast": "Pipeline",
+    "ap": "Eliana Rueda",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000N6WCsAAN"
+  },
+  {
+    "dsr": "DS-1690441",
+    "sssm": "Alejandra Acuña",
+    "oppName": "Rimac PE - New Business - Data Cloud - Prime",
+    "account": "Rimac Seguros",
+    "country": "PE",
+    "stage": "02 - Scoping",
+    "amount": 270000,
+    "closeDate": "2026-11-20",
+    "forecast": "Pipeline",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000Yrgf3AAB"
+  },
+  {
+    "dsr": "DS-1692386",
+    "sssm": "Alejandra Acuña",
+    "oppName": "ITAU (CO) - Salesforce - Fase 2 - Corporate Banking",
+    "account": "Itaú Colombia S.A.",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 400000,
+    "closeDate": "2026-10-22",
+    "forecast": "Best Case",
+    "ap": "Eliana Rueda",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000AplC1AAJ"
+  },
+  {
+    "dsr": "DS-1720878",
+    "sssm": "Alejandra Acuña",
+    "oppName": "Personal Pay - Martech roadmap implementation and Loyalty",
+    "account": "Telecom Argentina S.A.",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 320000,
+    "closeDate": "2026-10-30",
+    "forecast": "Pipeline",
+    "ap": "Juan María Aguirre",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000eauCjAAI"
+  },
+  {
+    "dsr": "DS-1632566",
+    "sssm": "Alejandra Acuña",
+    "oppName": "Movistar - AR - MKT - Martech first MVP",
+    "account": "Telefónica Móviles Argentina S.A.",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 873556,
+    "closeDate": "2027-03-26",
+    "forecast": "Pipeline",
+    "ap": "Juan María Aguirre",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000LqUHFAA3"
+  },
+  {
+    "dsr": "DS-1701806",
+    "sssm": "Alejandra Acuña",
+    "oppName": "Davivienda - CO - RFP",
+    "account": "Banco Davivienda S.A.",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 80000,
+    "closeDate": "2026-09-30",
+    "forecast": "Pipeline",
+    "ap": "Eliana Rueda",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000bLjo2AAC"
+  },
+  {
+    "dsr": "DS-1707289",
+    "sssm": "Alejandra Acuña",
+    "oppName": "Cencosud Argentina S.A. - AR - MKT - Marketing Cloud Next - Data Cloud - MVP",
+    "account": "Cencosud Argentina",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 450000,
+    "closeDate": "2026-10-30",
+    "forecast": "Pipeline",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000bK051AAC"
+  },
+  {
+    "dsr": "DS-1718431",
+    "sssm": "Alejandra Acuña",
+    "oppName": "Telecom Argentina - Loyalty implementation - One Client",
+    "account": "Telecom Argentina S.A.",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 400000,
+    "closeDate": "2026-09-17",
+    "forecast": "Pipeline",
+    "ap": "Juan María Aguirre",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000XIfL4AAL"
+  },
+  {
+    "dsr": "DS-1703886",
+    "sssm": "Alejandra Acuña",
+    "oppName": "FISERV - AR - MKT - Mis Consultas - Marketing for Mastercard Customers -CO",
+    "account": "First Data Cono Sur S.R.L.",
+    "country": "AR",
+    "stage": "03 - Initial Proposal",
+    "amount": 23478,
+    "closeDate": "2027-02-26",
+    "forecast": "Best Case",
+    "ap": "Laura Salazar",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000brBjBAAU"
+  },
+  {
+    "dsr": "DS-1609248",
+    "sssm": "Alejandra Acuña",
+    "oppName": "Banistmo - Centro America - Cuzcatlan",
+    "account": "Banistmo, S.A.",
+    "country": "PA",
+    "stage": "03 - Initial Proposal",
+    "amount": 0,
+    "closeDate": "2026-08-28",
+    "forecast": "Omitted",
+    "ap": "Eliana Rueda",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000AOUOzAAP"
+  },
+  {
+    "dsr": "DS-1622720",
+    "sssm": "Alejandra Acuña",
+    "oppName": "Change order -  Banco Agricola El Salvador - CIBEST - FSC Implementation",
+    "account": "Banco Agricola S.A.",
+    "country": "SV",
+    "stage": "03 - Initial Proposal",
+    "amount": 0,
+    "closeDate": "2026-10-23",
+    "forecast": "Best Case",
+    "ap": "Eliana Rueda",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000HC2AkAAL"
+  },
+  {
+    "dsr": "DS-1462017",
+    "sssm": "Alejandra Acuña",
+    "oppName": "Cencosud Argentina S.A. - AR - MKT - Loyalty Cloud Implementation",
+    "account": "Cencosud Argentina",
+    "country": "AR",
+    "stage": "04 - Active Negotiation",
+    "amount": 590695.18,
+    "closeDate": "2027-01-22",
+    "forecast": "Commit",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "0063y00001B7UmHAAV"
+  },
+  {
+    "dsr": "DS-1653341",
+    "sssm": "Alejandra Acuña",
+    "oppName": "ARI - Falabella - MC - New Business - Migración a Nueva Arquitectura",
+    "account": "Falabella Tecnologia Corporativa SpA",
+    "country": "CL",
+    "stage": "04 - Active Negotiation",
+    "amount": 0,
+    "closeDate": "2026-09-25",
+    "forecast": "Commit",
+    "ap": "Juan María Aguirre",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000PpFGLAA3"
+  },
+  {
+    "dsr": "DS-1716055",
+    "sssm": "Alejandra Acuña",
+    "oppName": "SWE NUTRESA (CO) - AELA/COE Prof Services",
+    "account": "Servicios Nutresa S A S",
+    "country": "CO",
+    "stage": "04 - Active Negotiation",
+    "amount": 0,
+    "closeDate": "2026-12-31",
+    "forecast": "Commit",
+    "ap": "Camilo José Escobar",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000eJnqnAAC"
+  },
+  {
+    "dsr": "DS-1692740",
+    "sssm": "Alejandra Acuña",
+    "oppName": "Mercardo Libre - AR - MC - SWE Wsp and Tableau",
+    "account": "MercadoLibre SRL",
+    "country": "AR",
+    "stage": "04 - Active Negotiation",
+    "amount": 0,
+    "closeDate": "2026-08-31",
+    "forecast": "Commit",
+    "ap": "Juan María Aguirre",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ZMe5tAAD"
+  },
+  {
+    "dsr": "DS-1696697",
+    "sssm": "Amanda Basílio",
+    "oppName": "Zurich - RCA - CSG - SOW",
+    "account": "Zurich Santander Brasil Seguros e Previdência S/A.",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 1000000,
+    "closeDate": "2027-03-26",
+    "forecast": "Pipeline",
+    "ap": "Ricardo de Oliveira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000aC4fpAAC"
+  },
+  {
+    "dsr": "DS-1691101",
+    "sssm": "Amanda Basílio",
+    "oppName": "Prudential - Agentforce - SWE - OF - CSG",
+    "account": "PRUDENTIAL DO BRASIL SEGUROS S.A.",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 0,
+    "closeDate": "2026-04-13",
+    "forecast": "Omitted",
+    "ap": "Ricardo de Oliveira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000YlUGnAAN"
+  },
+  {
+    "dsr": "DS-1696669",
+    "sssm": "Amanda Basílio",
+    "oppName": "Sicredi - Agentforce - SOW - CSG",
+    "account": "Sicredi",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 3000000,
+    "closeDate": "2027-01-29",
+    "forecast": "Pipeline",
+    "ap": "Ricardo de Oliveira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000aBQX8AAO"
+  },
+  {
+    "dsr": "DS-1696678",
+    "sssm": "Amanda Basílio",
+    "oppName": "Crefisa - INFORMATICA - SOW - CSG",
+    "account": "Crefisa",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 3000000,
+    "closeDate": "2027-03-26",
+    "forecast": "Pipeline",
+    "ap": "Ricardo de Oliveira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000aBPT0AAO"
+  },
+  {
+    "dsr": "DS-1696668",
+    "sssm": "Amanda Basílio",
+    "oppName": "Sicredi - CTO - SOW - CSG",
+    "account": "Sicredi",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 800000,
+    "closeDate": "2027-01-29",
+    "forecast": "Pipeline",
+    "ap": "Ricardo de Oliveira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000aBhPtAAK"
+  },
+  {
+    "dsr": "DS-1723911",
+    "sssm": "Amanda Basílio",
+    "oppName": "Core - Crefisa - Televendas - SOW - CSG",
+    "account": "Crefisa",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 1000000,
+    "closeDate": "2026-09-25",
+    "forecast": "Pipeline",
+    "ap": "Ricardo de Oliveira",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000gwOL9AAM"
+  },
+  {
+    "dsr": "DS-1723257",
+    "sssm": "Amanda Basílio",
+    "oppName": "BV - Core e Mulesoft Governance Projects - CSG - SOW",
+    "account": "Banco Votorantim S/A",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 0,
+    "closeDate": "2026-09-25",
+    "forecast": "Best Case",
+    "ap": "Ricardo de Oliveira",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000gmyWNAAY"
+  },
+  {
+    "dsr": "DS-1674929",
+    "sssm": "Amanda Basílio",
+    "oppName": "Prudential - Agentic Enterprise - SOW - CSG",
+    "account": "PRUDENTIAL DO BRASIL SEGUROS S.A.",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 1500000,
+    "closeDate": "2026-09-30",
+    "forecast": "Best Case",
+    "ap": "Ricardo de Oliveira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000VQbrhAAD"
+  },
+  {
+    "dsr": "DS-1674956",
+    "sssm": "Amanda Basílio",
+    "oppName": "Crefisa - Agentic - SOW - CSG",
+    "account": "Crefisa",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 3500000,
+    "closeDate": "2027-01-29",
+    "forecast": "Best Case",
+    "ap": "Ricardo de Oliveira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000VQeMYAA1"
+  },
+  {
+    "dsr": "DS-1569921",
+    "sssm": "Amanda Basílio",
+    "oppName": "Prudential - Agentforce LP - CSG -SOW",
+    "account": "Prudential do Brasil",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 900000,
+    "closeDate": "2027-01-29",
+    "forecast": "Best Case",
+    "ap": "Ricardo de Oliveira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000AQ1M5AAL"
+  },
+  {
+    "dsr": "DS-1705817",
+    "sssm": "Amanda Basílio",
+    "oppName": "Porto Seguro - Core Atendimento Corp - SOW - CSG",
+    "account": "PORTO SEGURO COMPANHIA DE SEGUROS GERAIS",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 4500000,
+    "closeDate": "2026-10-30",
+    "forecast": "Best Case",
+    "ap": "Ricardo de Oliveira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000cNDpuAAG"
+  },
+  {
+    "dsr": "DS-1634840",
+    "sssm": "Amanda Basílio",
+    "oppName": "Prudential - Core Insurance - CSG - SOW",
+    "account": "PRUDENTIAL DO BRASIL SEGUROS S.A.",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 2000000,
+    "closeDate": "2027-03-26",
+    "forecast": "Best Case",
+    "ap": "Ricardo de Oliveira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000MI1fJAAT"
+  },
+  {
+    "dsr": "DS-1634844",
+    "sssm": "Amanda Basílio",
+    "oppName": "SLK - Crefisa - SOW - CSG",
+    "account": "Crefisa",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 1200000,
+    "closeDate": "2027-01-15",
+    "forecast": "Best Case",
+    "ap": "Ricardo de Oliveira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000MI4zlAAD"
+  },
+  {
+    "dsr": "DS-1686435",
+    "sssm": "Amanda Basílio",
+    "oppName": "Serasa - RCA - LATAM BRAZIL - CSG - CTO - SOW",
+    "account": "Serasa RCA",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 1743502.3245,
+    "closeDate": "2026-11-27",
+    "forecast": "Best Case",
+    "ap": "Isac Nudelman",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed000007mRgEAAU"
+  },
+  {
+    "dsr": "DS-1717467",
+    "sssm": "Amanda Basílio",
+    "oppName": "Sicredi - Core ARI - SOW - CSG",
+    "account": "CONFEDERACAO DAS COOPERATIVAS DO SICREDI - CONFEDERACAO SICRED",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 0,
+    "closeDate": "2026-08-28",
+    "forecast": "Best Case",
+    "ap": "Ricardo de Oliveira",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000SeUnFAAV"
+  },
+  {
+    "dsr": "DS-1723917",
+    "sssm": "Amanda Basílio",
+    "oppName": "MS - BV Migracao Gateway - SOW - CSG",
+    "account": "Banco Votorantim S/A",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 1000000,
+    "closeDate": "2026-11-27",
+    "forecast": "Best Case",
+    "ap": "Ricardo de Oliveira",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000gx9GnAAI"
+  },
+  {
+    "dsr": "DS-1722760",
+    "sssm": "Amanda Basílio",
+    "oppName": "MS - MUFG - SOW - CSG",
+    "account": "BANCO MUFG BRASIL",
+    "country": "BR",
+    "stage": "04 - Active Negotiation",
+    "amount": 1835776.97,
+    "closeDate": "2026-08-31",
+    "forecast": "Commit",
+    "ap": "Ricardo de Oliveira",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000gChDtAAK"
+  },
+  {
+    "dsr": "DS-1724121",
+    "sssm": "Amanda Basílio",
+    "oppName": "Core - Lielu - SOW - CSG",
+    "account": "Lielu Turismo",
+    "country": "BR",
+    "stage": "04 - Active Negotiation",
+    "amount": 1656850.11,
+    "closeDate": "2026-09-15",
+    "forecast": "Commit",
+    "ap": "Ricardo de Oliveira",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000gyS9KAAU"
+  },
+  {
+    "dsr": "DS-1720447",
+    "sssm": "Amanda Basílio",
+    "oppName": "Porto Seguro - CTO - SOW -CSG",
+    "account": "PORTO SEGURO COMPANHIA DE SEGUROS GERAIS",
+    "country": "BR",
+    "stage": "04 - Active Negotiation",
+    "amount": 4981435.2,
+    "closeDate": "2026-09-30",
+    "forecast": "Commit",
+    "ap": "Ricardo de Oliveira",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000NSrAcAAL"
+  },
+  {
+    "dsr": "DS-1499115",
+    "sssm": "Christian Salazar",
+    "oppName": "IZZI B2B Bestel y PYMES - Comms Cloud, Marketing Cloud, Agentforce - SOW",
+    "account": "Cablevisión, S.A. de C.V.",
+    "country": "MX",
+    "stage": "01 - Discovery",
+    "amount": 0,
+    "closeDate": "2027-01-31",
+    "forecast": "Pipeline",
+    "ap": "Sarai Morales",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "0063y000019YdhiAAC"
+  },
+  {
+    "dsr": "DS-1692316",
+    "sssm": "Christian Salazar",
+    "oppName": "Tec Monterrey - Agentforce POC (Applicants Agent FAQS and Escalation) - Services SWE 50 KUSD 400 Hours",
+    "account": "Instituto Tecnológico y de Estudios Superiores de Monterrey-RFC:ITE430714KI0",
+    "country": "MX",
+    "stage": "01 - Discovery",
+    "amount": 0,
+    "closeDate": "2027-04-30",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000WKmhBAAT"
+  },
+  {
+    "dsr": "DS-1722712",
+    "sssm": "Christian Salazar",
+    "oppName": "Price Shoes - Agents - SOW",
+    "account": "Grupo Empresarial SJ, S.A de C.V  RFC: GES021031BL9",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 160000,
+    "closeDate": "2026-09-30",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000XLGI5AAP"
+  },
+  {
+    "dsr": "DS-1732312",
+    "sssm": "Christian Salazar",
+    "oppName": "MX - T-Systems - Mulesoft for Sigma Alimentos Mulesoft - SOW",
+    "account": "T-systems Mexico SA de CV",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 250000,
+    "closeDate": "2026-10-31",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000NbWwXAAV"
+  },
+  {
+    "dsr": "DS-1717962",
+    "sssm": "Christian Salazar",
+    "oppName": "MX - Actinver - FSC Lending",
+    "account": "Banco Actinver, S.A., Institución de Banca Múltiple, Grupo Financiero Actinver",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 300000,
+    "closeDate": "2027-01-15",
+    "forecast": "Pipeline",
+    "ap": "Gabriel Arturo Rada",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000fbt7ZAAQ"
+  },
+  {
+    "dsr": "DS-1692297",
+    "sssm": "Christian Salazar",
+    "oppName": "Tec Milenio - Agentforce POC (1 Agent FAQs and Escalation Lead Creation) - Services SWE - 50 KUSD 400 Hours",
+    "account": "ENSEÑANZA E INVESTIGACIÓN SUPERIOR, A.C.",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2027-04-30",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ZGHARAA5"
+  },
+  {
+    "dsr": "DS-1684603",
+    "sssm": "Christian Salazar",
+    "oppName": "SuKarne - Sales, Service, Service Cloud Voice (InConcert substitution) - SOW",
+    "account": "SUKARNE S.A DE C.V",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 160000,
+    "closeDate": "2026-12-18",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000XVreXAAT"
+  },
+  {
+    "dsr": "DS-1720784",
+    "sssm": "Christian Salazar",
+    "oppName": "MX-CBU INTER Plan & Design",
+    "account": "Interopolis, Agente de Seguros y de Fianzas RFC: IAS170307BU6",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 399000,
+    "closeDate": "2026-09-30",
+    "forecast": "Best Case",
+    "ap": "Abelardo Rojas",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000gBDhhAAG"
+  },
+  {
+    "dsr": "DS-1718808",
+    "sssm": "Christian Salazar",
+    "oppName": "Banco Galicia - AR - Core - Implementación CRM",
+    "account": "Banco de Galicia y Buenos Aires S.A.",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 1000000,
+    "closeDate": "2026-12-18",
+    "forecast": "Pipeline",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000fnH3JAAU"
+  },
+  {
+    "dsr": "DS-1715757",
+    "sssm": "Christian Salazar",
+    "oppName": "Colmena COL - ARI + Investment Insurance implementation",
+    "account": "Colmena Seguros Riesgos Laborales S.A",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 300000,
+    "closeDate": "2026-09-25",
+    "forecast": "Commit",
+    "ap": "Eliana Rueda",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000eadv3AAA"
+  },
+  {
+    "dsr": "DS-1714082",
+    "sssm": "Christian Salazar",
+    "oppName": "Metabrands - Grupo Vidanta - Expertise Hours: Mulesoft, Data 360- SOW",
+    "account": "Metabrands",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 50000,
+    "closeDate": "2027-04-30",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000UaJ1FAAV"
+  },
+  {
+    "dsr": "DS-1679024",
+    "sssm": "Christian Salazar",
+    "oppName": "MMM- PR- Migration PNM + Blueprint",
+    "account": "MMM Holdings, LLC (ORG 2)",
+    "country": "PR",
+    "stage": "04 - Active Negotiation",
+    "amount": 525440,
+    "closeDate": "2026-09-30",
+    "forecast": "Commit",
+    "ap": "Eliana Rueda",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000VvkNdAAJ"
+  },
+  {
+    "dsr": "DS-1667053",
+    "sssm": "Christian Salazar",
+    "oppName": "TELMEX - MX - ARI Investment - SOW - Licenses ARI SWE 1200 Hours 150 KUSD",
+    "account": "TELMEX",
+    "country": "MX",
+    "stage": "04 - Active Negotiation",
+    "amount": 0,
+    "closeDate": "2026-08-28",
+    "forecast": "Commit",
+    "ap": "Julián Mesa",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000NZnQQAA1"
+  },
+  {
+    "dsr": "DS-1730318",
+    "sssm": "Diego Alves",
+    "oppName": "Sociedade Educacional - VITRU Change managment - SOW - CSG",
+    "account": "SOCIEDADE EDUCACIONAL LEONARDO DA VINCI LTDA",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 50000,
+    "closeDate": "2027-01-29",
+    "forecast": "Pipeline",
+    "ap": "Isac Nudelman",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000WdygFAAR"
+  },
+  {
+    "dsr": "DS-1728014",
+    "sssm": "Diego Alves",
+    "oppName": "ELO - CSG - Mulesoft",
+    "account": "Elo Serviços S.A.",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 100000,
+    "closeDate": "2026-11-27",
+    "forecast": "Pipeline",
+    "ap": "Isac Nudelman",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hl7QIAAY"
+  },
+  {
+    "dsr": "DS-1731157",
+    "sssm": "Diego Alves",
+    "oppName": "Elo Serviços S.A. - Revenue Cloud Billing - SOW - CSG",
+    "account": "Elo Serviços S.A.",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 10000000,
+    "closeDate": "2026-11-27",
+    "forecast": "Pipeline",
+    "ap": "Isac Nudelman",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000iLiSvAAK"
+  },
+  {
+    "dsr": "DS-1680715",
+    "sssm": "Diego Alves",
+    "oppName": "NEO - ARI investment- CSG",
+    "account": "NEOENERGIA S.A.",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-11-30",
+    "forecast": "Pipeline",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000WeTwxAAF"
+  },
+  {
+    "dsr": "DS-1696622",
+    "sssm": "Diego Alves",
+    "oppName": "Equatorial - B2B Portal - Communities",
+    "account": "Equatorial Serviços S.A.",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 1440333.6,
+    "closeDate": "2026-10-23",
+    "forecast": "Pipeline",
+    "ap": "Gabriela Pedrazzoli",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000aBBzVAAW"
+  },
+  {
+    "dsr": "DS-1707042",
+    "sssm": "Diego Alves",
+    "oppName": "#QL Equatorial - MSGs Receptivas- CTO - Agentforce- CSG",
+    "account": "EQUATORIAL MARANHÃO DISTRIBUIDORA DE ENERGIA S/A",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 8100000,
+    "closeDate": "2026-10-23",
+    "forecast": "Best Case",
+    "ap": "Gabriela Pedrazzoli",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000cTEOJAA4"
+  },
+  {
+    "dsr": "DS-1659101",
+    "sssm": "Diego Alves",
+    "oppName": "Rede D'Or Sao Luiz (Matriz) - ARI Investment - SOW",
+    "account": "Rede D'Or Sao Luiz (Matriz)",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 0,
+    "closeDate": "2026-09-30",
+    "forecast": "Commit",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000QypwjAAB"
+  },
+  {
+    "dsr": "DS-1666556",
+    "sssm": "Diego Alves",
+    "oppName": "Rede D'Or Sao Luiz (Matriz) - ARI Investment - SOW",
+    "account": "Rede D'Or Sao Luiz (Matriz)",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 0,
+    "closeDate": "2026-09-30",
+    "forecast": "Commit",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000QypwjAAB"
+  },
+  {
+    "dsr": "DS-1701183",
+    "sssm": "Diego Alves",
+    "oppName": "Atlas Schindler - CTO - New Business - Sales - CSG",
+    "account": "ATLAS SCHINDLER",
+    "country": "BR",
+    "stage": "04 - Active Negotiation",
+    "amount": 921561.84,
+    "closeDate": "2026-11-30",
+    "forecast": "Commit",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000aiO8MAAU"
+  },
+  {
+    "dsr": "DS-1359037",
+    "sssm": "Diego Castro",
+    "oppName": "Despegar - AR - Core - Sales Cloud MVP",
+    "account": "Despegar.com.ar S.A.",
+    "country": "AR",
+    "stage": "01 - Discovery",
+    "amount": 0,
+    "closeDate": "2027-07-24",
+    "forecast": "Pipeline",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "0063y000018wsHjAAI"
+  },
+  {
+    "dsr": "DS-1719651",
+    "sssm": "Diego Castro",
+    "oppName": "NISSAN-IMPLEMENT-SEGUIMIENTO TEST DRIVE AF",
+    "account": "Nissan Mexicana SA de CV",
+    "country": "MX",
+    "stage": "01 - Discovery",
+    "amount": 180000,
+    "closeDate": "2027-01-27",
+    "forecast": "Pipeline",
+    "ap": "Daniel Isunza",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000d1XUwAAM"
+  },
+  {
+    "dsr": "DS-1683473",
+    "sssm": "Diego Castro",
+    "oppName": "Honda Mexico (Honda Brand) - AES Agentforce, Automotive, Experience, Service -SOW TM",
+    "account": "Honda de Mexico S.A. DE C.V.",
+    "country": "MX",
+    "stage": "01 - Discovery",
+    "amount": 1600000,
+    "closeDate": "2027-04-30",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000Ua5MVAAZ"
+  },
+  {
+    "dsr": "DS-1728288",
+    "sssm": "Diego Castro",
+    "oppName": "NRFM-NISSAN CAPITAL-SEH",
+    "account": "Nissan NRFM",
+    "country": "US",
+    "stage": "02 - Scoping",
+    "amount": 60000,
+    "closeDate": "2026-12-18",
+    "forecast": "Pipeline",
+    "ap": "Daniel Isunza",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hmZ9DAAU"
+  },
+  {
+    "dsr": "DS-1715678",
+    "sssm": "Diego Castro",
+    "oppName": "NISSAN-IMPLEMENT-MC",
+    "account": "Nissan Mexicana SA de CV",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 250000,
+    "closeDate": "2026-11-27",
+    "forecast": "Best Case",
+    "ap": "Daniel Isunza",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000d0FqEAAU"
+  },
+  {
+    "dsr": "DS-1712590",
+    "sssm": "Diego Castro",
+    "oppName": "Dos Pinos - Commerce B2B - ARI - 281K - Plan de Remediación",
+    "account": "Cooperativa de Productores de Leche Dos Pinos R.L.",
+    "country": "CR",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-09-30",
+    "forecast": "Pipeline",
+    "ap": "Camilo José Escobar",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000eBGqTAAW"
+  },
+  {
+    "dsr": "DS-1706019",
+    "sssm": "Diego Castro",
+    "oppName": "HOLCIM - Implement - New Business - RFP CRM LATAM - CSG - SOW",
+    "account": "Holcim Mexico Operaciones",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 800000,
+    "closeDate": "2026-09-25",
+    "forecast": "Pipeline",
+    "ap": "Daniel Isunza",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000cQ6WvAAK"
+  },
+  {
+    "dsr": "DS-1692708",
+    "sssm": "Diego Castro",
+    "oppName": "Clínica Internacional - PE - Core - Atención a Crónicos",
+    "account": "Clínica Internacional S.A.",
+    "country": "PE",
+    "stage": "02 - Scoping",
+    "amount": 300000,
+    "closeDate": "2026-10-30",
+    "forecast": "Pipeline",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ZMSZNAA5"
+  },
+  {
+    "dsr": "DS-1713914",
+    "sssm": "Diego Castro",
+    "oppName": "NISSAN-IMPLEMENT-CASE MANAGEMENT-SERVICE-CAC",
+    "account": "Nissan Mexicana SA de CV",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 600000,
+    "closeDate": "2026-11-27",
+    "forecast": "Best Case",
+    "ap": "Daniel Isunza",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000d1dGzAAI"
+  },
+  {
+    "dsr": "DS-1727137",
+    "sssm": "Diego Castro",
+    "oppName": "Digicel - Jaimaica - RFI - Bid Management",
+    "account": "Digicel Caribbean Limited",
+    "country": "JM",
+    "stage": "02 - Scoping",
+    "amount": 300000,
+    "closeDate": "2026-11-27",
+    "forecast": "Pipeline",
+    "ap": "Camilo José Escobar",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000hcfkYAAQ"
+  },
+  {
+    "dsr": "DS-1693382",
+    "sssm": "Diego Castro",
+    "oppName": "First Bank PR _ ROM Digital Onboarding Implementation",
+    "account": "FIRSTBANK PUERTO RICO",
+    "country": "PR",
+    "stage": "02 - Scoping",
+    "amount": 1500000,
+    "closeDate": "2026-10-28",
+    "forecast": "Pipeline",
+    "ap": "Eliana Rueda",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000ZR5lsAAD"
+  },
+  {
+    "dsr": "DS-1728828",
+    "sssm": "Diego Castro",
+    "oppName": "Personal Pay - AR - BRE - Motor de Reglas de Negocio",
+    "account": "Telecom Argentina S.A.",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 500000,
+    "closeDate": "2026-10-30",
+    "forecast": "Pipeline",
+    "ap": "Juan María Aguirre",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hrg1xAAA"
+  },
+  {
+    "dsr": "DS-1649722",
+    "sssm": "Diego Castro",
+    "oppName": "Telecom Argentina - AR - MKT - Martech B2B MVP 2026",
+    "account": "Telecom Argentina S.A.",
+    "country": "AR",
+    "stage": "03 - Initial Proposal",
+    "amount": 300000,
+    "closeDate": "2026-11-20",
+    "forecast": "Best Case",
+    "ap": "Juan María Aguirre",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000P4MYDAA3"
+  },
+  {
+    "dsr": "DS-1591236",
+    "sssm": "Diego Castro",
+    "oppName": "Directv Argentina - AR - Core - CTO Core B2B",
+    "account": "Directv Argentina S.R.L.",
+    "country": "AR",
+    "stage": "04 - Active Negotiation",
+    "amount": 154224,
+    "closeDate": "2026-10-30",
+    "forecast": "Commit",
+    "ap": "Laura Salazar",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000DRqB7AAL"
+  },
+  {
+    "dsr": "DS-1728001",
+    "sssm": "Diego Castro",
+    "oppName": "Equinox - PE - Core - ARI Implementation",
+    "account": "Equinox International",
+    "country": "PE",
+    "stage": "04 - Active Negotiation",
+    "amount": 0,
+    "closeDate": "2026-08-28",
+    "forecast": "Commit",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hErYMAA0"
+  },
+  {
+    "dsr": "DS-1719602",
+    "sssm": "Diego Castro",
+    "oppName": "Transbank (CL) - Sales - New Business - BI implementation",
+    "account": "Transbank S.A",
+    "country": "CL",
+    "stage": "04 - Active Negotiation",
+    "amount": 0,
+    "closeDate": "2026-08-28",
+    "forecast": "Commit",
+    "ap": "Juan María Aguirre",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000fnc69AAA"
+  },
+  {
+    "dsr": "DS-1690889",
+    "sssm": "Gaston Panizza",
+    "oppName": "Farmacias Benavides - Prime - MVP1 Data Cloud, MVP2 Loyalty - CSG - SOW",
+    "account": "Farmacias Benavides, S.A.B. de C.V.",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 756060,
+    "closeDate": "2027-01-31",
+    "forecast": "Omitted",
+    "ap": "Jorge Salafia",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000XLWczAAH"
+  },
+  {
+    "dsr": "DS-1704146",
+    "sssm": "Igor Barros Lima",
+    "oppName": "ENVASES UNIVERSALES - Implement - New Business -CTO",
+    "account": "Envases Universales De Mexico S.A P.I   De C .V",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 155991,
+    "closeDate": "2026-08-28",
+    "forecast": "Best Case",
+    "ap": "Daniel Isunza",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000buLfZAAU"
+  },
+  {
+    "dsr": "DS-1686785",
+    "sssm": "Irineu Silva",
+    "oppName": "POTTENCIAL - CORE - FSC - SOW - CSG - SG",
+    "account": "Pottencial Seguradora (2nd Org)",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 841050,
+    "closeDate": "2026-12-21",
+    "forecast": "Pipeline",
+    "ap": "Isac Nudelman",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000Y253FAAR"
+  },
+  {
+    "dsr": "DS-1717461",
+    "sssm": "Irineu Silva",
+    "oppName": "MTI_SOW_Ata$",
+    "account": "EMPRESA MATO-GROSSENSE DE TECNOLOGIA DA INFORMACAO - MTI",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-10-30",
+    "forecast": "Pipeline",
+    "ap": "Alex Siqueira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000eiJr7AAE"
+  },
+  {
+    "dsr": "DS-1720437",
+    "sssm": "Irineu Silva",
+    "oppName": "MTI_SOW",
+    "account": "EMPRESA MATO-GROSSENSE DE TECNOLOGIA DA INFORMACAO - MTI",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 1500000,
+    "closeDate": "2026-10-30",
+    "forecast": "Pipeline",
+    "ap": "Alex Siqueira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000gCUmvAAG"
+  },
+  {
+    "dsr": "DS-1720434",
+    "sssm": "Irineu Silva",
+    "oppName": "CONFEA_ PS_ ATA$",
+    "account": "Conselho Federal de Engenharia e Agronomia",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-09-12",
+    "forecast": "Pipeline",
+    "ap": "Alex Siqueira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000gCIkBAAW"
+  },
+  {
+    "dsr": "DS-1284172",
+    "sssm": "Irineu Silva",
+    "oppName": "ITAU Backoffice - Agentforce",
+    "account": "ITAU UNIBANCO S.A.",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 1100000,
+    "closeDate": "2026-12-29",
+    "forecast": "Pipeline",
+    "ap": "Ademir Aurelio Monteiro",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "0063y000019mgyzAAA"
+  },
+  {
+    "dsr": "DS-1513409",
+    "sssm": "Irineu Silva",
+    "oppName": "Sebrae - CTO Security & Architecture Authority (COE) - New - CSG",
+    "account": "SEBRAE BR- Serv Brasileiro de Apoio as Micro e Pequenas Empresas_W",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 10900000,
+    "closeDate": "2027-06-30",
+    "forecast": "Pipeline",
+    "ap": "Juliana Brites",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "0063y000019kzWfAAI"
+  },
+  {
+    "dsr": "DS-1717459",
+    "sssm": "Irineu Silva",
+    "oppName": "CONFEA_ CreaSP_ PS_ CTO",
+    "account": "Conselho Federal de Engenharia e Agronomia",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 250000,
+    "closeDate": "2026-09-12",
+    "forecast": "Pipeline",
+    "ap": "Alex Siqueira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000e28nFAAQ"
+  },
+  {
+    "dsr": "DS-1730623",
+    "sssm": "Irineu Silva",
+    "oppName": "WE PINK - SWE - CSG - SC - SOW",
+    "account": "We Pink",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-09-25",
+    "forecast": "Pipeline",
+    "ap": "Isac Nudelman",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000i5UXBAA2"
+  },
+  {
+    "dsr": "DS-1731855",
+    "sssm": "Irineu Silva",
+    "oppName": "Hypera - SWE - New Business - Life Science - CSG- Accelerate Program",
+    "account": "Hypera Farma",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 0,
+    "closeDate": "2026-08-21",
+    "forecast": "Best Case",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000iVEDSAA4"
+  },
+  {
+    "dsr": "DS-1455593",
+    "sssm": "Irineu Silva",
+    "oppName": "BASA - CTO and Assurance Services - CSG",
+    "account": "Banco Da Amazonia S/A",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 29666049.69,
+    "closeDate": "2027-01-21",
+    "forecast": "Best Case",
+    "ap": "Alex Siqueira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "0063y00001AdCcrAAF"
+  },
+  {
+    "dsr": "DS-1732864",
+    "sssm": "Irineu Silva",
+    "oppName": "E-Networks Communications - CO - Release 2 - FY27 CSG #QL",
+    "account": "E-Networks Communications Org",
+    "country": "US",
+    "stage": "04 - Active Negotiation",
+    "amount": 4609364.14,
+    "closeDate": "2026-09-18",
+    "forecast": "Commit",
+    "ap": "Julián Mesa",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000Xw4JZAAZ"
+  },
+  {
+    "dsr": "DS-1722167",
+    "sssm": "Irineu Silva",
+    "oppName": "ITAU UNIBANCO ARI - License - Renewal/Expansion",
+    "account": "ITAU UNIBANCO (Máquina)",
+    "country": "BR",
+    "stage": "04 - Active Negotiation",
+    "amount": 0,
+    "closeDate": "2026-10-27",
+    "forecast": "Commit",
+    "ap": "Ademir Aurelio Monteiro",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed000006FIpBAAW"
+  },
+  {
+    "dsr": "DS-1356200",
+    "sssm": "Irineu Silva",
+    "oppName": "CEF - MC - SOW -  Assurance Services + CTO - CSG",
+    "account": "Caixa Econômica Federal",
+    "country": "BR",
+    "stage": "04 - Active Negotiation",
+    "amount": 43181812.41,
+    "closeDate": "2026-09-18",
+    "forecast": "Commit",
+    "ap": "Alex Siqueira",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "0063y00001A0J5eAAF"
+  },
+  {
+    "dsr": "DS-1363155",
+    "sssm": "Irineu Silva",
+    "oppName": "ITAU Modernização Máquina - Remodelagem Estruturante",
+    "account": "ITAU UNIBANCO (Máquina)",
+    "country": "BR",
+    "stage": "04 - Active Negotiation",
+    "amount": 1,
+    "closeDate": "2027-01-15",
+    "forecast": "Commit",
+    "ap": "Ademir Aurelio Monteiro",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "0063y000019nTVEAA2"
+  },
+  {
+    "dsr": "DS-1729814",
+    "sssm": "Israel Hernandez",
+    "oppName": "Banco Atlantida - Honduras - New phases & Governance",
+    "account": "Banco Atlantida",
+    "country": "HN",
+    "stage": "02 - Scoping",
+    "amount": 400000,
+    "closeDate": "2026-09-29",
+    "forecast": "Best Case",
+    "ap": "Eliana Rueda",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000i1937AAA"
+  },
+  {
+    "dsr": "DS-1729123",
+    "sssm": "Israel Hernandez",
+    "oppName": "Bancolombia-COL- Net Zero Cloud RFP-Capacity Comsumption",
+    "account": "Bancolombia S.A.",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-09-25",
+    "forecast": "Pipeline",
+    "ap": "Eliana Rueda",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000hEt2IAAS"
+  },
+  {
+    "dsr": "DS-1731179",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "CLARO CENAM - MC Migration",
+    "account": "Telecomunicaciones de Guatemala S.A.",
+    "country": "GT",
+    "stage": "01 - Discovery",
+    "amount": 500000,
+    "closeDate": "2026-10-16",
+    "forecast": "Pipeline",
+    "ap": "Camilo José Escobar",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000iLup3AAC"
+  },
+  {
+    "dsr": "DS-1642065",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "FEMSA - Implement - New Business - mejoras CRM",
+    "account": "Propimex S. de R.L. de C.V.",
+    "country": "MX",
+    "stage": "01 - Discovery",
+    "amount": 0,
+    "closeDate": "2026-12-31",
+    "forecast": "Pipeline",
+    "ap": "Daniel Isunza",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000Nb7A9AAJ"
+  },
+  {
+    "dsr": "DS-1734214",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "Claro Ecuador - SWE - Data Cloud - Advisory - 200K",
+    "account": "Consorcio Ecuatoriano de Telecomunicaciones S.A. CONECEL",
+    "country": "EC",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-11-27",
+    "forecast": "Pipeline",
+    "ap": "Laura Salazar",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ix0vVAAQ"
+  },
+  {
+    "dsr": "DS-1671562",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "Dos Pinos - Costa Rica - Plan & Design - CG Cloud",
+    "account": "Cooperativa de Productores de Leche Dos Pinos R.L.",
+    "country": "CR",
+    "stage": "02 - Scoping",
+    "amount": 250000,
+    "closeDate": "2026-11-27",
+    "forecast": "Pipeline",
+    "ap": "Laura Salazar",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000UWelpAAD"
+  },
+  {
+    "dsr": "DS-1702257",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "Diltex - B2C and B2B Commerce As-Is Assessment - OF - Licenses SWE 50KUSD 400 Hours",
+    "account": "Diltex S.A. de C.V.",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-09-30",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000bHUKXAA4"
+  },
+  {
+    "dsr": "DS-1712565",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "Tuya - CO - MK - Retoma Digital - ARI - 250K",
+    "account": "Compañia de Financiamiento Tuya S.A",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2027-02-26",
+    "forecast": "Pipeline",
+    "ap": "Laura Salazar",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000cTojVAAS"
+  },
+  {
+    "dsr": "DS-1655160",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "Office Depot Odemas - Loyalty, Marketing Cloud, Data 360 - SOW",
+    "account": "Office Depot de México, S.A. de C.V.",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 500000,
+    "closeDate": "2026-12-18",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000QD0mPAAT"
+  },
+  {
+    "dsr": "DS-1697908",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "PubSec MX - ATDT Agencia Transformacion Digital y Telecom (Infotec) - MAF Mulesoft Agent Fabric - SOW",
+    "account": "INFOTEC, CENTRO DE INVESTIGACION E INNOVACION EN TIC",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 250000,
+    "closeDate": "2027-01-31",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000aVLQ3AAO"
+  },
+  {
+    "dsr": "DS-1728827",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "FEMSA - Implement - New Business - MULESOFTn- CSG",
+    "account": "FEMSA SERVICIOS, S.A. DE C.V.",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 500000,
+    "closeDate": "2026-11-13",
+    "forecast": "Best Case",
+    "ap": "Daniel Isunza",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hr97eAAA"
+  },
+  {
+    "dsr": "DS-1701838",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "FEMSA KOF-Mulesoft-INFORMATICA-MIGRACION BODS-SOW TM",
+    "account": "Ramsa Soluciones de Negocios en Bebidas, S. de R.L. de C.V.",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 300000,
+    "closeDate": "2026-10-16",
+    "forecast": "Pipeline",
+    "ap": "Daniel Isunza",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000bEo7jAAC"
+  },
+  {
+    "dsr": "DS-1684589",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "Farmacias Benavides - Prime - MVP1 Data Cloud, MVP2 Loyalty - CSG - SOW",
+    "account": "Farmacias Benavides, S.A.B. de C.V.",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 756060,
+    "closeDate": "2027-01-31",
+    "forecast": "Omitted",
+    "ap": "Jorge Salafia",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000XLWczAAH"
+  },
+  {
+    "dsr": "DS-1699422",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "FEMSA - Implement - New Business - MC Personalization- CSG",
+    "account": "FEMSA SERVICIOS, S.A. DE C.V.",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 998330.04,
+    "closeDate": "2026-09-24",
+    "forecast": "Best Case",
+    "ap": "Daniel Isunza",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000alz9lAAA"
+  },
+  {
+    "dsr": "DS-1692775",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "FEMSA_SPIFF_NEW BUSINESS_SOW",
+    "account": "FEMSA SERVICIOS, S.A. DE C.V.",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 4861560,
+    "closeDate": "2026-10-23",
+    "forecast": "Best Case",
+    "ap": "Daniel Isunza",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000ZN37WAAT"
+  },
+  {
+    "dsr": "DS-1697898",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "PubSec MX - CFE Distribucion - Mulesoft HCC, CTO, APIs Management - SOW Direct with Customer",
+    "account": "CFE Distribución",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 707040,
+    "closeDate": "2026-12-18",
+    "forecast": "Best Case",
+    "ap": "Jorge Salafia",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000aVY2HAAW"
+  },
+  {
+    "dsr": "DS-1729414",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "General Motors Mexico (OEM) - Marketing Cloud, Agentforce - SOW - AI Augmented",
+    "account": "General Motors de México, S. de R.L. de C.V.",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 149389,
+    "closeDate": "2026-09-30",
+    "forecast": "Best Case",
+    "ap": "Jorge Salafia",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hy9ywAAA"
+  },
+  {
+    "dsr": "DS-1729416",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "General Motors Mexico (Financial) - Marketing Cloud - SOW - AI Augmented - RFP",
+    "account": "GM Financial de México, S.A. de C.V., SOFOM, E.R.",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 426120,
+    "closeDate": "2026-09-30",
+    "forecast": "Best Case",
+    "ap": "Jorge Salafia",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hyfXNAAY"
+  },
+  {
+    "dsr": "DS-1707372",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "FEMSA -  Propimex - Implement - New Business - CORE- CSG",
+    "account": "Propimex S. de R.L. de C.V.",
+    "country": "MX",
+    "stage": "04 - Active Negotiation",
+    "amount": 495974.2,
+    "closeDate": "2026-08-28",
+    "forecast": "Commit",
+    "ap": "Daniel Isunza",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000cqjpZAAQ"
+  },
+  {
+    "dsr": "DS-1662010",
+    "sssm": "Ixchel Saucedo",
+    "oppName": "Walmart - CR - UCP - WhatsApp - SWE",
+    "account": "Walmart Costa Rica",
+    "country": "CR",
+    "stage": "04 - Active Negotiation",
+    "amount": 0,
+    "closeDate": "2026-08-28",
+    "forecast": "Commit",
+    "ap": "Laura Salazar",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000RtfkXAAR"
+  },
+  {
+    "dsr": "DS-1639028",
+    "sssm": "Juan Schunck",
+    "oppName": "Oriental Bank - Puerto Rico - CTO",
+    "account": "ORIENTAL BANK",
+    "country": "PR",
+    "stage": "02 - Scoping",
+    "amount": 154000,
+    "closeDate": "2026-09-18",
+    "forecast": "Pipeline",
+    "ap": "Eliana Rueda",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000N6WCsAAN"
+  },
+  {
+    "dsr": "DS-1699904",
+    "sssm": "Juan Schunck",
+    "oppName": "Claro RD - Republica Dominicana - RFP Comms Cloud B2C - Implementation",
+    "account": "Compania Dominicana De Telefonos S.A.",
+    "country": "DO",
+    "stage": "02 - Scoping",
+    "amount": 5467010,
+    "closeDate": "2026-12-30",
+    "forecast": "Pipeline",
+    "ap": "Julián Mesa",
+    "status": "Waiting on Requestor",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000Y66f3AAB"
+  },
+  {
+    "dsr": "DS-1679505",
+    "sssm": "Juan Schunck",
+    "oppName": "Banco Nación - AR - Core - CRM Implementation",
+    "account": "Banco de la Nación Argentina",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 500000,
+    "closeDate": "2026-11-30",
+    "forecast": "Pipeline",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "Waiting on Requestor",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000WRgryAAD"
+  },
+  {
+    "dsr": "DS-1669775",
+    "sssm": "Juan Schunck",
+    "oppName": "BBVA - Squads Core Sales Services FSC Marketing - TM - 3 years",
+    "account": "BBVA México, S.A., Institución de Banca Múltiple, Grupo Financiero, BBVA México",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 100000,
+    "closeDate": "2027-01-31",
+    "forecast": "Pipeline",
+    "ap": "Sarai Morales",
+    "status": "Waiting on Requestor",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000L7DhCAAV"
+  },
+  {
+    "dsr": "DS-1707455",
+    "sssm": "Juan Schunck",
+    "oppName": "PubSec MX - SEP Yucatan - Agentforce, Slack, Education Cloud, Data 360, Tableau - SOW",
+    "account": "Estado de Yucatán",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 850024,
+    "closeDate": "2027-01-31",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "Waiting on Requestor",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000crZRZAA2"
+  },
+  {
+    "dsr": "DS-1683774",
+    "sssm": "Juan Schunck",
+    "oppName": "Claro PE - Comms Cloud - White label #QL",
+    "account": "America Movil Peru S.A.C.",
+    "country": "PE",
+    "stage": "02 - Scoping",
+    "amount": 6154000,
+    "closeDate": "2026-11-12",
+    "forecast": "Pipeline",
+    "ap": "Julián Mesa",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000XAsP7AAL"
+  },
+  {
+    "dsr": "DS-1686636",
+    "sssm": "Juan Schunck",
+    "oppName": "FISERV - AR - MKT - Loyalty Management MVP",
+    "account": "First Data Cono Sur S.R.L.",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 350000,
+    "closeDate": "2027-01-15",
+    "forecast": "Pipeline",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000XDh8zAAD"
+  },
+  {
+    "dsr": "DS-1686637",
+    "sssm": "Juan Schunck",
+    "oppName": "Claro PE - Comms Cloud - White label #QL",
+    "account": "America Movil Peru S.A.C.",
+    "country": "PE",
+    "stage": "02 - Scoping",
+    "amount": 6154000,
+    "closeDate": "2026-11-12",
+    "forecast": "Pipeline",
+    "ap": "Julián Mesa",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000XAsP7AAL"
+  },
+  {
+    "dsr": "DS-1622933",
+    "sssm": "Juan Schunck",
+    "oppName": "Change order -  Banco Agricola El Salvador - CIBEST - FSC Implementation",
+    "account": "Banco Agricola S.A.",
+    "country": "SV",
+    "stage": "03 - Initial Proposal",
+    "amount": 0,
+    "closeDate": "2026-10-23",
+    "forecast": "Best Case",
+    "ap": "Eliana Rueda",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000HC2AkAAL"
+  },
+  {
+    "dsr": "DS-1604667",
+    "sssm": "Juan Schunck",
+    "oppName": "GTD - CL - iComms - New Business - P&D B2B Chile",
+    "account": "GTD Teleductos S.A.",
+    "country": "CL",
+    "stage": "03 - Initial Proposal",
+    "amount": 379695.36,
+    "closeDate": "2027-01-15",
+    "forecast": "Best Case",
+    "ap": "Juan María Aguirre",
+    "status": "Waiting on Requestor",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed000001pD7VAAU"
+  },
+  {
+    "dsr": "DS-1713556",
+    "sssm": "Juan Schunck",
+    "oppName": "PubSec Education MX - Universidad Ibero - Mulesoft - SOW",
+    "account": "Universidad Iberoamericana",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 283628,
+    "closeDate": "2026-10-31",
+    "forecast": "Best Case",
+    "ap": "Jorge Salafia",
+    "status": "Waiting on Requestor",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000eUMnHAAW"
+  },
+  {
+    "dsr": "DS-1646482",
+    "sssm": "Juan Schunck",
+    "oppName": "GTD (CL) - iComms - New Business - Implementación PYME",
+    "account": "GTD Teleductos S.A.",
+    "country": "CL",
+    "stage": "03 - Initial Proposal",
+    "amount": 958866.1,
+    "closeDate": "2026-12-18",
+    "forecast": "Best Case",
+    "ap": "Juan María Aguirre",
+    "status": "Waiting on Requestor",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000OJqgEAAT"
+  },
+  {
+    "dsr": "DS-1709491",
+    "sssm": "Juan Schunck",
+    "oppName": "BBVA - Digital Lending Implementation Project - #QL",
+    "account": "BBVA México, S.A., Institución de Banca Múltiple, Grupo Financiero, BBVA México",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 1728881,
+    "closeDate": "2026-09-30",
+    "forecast": "Best Case",
+    "ap": "Sarai Morales",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000bFmWrAAK"
+  },
+  {
+    "dsr": "DS-1666063",
+    "sssm": "Juan Schunck",
+    "oppName": "First Data - AR - Sales Cloud - Onboarding",
+    "account": "First Data Cono Sur S.R.L.",
+    "country": "AR",
+    "stage": "04 - Active Negotiation",
+    "amount": 1090438.84,
+    "closeDate": "2026-08-27",
+    "forecast": "Commit",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000T5tUbAAJ"
+  },
+  {
+    "dsr": "DS-1697581",
+    "sssm": "Laura Salazar",
+    "oppName": "Global Seguros - CO - CTO - SEH - FSC - Insurance",
+    "account": "Global Seguros de Vida S.A.",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 154000,
+    "closeDate": "2026-11-27",
+    "forecast": "Pipeline",
+    "ap": "Laura Salazar",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000aRL8VAAW"
+  },
+  {
+    "dsr": "DS-1680726",
+    "sssm": "Laura Salazar",
+    "oppName": "Sura Chile - CH - Core - CoE CTOs",
+    "account": "Seguros Generales Suramericana S.A.",
+    "country": "CL",
+    "stage": "02 - Scoping",
+    "amount": 154000,
+    "closeDate": "2026-09-25",
+    "forecast": "Pipeline",
+    "ap": "Juan María Aguirre",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000Wg3ofAAB"
+  },
+  {
+    "dsr": "DS-1692801",
+    "sssm": "Laura Salazar",
+    "oppName": "Digicel - SWE - Comms Cloud",
+    "account": "Digicel Caribbean Limited",
+    "country": "JM",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2027-02-26",
+    "forecast": "Pipeline",
+    "ap": "Laura Salazar",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ZM8vdAAD"
+  },
+  {
+    "dsr": "DS-1701779",
+    "sssm": "Laura Salazar",
+    "oppName": "BBVA - Digital Lending Implementation Project - #QL",
+    "account": "BBVA México, S.A., Institución de Banca Múltiple, Grupo Financiero, BBVA México",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 1728881,
+    "closeDate": "2026-09-30",
+    "forecast": "Best Case",
+    "ap": "Sarai Morales",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000bFmWrAAK"
+  },
+  {
+    "dsr": "DS-1729133",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "MX-CBU ANA Seguros Insurance Core - Digital Insurance RFP",
+    "account": "A.N.A. Compañía de Seguros SA de CV",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 1100000,
+    "closeDate": "2026-09-30",
+    "forecast": "Best Case",
+    "ap": "Abelardo Rojas",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hntYrAAI"
+  },
+  {
+    "dsr": "DS-1682554",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "Grupo Lala - RFP CG Cloud REX & Sales, B2B Commerce, Marketing Engagement - ProServ Plan & Design - SOW",
+    "account": "Grupo Lala S.A.B. de C.V.",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 250000,
+    "closeDate": "2026-10-31",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000UdoDQAAZ"
+  },
+  {
+    "dsr": "DS-1644294",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "Oriental Bank - Puerto Rico - CTO",
+    "account": "ORIENTAL BANK",
+    "country": "PR",
+    "stage": "02 - Scoping",
+    "amount": 154000,
+    "closeDate": "2026-09-18",
+    "forecast": "Pipeline",
+    "ap": "Eliana Rueda",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000N6WCsAAN"
+  },
+  {
+    "dsr": "DS-1715744",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "Coralisle (Bermuda) - Implementation Digital Insurance",
+    "account": "Coralisle Group Ltd.",
+    "country": "BM",
+    "stage": "02 - Scoping",
+    "amount": 7553040,
+    "closeDate": "2026-11-26",
+    "forecast": "Pipeline",
+    "ap": "Eliana Rueda",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000esGjtAAE"
+  },
+  {
+    "dsr": "DS-1725960",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "Bancolombia-COL- Net Zero Cloud RFP-Capacity Comsumption",
+    "account": "Bancolombia S.A.",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-09-25",
+    "forecast": "Pipeline",
+    "ap": "Eliana Rueda",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000hEt2IAAS"
+  },
+  {
+    "dsr": "DS-1715254",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "Liverpool - MX - CO - Loyalty Data Cloud",
+    "account": "SERVICIOS LIVERPOOL S.A. DE C.V.",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 250000,
+    "closeDate": "2026-09-30",
+    "forecast": "Pipeline",
+    "ap": "Diego Ramos",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000esV4dAAE"
+  },
+  {
+    "dsr": "DS-1711488",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "MX - Pam Hotels -  Agentforce Voice #RFP #QL",
+    "account": "Solaya Hospitality Management Group S. de R.L. de C.V.",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 155903.61,
+    "closeDate": "2026-09-30",
+    "forecast": "Best Case",
+    "ap": "Gabriel Arturo Rada",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000dxtq2AAA"
+  },
+  {
+    "dsr": "DS-1637662",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "Interbank PE - New Business - RFP CRM",
+    "account": "Banco Internacional del Perú S.A.A.",
+    "country": "PE",
+    "stage": "03 - Initial Proposal",
+    "amount": 102000,
+    "closeDate": "2026-10-21",
+    "forecast": "Best Case",
+    "ap": "Laura Salazar",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000MpdnRAAR"
+  },
+  {
+    "dsr": "DS-1628441",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "MX - Banamex -  MVP Miura / Personalization-FSC",
+    "account": "BANCO NACIONAL DE MEXICO S.A., INTEGRANTE DE GRUPO FINANCIERO BANAMEX",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 641120,
+    "closeDate": "2026-10-30",
+    "forecast": "Best Case",
+    "ap": "Gabriel Arturo Rada",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed0000099n9BAAQ"
+  },
+  {
+    "dsr": "DS-1573719",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "FSP - MX - Agent for Sales in Whatsapp Channel - SOW",
+    "account": "Pharma Plus, S.A. de C.V.",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 201375,
+    "closeDate": "2026-12-18",
+    "forecast": "Best Case",
+    "ap": "Jorge Salafia",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed000008DePdAAK"
+  },
+  {
+    "dsr": "DS-1649626",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "GUMA - Implementation - Sales, Service, Voice - TM SOW",
+    "account": "Grupo Guma Gutiérrez, S.A. de C.V.",
+    "country": "MX",
+    "stage": "04 - Active Negotiation",
+    "amount": 1970719.6,
+    "closeDate": "2026-12-18",
+    "forecast": "Best Case",
+    "ap": "Daniel Isunza",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000P3s5XAAR"
+  },
+  {
+    "dsr": "DS-1677311",
+    "sssm": "Luis Mauricio Pacheco",
+    "oppName": "MX - RCD - Data Cloud #prime",
+    "account": "Solaya Hospitality Management Group S. de R.L. de C.V.",
+    "country": "MX",
+    "stage": "04 - Active Negotiation",
+    "amount": 337420,
+    "closeDate": "2026-09-30",
+    "forecast": "Best Case",
+    "ap": "Gabriel Arturo Rada",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000Vwew6AAB"
+  },
+  {
+    "dsr": "DS-1718931",
+    "sssm": "Nelson Stebulaitis Filho",
+    "oppName": "SEFIN_Fortaleza_SOW",
+    "account": "Secretaria de Finanças de Fortaleza",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 549000,
+    "closeDate": "2026-10-30",
+    "forecast": "Pipeline",
+    "ap": "Alex Siqueira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000foMAbAAM"
+  },
+  {
+    "dsr": "DS-1734389",
+    "sssm": "Nelson Stebulaitis Filho",
+    "oppName": "PRODESP DER FS Implementation CSG New",
+    "account": "PRODESP-Companhia de Processamento de Dados do Estado de São Paulo",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 8000000,
+    "closeDate": "2027-01-25",
+    "forecast": "Pipeline",
+    "ap": "Juliana Brites",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000idVPBAA2"
+  },
+  {
+    "dsr": "DS-1707039",
+    "sssm": "Nelson Stebulaitis Filho",
+    "oppName": "DTP (CAU) Implementation CSG New",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 230000,
+    "closeDate": "2026-11-30",
+    "forecast": "Pipeline",
+    "ap": "Alex Siqueira",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000clW3NAAU"
+  },
+  {
+    "dsr": "DS-1734386",
+    "sssm": "Nelson Stebulaitis Filho",
+    "oppName": "Prodesp - ARI",
+    "account": "Prodesp - Empresa de TI do Estado de São Paulo_PPT",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-09-07",
+    "forecast": "Pipeline",
+    "ap": "Juliana Brites",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ix1GUAAY"
+  },
+  {
+    "dsr": "DS-1734387",
+    "sssm": "Nelson Stebulaitis Filho",
+    "oppName": "VIVO ARI Agentforce Service Layer for B2C CSG New",
+    "account": "Telefonica Brasil - Valentina",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-09-30",
+    "forecast": "Pipeline",
+    "ap": "Juliana Brites",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000iH1kjAAC"
+  },
+  {
+    "dsr": "DS-1734372",
+    "sssm": "Nelson Stebulaitis Filho",
+    "oppName": "Zello (SERPRO) AI & Data Implementation CSG New",
+    "account": "Zello Tecnologia Da Informacao Ltda",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 0,
+    "closeDate": "2026-08-31",
+    "forecast": "Best Case",
+    "ap": "Juliana Brites",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000eZ8WkAAK"
+  },
+  {
+    "dsr": "DS-1687873",
+    "sssm": "Nelson Stebulaitis Filho",
+    "oppName": "DTP (ANATEL) Atendimento CSG New",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 3200000,
+    "closeDate": "2026-10-15",
+    "forecast": "Best Case",
+    "ap": "Alex Siqueira",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000YEoW1AAL"
+  },
+  {
+    "dsr": "DS-1707011",
+    "sssm": "Nelson Stebulaitis Filho",
+    "oppName": "CLARO (BR) Comms CPQ Design CSG New #QL",
+    "account": "*Claro S.A.",
+    "country": "BR",
+    "stage": "04 - Active Negotiation",
+    "amount": 643416.64,
+    "closeDate": "2026-09-14",
+    "forecast": "Commit",
+    "ap": "Juliana Brites",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ckmDRAAY"
+  },
+  {
+    "dsr": "DS-1728208",
+    "sssm": "Nelson Stebulaitis Filho",
+    "oppName": "DTP (PAT) Implementation CSG New #QL",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "country": "BR",
+    "stage": "04 - Active Negotiation",
+    "amount": 3652561,
+    "closeDate": "2026-08-28",
+    "forecast": "Commit",
+    "ap": "Juliana Brites",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hmZ5xAAE"
+  },
+  {
+    "dsr": "DS-1730049",
+    "sssm": "Regina Garrido",
+    "oppName": "Cresol - CSG - CTO+SQUAD - SOW",
+    "account": "Cresol",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 180000,
+    "closeDate": "2026-10-23",
+    "forecast": "Pipeline",
+    "ap": "Isac Nudelman",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hxkZ7AAI"
+  },
+  {
+    "dsr": "DS-1689609",
+    "sssm": "Regina Garrido",
+    "oppName": "Bradesco Cockpit PJ - Agentforce Add-on- CSG",
+    "account": "Banco Bradesco S.A.",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 1122000,
+    "closeDate": "2026-09-29",
+    "forecast": "Best Case",
+    "ap": "Ademir Aurelio Monteiro",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000YfxIIAAZ"
+  },
+  {
+    "dsr": "DS-1681413",
+    "sssm": "Regina Garrido",
+    "oppName": "Bradesco Habitat - Implement - Change Order - CSG",
+    "account": "Banco Bradesco S.A.",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 1500000,
+    "closeDate": "2026-12-29",
+    "forecast": "Pipeline",
+    "ap": "Ademir Aurelio Monteiro",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000W6gtNAAR"
+  },
+  {
+    "dsr": "DS-1659521",
+    "sssm": "Regina Garrido",
+    "oppName": "ITAU - Backoffice N2 Contas e Cartões",
+    "account": "ITAU UNIBANCO S.A.",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 1790000,
+    "closeDate": "2026-12-29",
+    "forecast": "Pipeline",
+    "ap": "Ademir Aurelio Monteiro",
+    "status": "On Hold",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed000007FeYzAAK"
+  },
+  {
+    "dsr": "DS-1717775",
+    "sssm": "Regina Garrido",
+    "oppName": "Bradesco Seguros - Agentforce Jornada de Leads - Funil de Vendas",
+    "account": "Bradesco Seguros S.A.",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 550000,
+    "closeDate": "2026-09-29",
+    "forecast": "Pipeline",
+    "ap": "Ademir Aurelio Monteiro",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000fZyXxAAK"
+  },
+  {
+    "dsr": "DS-1703327",
+    "sssm": "Regina Garrido",
+    "oppName": "Ache - prime implem. piloto - new business - life science - CSG",
+    "account": "Aché Laboratórios Farmacêuticos S.A. (Corp)",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 2189778.8,
+    "closeDate": "2026-12-09",
+    "forecast": "Pipeline",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000bjnk1AAA"
+  },
+  {
+    "dsr": "DS-1692082",
+    "sssm": "Regina Garrido",
+    "oppName": "Bradesco Melhorias Whatsapp eAgro - CSG",
+    "account": "Banco Bradesco S.A.",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 1000000,
+    "closeDate": "2026-09-29",
+    "forecast": "Pipeline",
+    "ap": "Ademir Aurelio Monteiro",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000Z01XpAAJ"
+  },
+  {
+    "dsr": "DS-1690809",
+    "sssm": "Regina Garrido",
+    "oppName": "Unimed  Nordeste/RS - ARI Investment - Agentforce Mulesoft - CSG",
+    "account": "Unimed Nordeste/RS",
+    "country": "BR",
+    "stage": "04 - Active Negotiation",
+    "amount": 0,
+    "closeDate": "2026-09-30",
+    "forecast": "Commit",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000YxDVVAA3"
+  },
+  {
+    "dsr": "DS-1706415",
+    "sssm": "Regina Garrido",
+    "oppName": "YPF - AR - Mkt - Loyalty Management Implementation Change Order",
+    "account": "YPF S.A 2",
+    "country": "AR",
+    "stage": "04 - Active Negotiation",
+    "amount": 339031.6,
+    "closeDate": "2026-08-31",
+    "forecast": "Commit",
+    "ap": "Juan María Aguirre",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000cVXkzAAG"
+  },
+  {
+    "dsr": "DS-1677055",
+    "sssm": "Regina Garrido",
+    "oppName": "Bradesco Umbrella SOW010-CO007 - Annual Adjustment FY27",
+    "account": "Banco Bradesco S.A.",
+    "country": "BR",
+    "stage": "04 - Active Negotiation",
+    "amount": 0,
+    "closeDate": "2026-08-27",
+    "forecast": "Commit",
+    "ap": "Ademir Aurelio Monteiro",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000VsyWoAAJ"
+  },
+  {
+    "dsr": "DS-1685078",
+    "sssm": "Sandro Alberto Thomas",
+    "oppName": "IZZI B2B Bestel y PYMES - Comms Cloud, Marketing Cloud, Agentforce - SOW",
+    "account": "Cablevisión, S.A. de C.V.",
+    "country": "MX",
+    "stage": "01 - Discovery",
+    "amount": 0,
+    "closeDate": "2027-01-31",
+    "forecast": "Pipeline",
+    "ap": "Sarai Morales",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "0063y000019YdhiAAC"
+  },
+  {
+    "dsr": "DS-1694318",
+    "sssm": "Sandro Alberto Thomas",
+    "oppName": "Claro CO - Mulesoft - CSE",
+    "account": "Comunicación Celular, S.A",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-08-20",
+    "forecast": "Pipeline",
+    "ap": "Julián Mesa",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000Zg7CDAAZ"
+  },
+  {
+    "dsr": "DS-1698409",
+    "sssm": "Sandro Alberto Thomas",
+    "oppName": "Claro Colombia - Agentforce Consumption - CSE",
+    "account": "Comunicación Celular, S.A",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-09-25",
+    "forecast": "Pipeline",
+    "ap": "Julián Mesa",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000abekvAAA"
+  },
+  {
+    "dsr": "DS-1720388",
+    "sssm": "Sandro Alberto Thomas",
+    "oppName": "Totalplay - MX - Media Cloud #QL",
+    "account": "Totalplay Telecomunicaciones SAPI de CV // TPT890516JP5",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 700000,
+    "closeDate": "2026-09-24",
+    "forecast": "Pipeline",
+    "ap": "Julián Mesa",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000gBeWdAAK"
+  },
+  {
+    "dsr": "DS-1702763",
+    "sssm": "Sandro Alberto Thomas",
+    "oppName": "Claro Colombia - Agent fabric - CSE",
+    "account": "Comunicación Celular, S.A",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-08-20",
+    "forecast": "Pipeline",
+    "ap": "Julián Mesa",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000bc17SAAQ"
+  },
+  {
+    "dsr": "DS-1683186",
+    "sssm": "Sandro Alberto Thomas",
+    "oppName": "FISERV - AR - MKT - Loyalty Management MVP",
+    "account": "First Data Cono Sur S.R.L.",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 350000,
+    "closeDate": "2027-01-15",
+    "forecast": "Pipeline",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000XDh8zAAD"
+  },
+  {
+    "dsr": "DS-1733294",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "Blau - CTO - New Business - Revenue Cloud - CSG",
+    "account": "Blau Farmaceutica S.A.",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 980000,
+    "closeDate": "2026-11-30",
+    "forecast": "Pipeline",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ioM42AAE"
+  },
+  {
+    "dsr": "DS-1732499",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "SERASA - EXT TABLEAU FORECAST INT + AGF - SOW - CSG",
+    "account": "Serasa Experian",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 1000000,
+    "closeDate": "2026-10-30",
+    "forecast": "Pipeline",
+    "ap": "Isac Nudelman",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000aODqbAAG"
+  },
+  {
+    "dsr": "DS-1713151",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "NUTRESA (CO) - ARI Implementation",
+    "account": "Servicios Nutresa S A S",
+    "country": "CO",
+    "stage": "01 - Discovery",
+    "amount": 0,
+    "closeDate": "2026-09-15",
+    "forecast": "Pipeline",
+    "ap": "Camilo José Escobar",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000dzG32AAE"
+  },
+  {
+    "dsr": "DS-1714569",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "Claro Chile - CH - BSS Full Stack Implementation B2C",
+    "account": "Claro Chile S A",
+    "country": "CL",
+    "stage": "02 - Scoping",
+    "amount": 1500000,
+    "closeDate": "2027-01-22",
+    "forecast": "Pipeline",
+    "ap": "Juan María Aguirre",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ejPxhAAE"
+  },
+  {
+    "dsr": "DS-1689850",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "PagBank - Fields Services",
+    "account": "Pagseguro Pagbank",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 1957707.61,
+    "closeDate": "2026-11-27",
+    "forecast": "Pipeline",
+    "ap": "Isac Nudelman",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000YkJSLAA3"
+  },
+  {
+    "dsr": "DS-1680290",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "MX-CBU GESEMEX FT CTO SVCS",
+    "account": "Gesemex Red de Distribuidores Exxon Mexico SA de CV",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 308448,
+    "closeDate": "2026-11-26",
+    "forecast": "Pipeline",
+    "ap": "Abelardo Rojas",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000WZ2pJAAT"
+  },
+  {
+    "dsr": "DS-1720079",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "NUTRESA (CO) - LIC SWAP",
+    "account": "Servicios Nutresa S A S",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 60000,
+    "closeDate": "2026-12-18",
+    "forecast": "Pipeline",
+    "ap": "Laura Salazar",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000fnQubAAE"
+  },
+  {
+    "dsr": "DS-1728830",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "Operaciones Satelitales - ITSM MVP 1 - Incidents, Problem, Change, CMDB - SOW - #QL",
+    "account": "Grupo Televisa, S.A.B.",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 120000,
+    "closeDate": "2026-11-30",
+    "forecast": "Pipeline",
+    "ap": "Jorge Salafia",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hnBG5AAM"
+  },
+  {
+    "dsr": "DS-1695074",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "BCP PE - New Business - MVP CEF",
+    "account": "Banco de Crédito del Perú - BCP",
+    "country": "PE",
+    "stage": "02 - Scoping",
+    "amount": 350000,
+    "closeDate": "2027-02-19",
+    "forecast": "Pipeline",
+    "ap": "Juan María Aguirre",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ZshYUAAZ"
+  },
+  {
+    "dsr": "DS-1699455",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "Telmex - MX - Whatsapp Marketing Cloud - Licenses SWE - 400 KUSD - 3200 Hours",
+    "account": "Telmex B2C",
+    "country": "MX",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-08-28",
+    "forecast": "Pipeline",
+    "ap": "Julián Mesa",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000amD7tAAE"
+  },
+  {
+    "dsr": "DS-1706671",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "TSTT - Trinidad  Mulesoft upgrade",
+    "account": "Telecommunications Services of Trinidad and Tobago Ltd. (TSTT)",
+    "country": "TT",
+    "stage": "02 - Scoping",
+    "amount": 300000,
+    "closeDate": "2026-09-25",
+    "forecast": "Pipeline",
+    "ap": "Camilo José Escobar",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000cO3lFAAS"
+  },
+  {
+    "dsr": "DS-1730000",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "Cirion Technologies - AR - Core - CPQ Implementation",
+    "account": "Cirion Technologies Solutions, LLC",
+    "country": "US",
+    "stage": "02 - Scoping",
+    "amount": 600000,
+    "closeDate": "2026-11-27",
+    "forecast": "Pipeline",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000i7q0YAAQ"
+  },
+  {
+    "dsr": "DS-1733598",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "Telecentro - AR - Core - Billing implementation",
+    "account": "Telecentro S.A.",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 1000000,
+    "closeDate": "2026-11-27",
+    "forecast": "Pipeline",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000isPmTAAU"
+  },
+  {
+    "dsr": "DS-1734225",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "Grupo AVAL - ADL - Advisory / CTO - MC Advanced",
+    "account": "Grupo AVAL",
+    "country": "CO",
+    "stage": "02 - Scoping",
+    "amount": 308000,
+    "closeDate": "2026-10-30",
+    "forecast": "Pipeline",
+    "ap": "Laura Salazar",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000j0W4QAAU"
+  },
+  {
+    "dsr": "DS-1712124",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "MODO - AR - MKT - Marketing Cloud implementation",
+    "account": "Play Digital SA (MODO)",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 250000,
+    "closeDate": "2026-11-27",
+    "forecast": "Pipeline",
+    "ap": "Gustavo Marcelo Pulitano",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000e6NXZAA2"
+  },
+  {
+    "dsr": "DS-1708253",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "ARI - Mercardo Libre - AR - TAB - Tableau Attrition",
+    "account": "MercadoLibre SRL",
+    "country": "AR",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-10-23",
+    "forecast": "Pipeline",
+    "ap": "Juan María Aguirre",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000d2qFOAAY"
+  },
+  {
+    "dsr": "DS-1728608",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "Bauducco - ARI Investment",
+    "account": "Pandurata Alimentos Ltda",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-10-30",
+    "forecast": "Pipeline",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hq60XAAQ"
+  },
+  {
+    "dsr": "DS-1680293",
+    "sssm": "SOW/EM Support: LATAM",
+    "oppName": "MX-CBU INVEX Guardians Rescue SVCS",
+    "account": "BANCO INVEX, S.A., INSTITUCIÓN DE BANCA MÚLTIPLE, INVEX GRUPO FINANCIERO",
+    "country": "MX",
+    "stage": "03 - Initial Proposal",
+    "amount": 127680,
+    "closeDate": "2026-09-25",
+    "forecast": "Best Case",
+    "ap": "Abelardo Rojas",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000WYPWEAA5"
+  },
+  {
+    "dsr": "DS-1706322",
+    "sssm": "Thais Ishii",
+    "oppName": "CPFL - P&D & CTO - New Business - MC DC Mulesoft E&U - CSG",
+    "account": "CPFL - Companhia Paulista de Força e Luz",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 3000000,
+    "closeDate": "2026-12-18",
+    "forecast": "Pipeline",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000cTRAEAA4"
+  },
+  {
+    "dsr": "DS-1722371",
+    "sssm": "Thais Ishii",
+    "oppName": "CPFL - Prime Implementation - New Business - MC Agentforce - CSG",
+    "account": "CPFL - Companhia Paulista de Força e Luz",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 2500000,
+    "closeDate": "2026-11-30",
+    "forecast": "Pipeline",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Waiting on Requestor",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000gd68bAAA"
+  },
+  {
+    "dsr": "DS-1724675",
+    "sssm": "Thais Ishii",
+    "oppName": "Medtronic - P&D & CTO CoE - New Business - HC MC RC - CSG",
+    "account": "Medtronic Comercial Ltda",
+    "country": "BR",
+    "stage": "01 - Discovery",
+    "amount": 2700000,
+    "closeDate": "2026-11-30",
+    "forecast": "Pipeline",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hA5thAAC"
+  },
+  {
+    "dsr": "DS-1717177",
+    "sssm": "Thais Ishii",
+    "oppName": "FORD - CTO - New Business - CSG",
+    "account": "Ford South America",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 850000,
+    "closeDate": "2026-11-30",
+    "forecast": "Pipeline",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "In Queue",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000eX5gDAAS"
+  },
+  {
+    "dsr": "DS-1714923",
+    "sssm": "Thais Ishii",
+    "oppName": "Unimed - CTO & Prime Implementation - New Business - CSG",
+    "account": "Unimed Nacional",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 2000000,
+    "closeDate": "2026-12-30",
+    "forecast": "Pipeline",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000enmHNAAY"
+  },
+  {
+    "dsr": "DS-1732494",
+    "sssm": "Thais Ishii",
+    "oppName": "Unidas - Expertise Services - New Business - Core - CSG",
+    "account": "Unidas Locacoes E Servicos S/A",
+    "country": "BR",
+    "stage": "02 - Scoping",
+    "amount": 0,
+    "closeDate": "2026-11-30",
+    "forecast": "Pipeline",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ifk2LAAQ"
+  },
+  {
+    "dsr": "DS-1712314",
+    "sssm": "Thais Ishii",
+    "oppName": "Whirlpool - ARI Investiment",
+    "account": "Whirlpool S.A.",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 0,
+    "closeDate": "2026-09-30",
+    "forecast": "Best Case",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Waiting on Requestor",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000e8d8PAAQ"
+  },
+  {
+    "dsr": "DS-1727582",
+    "sssm": "Thais Ishii",
+    "oppName": "Thermo King - Expertise Services & HCC - New Business - Sales&Service - CSG",
+    "account": "Thermo King do Brasil Ltda",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 900000,
+    "closeDate": "2026-12-21",
+    "forecast": "Best Case",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Waiting on Requestor",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000hh9yYAAQ"
+  },
+  {
+    "dsr": "DS-1714559",
+    "sssm": "Thais Ishii",
+    "oppName": "FEMSA - Prime Implementation - New Business - Core - CSG",
+    "account": "COCA-COLA FEMSA BRASIL",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 17987343.45,
+    "closeDate": "2026-11-30",
+    "forecast": "Best Case",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Waiting on Requestor",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ej7JFAAY"
+  },
+  {
+    "dsr": "DS-1700828",
+    "sssm": "Thais Ishii",
+    "oppName": "Neoenergia - Prime Implementation - Neuw Business - Canais Digitais - CSG",
+    "account": "NEOENERGIA S.A.",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 5000000,
+    "closeDate": "2026-11-20",
+    "forecast": "Best Case",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "oppId": "006ed00000bA1GrAAK"
+  },
+  {
+    "dsr": "DS-1714564",
+    "sssm": "Thais Ishii",
+    "oppName": "Yduqs - ARI Investment",
+    "account": "SOCIEDADE DE ENSINO SUPERIOR ESTACIO DE SA LTDA",
+    "country": "BR",
+    "stage": "03 - Initial Proposal",
+    "amount": 0,
+    "closeDate": "2026-09-30",
+    "forecast": "Best Case",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "status": "Working",
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "oppId": "006ed00000ejEe5AAE"
+  }
+];
+const QUALI_MAP = {
+  "DS-1421855": {
+    "qualified": "NO",
+    "qualDate": "2026-08-12",
+    "qualBy": "",
+    "score": 5,
+    "d1": "NO",
+    "d2": "YES",
+    "valueProp": "L",
+    "d3": "NO",
+    "d4": "NO",
+    "d5": "NO",
+    "deliveryModel": "Not Qualified",
+    "offering": "SOW - EM Support"
+  },
+  "DS-1731286": {
+    "qualified": "YES",
+    "qualDate": "2026-08-17",
+    "qualBy": "Alejandra Acuña",
+    "score": 22,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Native Agentic",
+    "offering": "Agentforce PS"
+  },
+  "DS-1731179": {
+    "qualified": "NO",
+    "qualDate": "2026-08-18",
+    "qualBy": "Christian Salazar",
+    "score": 10,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "NO",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Data Cloud PS"
+  },
+  "DS-1731159": {
+    "qualified": "NO",
+    "qualDate": "2026-08-19",
+    "qualBy": "Emmanuel Moreno",
+    "score": 5,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "U",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "NO",
+    "deliveryModel": "Not Qualified",
+    "offering": "Agentforce PS"
+  },
+  "DS-1731157": {
+    "qualified": "YES",
+    "qualDate": "2026-08-20",
+    "qualBy": "Diego Castro",
+    "score": 13,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Augmented",
+    "offering": "Service Cloud PS"
+  },
+  "DS-1731037": {
+    "qualified": "NO",
+    "qualDate": "2026-08-21",
+    "qualBy": "Juan Schunck",
+    "score": 3,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "NO",
+    "deliveryModel": "Not Qualified",
+    "offering": "Service Cloud PS"
+  },
+  "DS-1730751": {
+    "qualified": "NO",
+    "qualDate": "2026-08-22",
+    "qualBy": "Christian Salazar",
+    "score": 11,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "NO",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Tableau PS"
+  },
+  "DS-1730623": {
+    "qualified": "YES",
+    "qualDate": "2026-08-23",
+    "qualBy": "Igor Barros Lima",
+    "score": 17,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Augmented",
+    "offering": "Revenue Cloud PS"
+  },
+  "DS-1730377": {
+    "qualified": "NO",
+    "qualDate": "2026-08-24",
+    "qualBy": "Alejandra Acuña",
+    "score": 13,
+    "d1": "YES",
+    "d2": "NO",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Tableau PS"
+  },
+  "DS-1730363": {
+    "qualified": "NO",
+    "qualDate": "2026-08-25",
+    "qualBy": "Igor Barros Lima",
+    "score": 14,
+    "d1": "NO",
+    "d2": "YES",
+    "valueProp": "L",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Agentforce PS"
+  },
+  "DS-1730345": {
+    "qualified": "YES",
+    "qualDate": "2026-08-26",
+    "qualBy": "Luis Mauricio Pacheco",
+    "score": 23,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Native Agentic",
+    "offering": "Agentforce + MuleSoft PS"
+  },
+  "DS-1730318": {
+    "qualified": "NO",
+    "qualDate": "2026-08-27",
+    "qualBy": "Igor Barros Lima",
+    "score": 15,
+    "d1": "NO",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Data Cloud + Revenue Cloud PS"
+  },
+  "DS-1730049": {
+    "qualified": "NO",
+    "qualDate": "2026-08-28",
+    "qualBy": "Emmanuel Moreno",
+    "score": 9,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "NO",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Service Cloud PS"
+  },
+  "DS-1729876": {
+    "qualified": "YES",
+    "qualDate": "2026-08-29",
+    "qualBy": "Igor Barros Lima",
+    "score": 24,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Native Agentic",
+    "offering": "Data Cloud PS"
+  },
+  "DS-1729840": {
+    "qualified": "NO",
+    "qualDate": "2026-08-30",
+    "qualBy": "Igor Barros Lima",
+    "score": 6,
+    "d1": "YES",
+    "d2": "NO",
+    "valueProp": "U",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "SWE PS"
+  },
+  "DS-1729814": {
+    "qualified": "NO",
+    "qualDate": "2026-08-17",
+    "qualBy": "Ixchel Saucedo",
+    "score": 8,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "L",
+    "d3": "NO",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Service Cloud PS"
+  },
+  "DS-1729655": {
+    "qualified": "YES",
+    "qualDate": "2026-08-18",
+    "qualBy": "Igor Barros Lima",
+    "score": 22,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Native Agentic",
+    "offering": "Data Cloud PS"
+  },
+  "DS-1729431": {
+    "qualified": "NO",
+    "qualDate": "2026-08-19",
+    "qualBy": "Christian Salazar",
+    "score": 8,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "NO",
+    "deliveryModel": "Not Qualified",
+    "offering": "SWE PS"
+  },
+  "DS-1729416": {
+    "qualified": "NO",
+    "qualDate": "2026-08-20",
+    "qualBy": "Ixchel Saucedo",
+    "score": 11,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "NO",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Agentforce PS"
+  },
+  "DS-1729414": {
+    "qualified": "YES",
+    "qualDate": "2026-08-21",
+    "qualBy": "Emmanuel Moreno",
+    "score": 15,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Augmented",
+    "offering": "MuleSoft PS"
+  },
+  "DS-1729391": {
+    "qualified": "NO",
+    "qualDate": "2026-08-22",
+    "qualBy": "Diego Castro",
+    "score": 11,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "NO",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Data Cloud + Revenue Cloud PS"
+  },
+  "DS-1729133": {
+    "qualified": "NO",
+    "qualDate": "2026-08-23",
+    "qualBy": "Juan Schunck",
+    "score": 9,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "U",
+    "d3": "NO",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "SWE PS"
+  },
+  "DS-1729123": {
+    "qualified": "YES",
+    "qualDate": "2026-08-24",
+    "qualBy": "Igor Barros Lima",
+    "score": 14,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Augmented",
+    "offering": "Revenue Cloud PS"
+  },
+  "DS-1729084": {
+    "qualified": "NO",
+    "qualDate": "2026-08-25",
+    "qualBy": "Juan Schunck",
+    "score": 11,
+    "d1": "YES",
+    "d2": "NO",
+    "valueProp": "U",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "MuleSoft PS"
+  },
+  "DS-1729083": {
+    "qualified": "NO",
+    "qualDate": "2026-08-26",
+    "qualBy": "Alejandra Acuña",
+    "score": 7,
+    "d1": "YES",
+    "d2": "NO",
+    "valueProp": "U",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Agentforce PS"
+  },
+  "DS-1728830": {
+    "qualified": "YES",
+    "qualDate": "2026-08-27",
+    "qualBy": "Christian Salazar",
+    "score": 13,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Augmented",
+    "offering": "Revenue Cloud PS"
+  },
+  "DS-1728828": {
+    "qualified": "NO",
+    "qualDate": "2026-08-28",
+    "qualBy": "Juan Schunck",
+    "score": 5,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "U",
+    "d3": "YES",
+    "d4": "NO",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Data Cloud + Revenue Cloud PS"
+  },
+  "DS-1728827": {
+    "qualified": "NO",
+    "qualDate": "2026-08-29",
+    "qualBy": "Alejandra Acuña",
+    "score": 11,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "NO",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Agentforce + MuleSoft PS"
+  },
+  "DS-1728608": {
+    "qualified": "YES",
+    "qualDate": "2026-08-30",
+    "qualBy": "Igor Barros Lima",
+    "score": 24,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Native Agentic",
+    "offering": "MuleSoft PS"
+  },
+  "DS-1728208": {
+    "qualified": "NO",
+    "qualDate": "2026-08-17",
+    "qualBy": "Christian Salazar",
+    "score": 12,
+    "d1": "NO",
+    "d2": "YES",
+    "valueProp": "U",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "SWE PS"
+  },
+  "DS-1728014": {
+    "qualified": "NO",
+    "qualDate": "2026-08-18",
+    "qualBy": "Alejandra Acuña",
+    "score": 11,
+    "d1": "NO",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Agentforce + Data Cloud PS"
+  },
+  "DS-1728001": {
+    "qualified": "YES",
+    "qualDate": "2026-08-19",
+    "qualBy": "Diego Castro",
+    "score": 22,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Native Agentic",
+    "offering": "Revenue Cloud PS"
+  },
+  "DS-1727832": {
+    "qualified": "NO",
+    "qualDate": "2026-08-20",
+    "qualBy": "Ixchel Saucedo",
+    "score": 8,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "NO",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "SWE PS"
+  },
+  "DS-1727725": {
+    "qualified": "NO",
+    "qualDate": "2026-08-21",
+    "qualBy": "Igor Barros Lima",
+    "score": 6,
+    "d1": "NO",
+    "d2": "YES",
+    "valueProp": "L",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Service Cloud PS"
+  },
+  "DS-1727582": {
+    "qualified": "YES",
+    "qualDate": "2026-08-22",
+    "qualBy": "Diego Castro",
+    "score": 12,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Augmented",
+    "offering": "Data Cloud + Revenue Cloud PS"
+  },
+  "DS-1726293": {
+    "qualified": "NO",
+    "qualDate": "2026-08-23",
+    "qualBy": "Alejandra Acuña",
+    "score": 5,
+    "d1": "NO",
+    "d2": "YES",
+    "valueProp": "U",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Agentforce + MuleSoft PS"
+  },
+  "DS-1725960": {
+    "qualified": "NO",
+    "qualDate": "2026-08-24",
+    "qualBy": "Christian Salazar",
+    "score": 7,
+    "d1": "YES",
+    "d2": "NO",
+    "valueProp": "U",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Agentforce + Data Cloud PS"
+  },
+  "DS-1725831": {
+    "qualified": "YES",
+    "qualDate": "2026-08-25",
+    "qualBy": "Juan Schunck",
+    "score": 20,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Augmented",
+    "offering": "Service Cloud PS"
+  },
+  "DS-1725299": {
+    "qualified": "NO",
+    "qualDate": "2026-08-26",
+    "qualBy": "Juan Schunck",
+    "score": 9,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "L",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "NO",
+    "deliveryModel": "Not Qualified",
+    "offering": "MuleSoft PS"
+  },
+  "DS-1724954": {
+    "qualified": "NO",
+    "qualDate": "2026-08-27",
+    "qualBy": "Diego Castro",
+    "score": 17,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "NO",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Service Cloud PS"
+  },
+  "DS-1724675": {
+    "qualified": "YES",
+    "qualDate": "2026-08-28",
+    "qualBy": "Ixchel Saucedo",
+    "score": 13,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Augmented",
+    "offering": "Agentforce PS"
+  },
+  "DS-1724121": {
+    "qualified": "NO",
+    "qualDate": "2026-08-29",
+    "qualBy": "Emmanuel Moreno",
+    "score": 10,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "NO",
+    "deliveryModel": "Not Qualified",
+    "offering": "Data Cloud PS"
+  },
+  "DS-1723919": {
+    "qualified": "NO",
+    "qualDate": "2026-08-30",
+    "qualBy": "Emmanuel Moreno",
+    "score": 10,
+    "d1": "NO",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "MuleSoft PS"
+  },
+  "DS-1723917": {
+    "qualified": "YES",
+    "qualDate": "2026-08-17",
+    "qualBy": "Diego Castro",
+    "score": 13,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Augmented",
+    "offering": "Agentforce + Data Cloud PS"
+  },
+  "DS-1723911": {
+    "qualified": "NO",
+    "qualDate": "2026-08-18",
+    "qualBy": "Luis Mauricio Pacheco",
+    "score": 9,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "NO",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Service Cloud PS"
+  },
+  "DS-1723905": {
+    "qualified": "NO",
+    "qualDate": "2026-08-19",
+    "qualBy": "Alejandra Acuña",
+    "score": 16,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "M",
+    "d3": "YES",
+    "d4": "NO",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Data Cloud PS"
+  },
+  "DS-1723620": {
+    "qualified": "YES",
+    "qualDate": "2026-08-20",
+    "qualBy": "Juan Schunck",
+    "score": 22,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "H",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "AI-Native Agentic",
+    "offering": "MuleSoft PS"
+  },
+  "DS-1723257": {
+    "qualified": "NO",
+    "qualDate": "2026-08-21",
+    "qualBy": "Emmanuel Moreno",
+    "score": 16,
+    "d1": "YES",
+    "d2": "YES",
+    "valueProp": "U",
+    "d3": "YES",
+    "d4": "NO",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Data Cloud PS"
+  },
+  "DS-1723135": {
+    "qualified": "NO",
+    "qualDate": "2026-08-22",
+    "qualBy": "Alejandra Acuña",
+    "score": 15,
+    "d1": "NO",
+    "d2": "YES",
+    "valueProp": "L",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Service Cloud PS"
+  },
+  "DS-1722760": {
+    "qualified": "NO",
+    "qualDate": "2026-08-23",
+    "qualBy": "Christian Salazar",
+    "score": 9,
+    "d1": "YES",
+    "d2": "NO",
+    "valueProp": "U",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Tableau PS"
+  },
+  "DS-1722712": {
+    "qualified": "NO",
+    "qualDate": "2026-08-24",
+    "qualBy": "Diego Castro",
+    "score": 11,
+    "d1": "YES",
+    "d2": "NO",
+    "valueProp": "U",
+    "d3": "YES",
+    "d4": "YES",
+    "d5": "YES",
+    "deliveryModel": "Not Qualified",
+    "offering": "Data Cloud PS"
+  }
+};
+const GENERATED = "2026-08-26";
+const LAST_SNAPSHOT = null;
+
+let filtered = [];
+let sortField = 'heat';
+let sortDir = -1;
+let currentPage = 1;
+const PAGE_SIZE = 25;
+let charts = {};
+
+function refreshAlert() {
+  alert("Para actualizar los datos:\n\n1. En Slack, escribe: @Claude ps-dashboard\n2. Claude fetcha datos frescos de org62 y Quali_DB\n3. Genera HTML actualizado y lo sube a GitSoma\n4. Posta resumen ejecutivo en el canal");
+}
+
+function fmt$(n) {
+  if (!n) return '$0';
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return '$' + (n/1e3).toFixed(0) + 'K';
+  return '$' + n;
+}
+
+function heatScore(dsr, quali) {
+  const fmap = {Commit:3,'Best Case':2,Pipeline:1,Omitted:0};
+  const f = fmap[dsr.forecast] || 0;
+  const amt = dsr.amount > 1000000 ? 3 : dsr.amount > 500000 ? 2 : dsr.amount > 100000 ? 1 : 0;
+  const today = new Date(GENERATED);
+  const close = new Date(dsr.closeDate);
+  const days = (close - today) / 86400000;
+  const urg = days < 14 ? 3 : days < 30 ? 2 : days < 90 ? 1 : 0;
+  const q = quali?.qualified === 'YES' ? 2 : quali?.qualified === 'NO' ? -2 : 0;
+  return Math.max(0, Math.min(11, f + amt + urg + q));
+}
+
+function heatBadge(score) {
+  if (score >= 8) return `<span class="heat-high px-2 py-0.5 rounded text-xs font-bold">${score}</span>`;
+  if (score >= 4) return `<span class="heat-mid px-2 py-0.5 rounded text-xs font-bold">${score}</span>`;
+  return `<span class="heat-low px-2 py-0.5 rounded text-xs font-bold">${score}</span>`;
+}
+
+function forecastBadge(f) {
+  if (f === 'Commit') return `<span class="badge-commit">${f}</span>`;
+  if (f === 'Best Case') return `<span class="badge-bestcase">${f}</span>`;
+  if (f === 'Pipeline') return `<span class="badge-pipeline">${f}</span>`;
+  return `<span class="badge-pending">${f||'--'}</span>`;
+}
+function forecastColor(f) { return ''; } // kept for compat
+
+function deliveryBadge(dm) {
+  if (!dm || dm === 'Pending') return '<span class="badge-pending">Pendiente</span>';
+  if (dm === 'AI-Native Agentic') return '<span class="badge-ainative">AI-Native Agentic</span>';
+  if (dm === 'AI-Augmented') return '<span class="badge-aiaugmented">AI-Augmented</span>';
+  if (dm === 'Traditional') return '<span class="badge-inqueue">Traditional</span>';
+  return '<span class="badge-notqualified">Not Qualified</span>';
+}
+
+function statusBadge(s) {
+  if (s === 'Working') return '<span class="badge-working">Working</span>';
+  if (s === 'On Hold') return '<span class="badge-onhold">On Hold</span>';
+  if (s === 'In Queue') return '<span class="badge-inqueue">In Queue</span>';
+  return `<span class="badge-pending">${s}</span>`;
+}
+
+function initFilters() {
+  document.getElementById('genDate').textContent = GENERATED;
+  const sssmSel = document.getElementById('fSSSM');
+  const sssms = [...new Set(DSR_DATA.map(d => d.sssm))].sort();
+  sssms.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sssmSel.appendChild(o); });
+  const ctrySel = document.getElementById('fCountry');
+  const countries = [...new Set(DSR_DATA.map(d => d.country).filter(Boolean))].sort();
+  countries.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; ctrySel.appendChild(o); });
+  document.getElementById('fDateFrom').value = GENERATED;
+  const sixmo = new Date(GENERATED); sixmo.setDate(sixmo.getDate()+180);
+  document.getElementById('fDateTo').value = sixmo.toISOString().split('T')[0];
+  document.getElementById('fAmtMax').value = 30;
+  applyFilters();
+}
+
+function applyFilters() {
+  const sssm = document.getElementById('fSSSM').value;
+  const stage = document.getElementById('fStage').value;
+  const forecast = document.getElementById('fForecast').value;
+  const status = document.getElementById('fStatus').value;
+  const dateFrom = document.getElementById('fDateFrom').value;
+  const dateTo = document.getElementById('fDateTo').value;
+  const amtMin = parseFloat(document.getElementById('fAmtMin').value || 0) * 1000;
+  const amtMax = parseFloat(document.getElementById('fAmtMax').value || 30) * 1e6;
+  const qual = document.getElementById('fQual').value;
+  const delivery = document.getElementById('fDelivery').value;
+  const country = document.getElementById('fCountry').value;
+
+  filtered = DSR_DATA.filter(d => {
+    const q = QUALI_MAP[d.dsr];
+    if (sssm && d.sssm !== sssm) return false;
+    if (stage && d.stage !== stage) return false;
+    if (forecast && d.forecast !== forecast) return false;
+    if (status && d.status !== status) return false;
+    if (dateFrom && d.closeDate < dateFrom) return false;
+    if (dateTo && d.closeDate > dateTo) return false;
+    if (d.amount < amtMin) return false;
+    if (d.amount > amtMax) return false;
+    if (country && d.country !== country) return false;
+    if (qual === 'qualified' && (!q || q.qualified !== 'YES')) return false;
+    if (qual === 'not_qualified' && (!q || q.qualified !== 'NO')) return false;
+    if (qual === 'pending' && q) return false;
+    if (delivery === 'pending_dm' && q) return false;
+    if (delivery && delivery !== 'pending_dm' && (!q || q.deliveryModel !== delivery)) return false;
+    return true;
+  });
+
+  currentPage = 1;
+  updateAlerts();
+  renderTab1();
+  renderTab2();
+  renderTab3();
+  renderTab4();
+  renderTab5();
+  renderTab6();
+  renderSSSmGroupedView(filtered);
+}
+
+function resetFilters() {
+  document.getElementById('fSSSM').value = '';
+  document.getElementById('fStage').value = '';
+  document.getElementById('fForecast').value = '';
+  document.getElementById('fStatus').value = '';
+  document.getElementById('fDateFrom').value = GENERATED;
+  const sixmo = new Date(GENERATED); sixmo.setDate(sixmo.getDate()+180);
+  document.getElementById('fDateTo').value = sixmo.toISOString().split('T')[0];
+  document.getElementById('fAmtMin').value = '';
+  document.getElementById('fAmtMax').value = 30;
+  document.getElementById('fQual').value = '';
+  document.getElementById('fDelivery').value = '';
+  document.getElementById('fCountry').value = '';
+  applyFilters();
+}
+
+function updateAlerts() {
+  const today = new Date(GENERATED);
+  const alerts = [];
+  const imminent = filtered.filter(d => {
+    const days = (new Date(d.closeDate) - today) / 86400000;
+    return days >= 0 && days < 14 && d.status !== 'Working';
+  });
+  if (imminent.length) alerts.push(`<span class="alert-chip" style="background:#FFF0EE;color:#C23934;border-color:#C23934;">🔴 ${imminent.length} cierran en &lt;14 días sin Working</span>`);
+  const highUnq = filtered.filter(d => d.amount > 500000 && !QUALI_MAP[d.dsr]);
+  if (highUnq.length) alerts.push(`<span class="alert-chip" style="background:#FFF3E0;color:#C56200;border-color:#C56200;">🟡 ${highUnq.length} opps &gt;$500K sin calificar</span>`);
+  const sssmCnt = {};
+  filtered.forEach(d => sssmCnt[d.sssm] = (sssmCnt[d.sssm]||0)+1);
+  const overloaded = Object.entries(sssmCnt).filter(([,c]) => c > 15);
+  if (overloaded.length) alerts.push(`<span class="alert-chip" style="background:#FFF3E0;color:#C56200;border-color:#C56200;">🟠 ${overloaded.length} SSSM con &gt;15 DSRs</span>`);
+  const past = filtered.filter(d => d.closeDate < GENERATED);
+  if (past.length) alerts.push(`<span class="alert-chip" style="background:#FFFBE6;color:#C56200;border-color:#C56200;">⏰ ${past.length} DSRs con cierre pasado</span>`);
+  document.getElementById('alertBar').innerHTML = alerts.length ? alerts.join('') : '<span class="text-sm" style="color:#706E6B;">✅ Sin alertas activas</span>';
+}
+
+function makeChart(id, type, labels, datasets, opts={}) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  charts[id] = new Chart(ctx, {
+    type,
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#3E3E3C', font: { size: 11 } } } },
+      scales: type === 'bar' ? { x: { ticks: { color: '#706E6B', font: { size: 10 } }, grid: { color: '#F3F3F3' } }, y: { ticks: { color: '#706E6B', font: { size: 10 } }, grid: { color: '#F3F3F3' } } } : {},
+      ...opts
+    }
+  });
+}
+
+function renderTab1() {
+  const total = filtered.length;
+  const totalArr = filtered.reduce((s,d) => s+d.amount, 0);
+  const commitArr = filtered.filter(d => d.forecast==='Commit').reduce((s,d) => s+d.amount, 0);
+  const qualified = filtered.filter(d => QUALI_MAP[d.dsr]?.qualified === 'YES');
+  const withData = filtered.filter(d => QUALI_MAP[d.dsr]);
+  const pctQual = withData.length ? Math.round(qualified.length/withData.length*100) : 0;
+  const scores = withData.map(d => QUALI_MAP[d.dsr].score).filter(s => s > 0);
+  const avgScore = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : '--';
+
+  document.getElementById('k1').textContent = total;
+  document.getElementById('k2').textContent = fmt$(totalArr);
+  document.getElementById('k3').textContent = fmt$(commitArr);
+  document.getElementById('k4').textContent = pctQual + '%';
+  document.getElementById('k5').textContent = avgScore + '/27';
+
+  // Forecast chart
+  const fCnt = {Commit:0,'Best Case':0,Pipeline:0,Omitted:0};
+  filtered.forEach(d => fCnt[d.forecast] = (fCnt[d.forecast]||0)+1);
+  makeChart('chartForecast','doughnut',Object.keys(fCnt),
+    [{data:Object.values(fCnt),backgroundColor:['#0176D3','#FFB75D','#9E9E9E','#DDDBDA'],borderWidth:0}],
+    {plugins:{legend:{position:'right',labels:{color:'#3E3E3C',font:{size:10}}}}}
+  );
+
+  // Delivery chart
+  const dCnt = {'AI-Native Agentic':0,'AI-Augmented':0,'Traditional':0,'Not Qualified':0,'Pendiente':0};
+  filtered.forEach(d => {
+    const dm = QUALI_MAP[d.dsr]?.deliveryModel;
+    if (!dm) dCnt['Pendiente']++;
+    else dCnt[dm] = (dCnt[dm]||0)+1;
+  });
+  makeChart('chartDelivery','doughnut',Object.keys(dCnt),
+    [{data:Object.values(dCnt),backgroundColor:['#04844B','#FFB75D','#9E9E9E','#C23934','#DDDBDA'],borderWidth:0}],
+    {plugins:{legend:{position:'right',labels:{color:'#3E3E3C',font:{size:10}}}}}
+  );
+
+  // Stage chart
+  const stages = ['01 - Discovery','02 - Scoping','03 - Initial Proposal','04 - Active Negotiation'];
+  const stageLbls = ['Discovery','Scoping','Initial Prop','Active Neg'];
+  const stageCnts = stages.map(s => filtered.filter(d => d.stage===s).length);
+  makeChart('chartStage','bar',stageLbls,[{label:'DSRs',data:stageCnts,backgroundColor:'#0176D3',borderRadius:4}]);
+
+  // Top 5
+  const sorted = [...filtered].sort((a,b) => b.amount - a.amount).slice(0,5);
+  document.getElementById('top5Body').innerHTML = sorted.map(d => {
+    const q = QUALI_MAP[d.dsr];
+    const hs = heatScore(d,q);
+    const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
+    return `<tr class="table-row">
+      <td><a href="${link}" target="_blank" class="opp-link font-mono text-xs">${d.dsr}</a></td>
+      <td>${d.account}</td>
+      <td><a href="${link}" target="_blank" class="opp-link" title="${d.oppName}">${d.oppName.length>45?d.oppName.substring(0,45)+'…':d.oppName}</a></td>
+      <td style="color:#706E6B;">${d.sssm}</td>
+      <td class="text-right font-semibold">${fmt$(d.amount)}</td>
+      <td style="font-size:0.75rem;">${d.stage.split(' - ')[1]||d.stage}</td>
+      <td>${forecastBadge(d.forecast)}</td>
+      <td class="text-center">${heatBadge(hs)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderTab2() {
+  const sssmMap = {};
+  filtered.forEach(d => {
+    if (!sssmMap[d.sssm]) sssmMap[d.sssm] = {total:0,arr:0,working:0,onhold:0,inqueue:0,qualified:0,scores:[],aiNative:0,aiAug:0};
+    const m = sssmMap[d.sssm];
+    m.total++; m.arr += d.amount;
+    if (d.status==='Working') m.working++;
+    if (d.status==='On Hold') m.onhold++;
+    if (d.status==='In Queue') m.inqueue++;
+    const q = QUALI_MAP[d.dsr];
+    if (q?.qualified==='YES') m.qualified++;
+    if (q?.score) m.scores.push(q.score);
+    if (q?.deliveryModel==='AI-Native Agentic') m.aiNative++;
+    if (q?.deliveryModel==='AI-Augmented') m.aiAug++;
+  });
+
+  const entries = Object.entries(sssmMap).sort((a,b) => b[1].total - a[1].total);
+  document.getElementById('sssmBody').innerHTML = entries.map(([name,m]) => {
+    const avgSc = m.scores.length ? (m.scores.reduce((a,b)=>a+b,0)/m.scores.length).toFixed(1) : '--';
+    const overload = m.total > 18;
+    const warn = m.total > 15;
+    const rowStyle = overload ? 'color:#C23934;font-weight:600;' : warn ? 'color:#C56200;font-weight:600;' : '';
+    return `<tr class="table-row">
+      <td style="${rowStyle}">${name}${warn?' ⚠️':''}</td>
+      <td class="text-right font-bold" style="${rowStyle}">${m.total}</td>
+      <td class="text-right">${fmt$(m.arr)}</td>
+      <td class="text-right" style="color:#04844B;">${m.working}</td>
+      <td class="text-right" style="color:#C56200;">${m.onhold}</td>
+      <td class="text-right" style="color:#0176D3;">${m.inqueue}</td>
+      <td class="text-right">${m.qualified}</td>
+      <td class="text-right" style="color:#032D60;font-weight:600;">${avgSc}</td>
+      <td class="text-right" style="color:#04844B;">${m.aiNative}</td>
+      <td class="text-right" style="color:#FFB75D;">${m.aiAug}</td>
+    </tr>`;
+  }).join('');
+
+  const labels = entries.map(([n]) => n.split(' ')[0]);
+  const counts = entries.map(([,m]) => m.total);
+  const arrs = entries.map(([,m]) => +(m.arr/1e6).toFixed(2));
+  makeChart('chartSSSM','bar',labels,[{label:'DSRs',data:counts,backgroundColor:'#0176D3',borderRadius:3}]);
+  makeChart('chartSSSMArr','bar',labels,[{label:'ARR ($M)',data:arrs,backgroundColor:'#04844B',borderRadius:3}]);
+}
+
+function renderTab3() {
+  const stages = ['01 - Discovery','02 - Scoping','03 - Initial Proposal','04 - Active Negotiation'];
+  const stageLbls = ['Discovery','Scoping','Initial Prop','Active Neg'];
+  const stageCounts = stages.map(s => filtered.filter(d => d.stage===s).length);
+  const stageArr = stages.map(s => filtered.filter(d=>d.stage===s).reduce((a,d)=>a+d.amount,0)/1e6);
+  makeChart('chartFunnel','bar',stageLbls,[
+    {label:'DSRs',data:stageCounts,backgroundColor:'#0176D3',borderRadius:3,yAxisID:'y'},
+    {label:'ARR ($M)',data:stageArr.map(v=>+v.toFixed(1)),backgroundColor:'#04844B',borderRadius:3,yAxisID:'y1'}
+  ],{
+    scales:{
+      y:{type:'linear',position:'left',ticks:{color:'#706E6B'},grid:{color:'#F3F3F3'}},
+      y1:{type:'linear',position:'right',ticks:{color:'#04844B'},grid:{drawOnChartArea:false}}
+    }
+  });
+
+  // Stage × Forecast
+  const forecasts = ['Commit','Best Case','Pipeline'];
+  document.getElementById('stageForecastBody').innerHTML = stages.map(s => {
+    const row = filtered.filter(d => d.stage===s);
+    const total = row.length;
+    const cells = forecasts.map(f => `<td class="text-right py-1.5 pr-3">${row.filter(d=>d.forecast===f).length}</td>`).join('');
+    return `<tr class="table-row"><td class="py-1.5 pr-3" style="color:#3E3E3C;">${s.split(' - ')[1]||s}</td>${cells}<td class="text-right py-1.5 font-bold">${total}</td></tr>`;
+  }).join('');
+
+  // Close by month
+  const monthMap = {};
+  filtered.forEach(d => {
+    if (!d.closeDate) return;
+    const mo = d.closeDate.substring(0,7);
+    if (!monthMap[mo]) monthMap[mo] = {count:0,arr:0,commit:0};
+    monthMap[mo].count++;
+    monthMap[mo].arr += d.amount;
+    if (d.forecast==='Commit') monthMap[mo].commit += d.amount;
+  });
+  const months = Object.keys(monthMap).sort();
+  document.getElementById('closeMonthBody').innerHTML = months.map(m => {
+    const v = monthMap[m];
+    const label = new Date(m+'-01').toLocaleString('es', {month:'short',year:'numeric'});
+    return `<tr class="table-row"><td class="py-1.5 pr-4" style="color:#3E3E3C;">${label}</td><td class="py-1.5 pr-4 text-right">${v.count}</td><td class="py-1.5 pr-4 text-right" style="color:#0176D3;">${fmt$(v.arr)}</td><td class="py-1.5 text-right" style="color:#04844B;">${fmt$(v.commit)}</td></tr>`;
+  }).join('');
+}
+
+function renderTab4() {
+  const qualified = filtered.filter(d => QUALI_MAP[d.dsr]);
+  const native = qualified.filter(d => QUALI_MAP[d.dsr].deliveryModel==='AI-Native Agentic');
+  const aug = qualified.filter(d => QUALI_MAP[d.dsr].deliveryModel==='AI-Augmented');
+  const notq = qualified.filter(d => QUALI_MAP[d.dsr].deliveryModel==='Not Qualified');
+  const scores = qualified.map(d => QUALI_MAP[d.dsr].score).filter(s=>s>0);
+  const avgSc = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : '--';
+  document.getElementById('aiK1').textContent = native.length;
+  document.getElementById('aiK2').textContent = aug.length;
+  document.getElementById('aiK3').textContent = notq.length;
+  document.getElementById('aiK4').textContent = avgSc + '/27';
+
+  makeChart('chartAIDelivery','doughnut',['AI-Native','AI-Augmented','Not Qualified'],[{
+    data:[native.length,aug.length,notq.length],
+    backgroundColor:['#04844B','#FFB75D','#C23934'],borderWidth:0
+  }],{plugins:{legend:{position:'right',labels:{color:'#3E3E3C',font:{size:11}}}}});
+
+  const offrMap = {};
+  qualified.forEach(d => {
+    const o = QUALI_MAP[d.dsr].offering;
+    if (o) offrMap[o] = (offrMap[o]||0)+1;
+  });
+  const offrSorted = Object.entries(offrMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  makeChart('chartOffering','bar',offrSorted.map(([k])=>k.replace(' PS','')),[{
+    label:'DSRs',data:offrSorted.map(([,v])=>v),backgroundColor:'#0176D3',borderRadius:3
+  }],{indexAxis:'y'});
+
+  const top10 = qualified.sort((a,b) => (QUALI_MAP[b.dsr]?.score||0)-(QUALI_MAP[a.dsr]?.score||0)).slice(0,10);
+  document.getElementById('aiTop10Body').innerHTML = top10.map(d => {
+    const q = QUALI_MAP[d.dsr];
+    const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
+    return `<tr class="table-row">
+      <td style="color:#0176D3;" class="font-mono text-xs"><a href="${link}" target="_blank" class="opp-link">${d.dsr}</a></td>
+      <td style="color:#706E6B;">${d.sssm.split(' ')[0]}</td>
+      <td>${d.account}</td>
+      <td class="text-right font-bold" style="color:#032D60;">${q.score}</td>
+      <td>${deliveryBadge(q.deliveryModel)}</td>
+      <td style="color:#706E6B;" class="text-xs">${q.offering||'--'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('aiNote').textContent = `Solo muestra ${qualified.length} oportunidades calificadas de ${filtered.length} totales filtradas.`;
+}
+
+function renderTab5() {
+  const today = new Date(GENERATED);
+  const imminent = filtered.filter(d => {
+    const days = (new Date(d.closeDate) - today) / 86400000;
+    return days >= 0 && days < 14 && d.status !== 'Working';
+  });
+  document.getElementById('imminentCards').innerHTML = imminent.length
+    ? imminent.map(d => `<div style="background:#FFF0EE;border:1px solid #C23934;border-radius:8px;padding:0.75rem;">
+        <div class="font-semibold text-sm" style="color:#C23934;">${d.dsr} · ${d.account}</div>
+        <div class="text-xs mt-1" style="color:#C56200;">Cierre: ${d.closeDate} · Status: ${d.status} · ${fmt$(d.amount)} · ${d.sssm}</div>
+      </div>`).join('')
+    : '<p class="text-sm" style="color:#706E6B;">✅ Sin cierres inminentes críticos</p>';
+
+  const highVal = filtered.filter(d => d.amount > 500000 && !QUALI_MAP[d.dsr])
+    .sort((a,b)=>b.amount-a.amount).slice(0,10);
+  document.getElementById('highValueBody').innerHTML = highVal.length
+    ? highVal.map(d => `<tr class="table-row text-xs">
+        <td class="py-1.5 pr-3 font-mono" style="color:#0176D3;">${d.dsr}</td>
+        <td class="py-1.5 pr-3">${d.account}</td>
+        <td class="py-1.5 pr-3 text-right font-bold" style="color:#C56200;">${fmt$(d.amount)}</td>
+        <td class="py-1.5" style="color:#706E6B;">${d.sssm.split(' ')[0]}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="4" class="py-2 text-sm text-center" style="color:#706E6B;">✅ Sin opps de alto valor sin calificar</td></tr>';
+
+  const sssmCnt = {};
+  filtered.forEach(d => sssmCnt[d.sssm] = (sssmCnt[d.sssm]||0)+1);
+  const overloaded = Object.entries(sssmCnt).filter(([,c])=>c>15).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('overloadedSSSM').innerHTML = overloaded.length
+    ? overloaded.map(([n,c]) => `<div class="flex items-center justify-between" style="background:#FFF3E0;border:1px solid #C56200;border-radius:8px;padding:0.5rem 0.75rem;">
+        <span class="font-medium" style="color:#C56200;">${n}</span>
+        <span class="font-bold" style="color:#C56200;">${c} DSRs ${c>18?'🔴':'🟡'}</span>
+      </div>`).join('')
+    : '<p class="text-sm" style="color:#706E6B;">✅ Carga distribuida normalmente</p>';
+
+  const flags = [
+    ['D1 - License Attached','d1'],['D2 - Compelling Event','d2'],
+    ['D3 - Budget Confirmed','d3'],['D4 - PS Talking to DM','d4'],['D5 - Close Date w/DM','d5']
+  ];
+  const qualified = filtered.filter(d => QUALI_MAP[d.dsr]);
+  document.getElementById('riskFlagsBody').innerHTML = flags.map(([label, key]) => {
+    const yes = qualified.filter(d => QUALI_MAP[d.dsr][key]==='YES').length;
+    const no = qualified.filter(d => QUALI_MAP[d.dsr][key]==='NO').length;
+    const total = yes+no;
+    const pct = total ? Math.round(no/total*100) : 0;
+    return `<tr class="table-row text-xs">
+      <td class="py-1.5 pr-4">${label}</td>
+      <td class="py-1.5 pr-4 text-right" style="color:#04844B;">${yes}</td>
+      <td class="py-1.5 pr-4 text-right" style="color:#C23934;">${no}</td>
+      <td class="py-1.5 text-right" style="color:${pct>50?'#C23934':'#C56200'};">${pct}%</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderTab6() {
+  const data = [...filtered].map(d => ({...d, _heat: heatScore(d, QUALI_MAP[d.dsr]), _quali: QUALI_MAP[d.dsr]}));
+  data.sort((a,b) => {
+    let av = a[sortField] ?? a['_'+sortField] ?? '';
+    let bv = b[sortField] ?? b['_'+sortField] ?? '';
+    if (sortField === 'heat') { av = a._heat; bv = b._heat; }
+    if (sortField === 'score') { av = a._quali?.score||0; bv = b._quali?.score||0; }
+    if (typeof av === 'string') return sortDir * av.localeCompare(bv);
+    return sortDir * (av - bv);
+  });
+  const total = data.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  document.getElementById('detailCount').textContent = total;
+  document.getElementById('curPage').textContent = currentPage;
+  document.getElementById('totalPages').textContent = pages;
+  const pageData = data.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+  document.getElementById('detailBody').innerHTML = pageData.map(d => {
+    const q = d._quali;
+    const hs = d._heat;
+    const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
+    const qualBadge = !q ? '<span style="color:#706E6B;">Pendiente</span>' : q.qualified==='YES' ? '<span style="color:#04844B;">✅ Sí</span>' : '<span style="color:#C23934;">❌ No</span>';
+    const copyText = `DSR: ${d.dsr} | ${d.account} | ${d.oppName} | ${d.country} | ${fmt$(d.amount)} | ${d.stage} | ${d.status} | AP: ${d.ap||''} | Tipo: ${d.requestTypeDetail||''} | Score: ${q?.score||'N/A'} | ${q?.deliveryModel||'Pendiente'}`;
+    const oppNameShort = d.oppName && d.oppName.length > 40 ? d.oppName.substring(0,40)+'…' : (d.oppName||'--');
+    return `<tr class="table-row">
+      <td class="px-2 text-center">${heatBadge(hs)}</td>
+      <td class="px-2"><a href="${link}" target="_blank" class="opp-link font-mono text-xs">${d.dsr}</a></td>
+      <td class="px-2 whitespace-nowrap" style="color:#706E6B;font-size:0.72rem;">${d.sssm.split(' ')[0]}</td>
+      <td class="px-2 max-w-xs truncate" title="${d.account}">${d.account}</td>
+      <td class="px-2" title="${d.oppName}"><a href="${link}" target="_blank" class="opp-link" style="font-size:0.72rem;">${oppNameShort}</a></td>
+      <td class="px-2 text-center font-mono" style="color:#706E6B;font-size:0.72rem;">${d.country||'--'}</td>
+      <td class="px-2 whitespace-nowrap" style="font-size:0.72rem;">${d.stage.split(' - ')[1]||d.stage}</td>
+      <td class="px-2 text-right font-semibold">${fmt$(d.amount)}</td>
+      <td class="px-2 whitespace-nowrap">${forecastBadge(d.forecast)}</td>
+      <td class="px-2 whitespace-nowrap" style="color:#706E6B;">${d.closeDate}</td>
+      <td class="px-2 whitespace-nowrap">${statusBadge(d.status)}</td>
+      <td class="px-2 max-w-xs truncate" style="color:#3E3E3C;font-size:0.72rem;" title="${d.ap||''}">${d.ap||'--'}</td>
+      <td class="px-2" style="color:#706E6B;font-size:0.72rem;">${d.requestTypeDetail||'--'}</td>
+      <td class="px-2 text-right font-bold" style="color:#032D60;">${q?.score||'--'}</td>
+      <td class="px-2 whitespace-nowrap">${deliveryBadge(q?.deliveryModel)}</td>
+      <td class="px-2">${qualBadge}</td>
+      <td class="px-2 max-w-xs truncate" style="color:#706E6B;font-size:0.72rem;" title="${q?.offering||''}">${q?.offering||'--'}</td>
+      <td class="px-2"><button onclick="navigator.clipboard.writeText('${copyText.replace(/'/g,"\\'").replace(/`/g,'\\`')}')" style="color:#706E6B;font-size:0.72rem;padding:2px 6px;border:1px solid #DDDBDA;border-radius:4px;" onmouseover="this.style.color='#032D60'" onmouseout="this.style.color='#706E6B'">📋</button></td>
+    </tr>`;
+  }).join('');
+}
+
+let detailSortDir = {};
+function sortTable(field) {
+  if (sortField === field) sortDir *= -1;
+  else { sortField = field; sortDir = -1; }
+  renderTab6();
+}
+
+function prevPage() {
+  if (currentPage > 1) { currentPage--; renderTab6(); }
+}
+function nextPage() {
+  const maxP = Math.ceil(filtered.length/PAGE_SIZE);
+  if (currentPage < maxP) { currentPage++; renderTab6(); }
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.remove('hidden');
+  btn.classList.add('active');
+  // re-render charts after display (needed for Chart.js resize)
+  setTimeout(() => {
+    if (id === 't1') renderTab1();
+    if (id === 't2') renderTab2();
+    if (id === 't3') renderTab3();
+    if (id === 't4') renderTab4();
+    if (id === 'tsssm') renderSSSmGroupedView(filtered);
+  }, 50);
+}
+
+function toggleAllGroups(expand) {
+  document.querySelectorAll('.sssm-group').forEach(g => {
+    const body = g.querySelector('.sssm-group-body');
+    const icon = g.querySelector('.toggle-icon');
+    if (body) body.style.display = expand ? '' : 'none';
+    if (icon) icon.textContent = expand ? '▾' : '▸';
+  });
+}
+
+function toggleGroup(el) {
+  const group = el.closest('.sssm-group');
+  const body = group.querySelector('.sssm-group-body');
+  const icon = el.querySelector('.toggle-icon');
+  if (body) {
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? '' : 'none';
+    if (icon) icon.textContent = isHidden ? '▾' : '▸';
+  }
+}
+
+function renderSSSmGroupedView(data) {
+  const container = document.getElementById('sssmGroupedContainer');
+  if (!container) return;
+
+  const STAGE_ORDER = ['01 - Discovery','02 - Scoping','03 - Initial Proposal','04 - Active Negotiation'];
+
+  // Group: sssm → stage → status → rows
+  const bySSM = {};
+  data.forEach(d => {
+    if (!bySSM[d.sssm]) bySSM[d.sssm] = {};
+    if (!bySSM[d.sssm][d.stage]) bySSM[d.sssm][d.stage] = {};
+    if (!bySSM[d.sssm][d.stage][d.status]) bySSM[d.sssm][d.stage][d.status] = [];
+    bySSM[d.sssm][d.stage][d.status].push(d);
+  });
+
+  const sssmNames = Object.keys(bySSM).sort();
+
+  container.innerHTML = sssmNames.map(sssm => {
+    const stages = bySSM[sssm];
+    const sssmTotal = Object.values(stages).reduce((t, s) => t + Object.values(s).reduce((tt, rows) => tt + rows.length, 0), 0);
+    const sssmArr = Object.values(stages).reduce((t, s) => t + Object.values(s).reduce((tt, rows) => tt + rows.reduce((a, d) => a + d.amount, 0), 0), 0);
+
+    const stageHtml = STAGE_ORDER.filter(st => stages[st]).map(st => {
+      const statuses = stages[st];
+      const stageRows = Object.values(statuses).flat();
+      const stageTotal = stageRows.length;
+      const stageArr = stageRows.reduce((a, d) => a + d.amount, 0);
+
+      const statusHtml = Object.keys(statuses).sort().map(status => {
+        const rows = statuses[status];
+        const rowsHtml = rows.map(d => {
+          const q = QUALI_MAP[d.dsr];
+          const hs = heatScore(d, q);
+          const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
+          const oppShort = d.oppName && d.oppName.length > 50 ? d.oppName.substring(0,50)+'…' : (d.oppName||'--');
+          return `<tr class="inner-row">
+            <td>${heatBadge(hs)}</td>
+            <td><a href="${link}" target="_blank" class="opp-link font-mono" style="font-size:0.72rem;">${d.dsr}</a></td>
+            <td title="${d.oppName}"><a href="${link}" target="_blank" class="opp-link" style="font-size:0.72rem;">${oppShort}</a></td>
+            <td>${d.account}</td>
+            <td style="color:#706E6B;font-size:0.72rem;">${d.country||'--'}</td>
+            <td class="text-right font-semibold">${fmt$(d.amount)}</td>
+            <td>${forecastBadge(d.forecast)}</td>
+            <td style="color:#706E6B;font-size:0.72rem;">${d.closeDate}</td>
+            <td style="color:#706E6B;font-size:0.72rem;" class="max-w-xs truncate" title="${d.ap||''}">${d.ap||'--'}</td>
+            <td>${deliveryBadge(q?.deliveryModel)}</td>
+            <td class="text-right" style="color:#032D60;font-weight:600;">${q?.score||'--'}</td>
+          </tr>`;
+        }).join('');
+        return `<tr><td colspan="11" style="padding:4px 0 2px 0;">
+          <span class="status-label">${status}</span>
+          <span style="color:#706E6B;font-size:0.72rem;margin-left:8px;">(${rows.length})</span>
+        </td></tr>${rowsHtml}`;
+      }).join('');
+
+      return `<div class="stage-group-header">
+        <span>${st}</span>
+        <span style="color:#706E6B;font-size:0.75rem;margin-left:8px;">${stageTotal} DSRs · ${fmt$(stageArr)}</span>
+      </div>
+      <table class="inner-table w-full" style="font-size:0.78rem;">
+        <thead><tr>
+          <th>Heat</th><th>DSR</th><th>Oportunidad</th><th>Cuenta</th>
+          <th>País</th><th class="text-right">Monto</th><th>Forecast</th>
+          <th>Cierre</th><th>Account Partner</th><th>Delivery</th><th class="text-right">Score</th>
+        </tr></thead>
+        <tbody>${statusHtml}</tbody>
+      </table>`;
+    }).join('');
+
+    return `<div class="sssm-group card-panel mb-4">
+      <div class="sssm-group-header" onclick="toggleGroup(this)" style="cursor:pointer;">
+        <span><span class="toggle-icon">▾</span> ${sssm}</span>
+        <span style="font-size:0.8rem;font-weight:400;">${sssmTotal} DSRs · ${fmt$(sssmArr)}</span>
+      </div>
+      <div class="sssm-group-body" style="padding:0 1rem 1rem;">
+        ${stageHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.addEventListener('load', initFilters);
+</script>
+</body>
+</html>
