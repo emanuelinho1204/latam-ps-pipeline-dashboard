@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,6 +54,20 @@
   .inner-row:hover { background: #EAF5FE; }
   .inner-row td { padding: 0.3rem 0.625rem; }
   .sssm-group-header { display: flex; justify-content: space-between; align-items: center; }
+  /* Territory badges */
+  .badge-territory-mx { background:#00A651;color:#fff;border-radius:12px;padding:2px 7px;font-size:0.7rem;font-weight:600;white-space:nowrap; }
+  .badge-territory-gn { background:#FFB75D;color:#032D60;border-radius:12px;padding:2px 7px;font-size:0.7rem;font-weight:600;white-space:nowrap; }
+  .badge-territory-gs { background:#7B5EA7;color:#fff;border-radius:12px;padding:2px 7px;font-size:0.7rem;font-weight:600;white-space:nowrap; }
+  .badge-territory-br { background:#0176D3;color:#fff;border-radius:12px;padding:2px 7px;font-size:0.7rem;font-weight:600;white-space:nowrap; }
+  .badge-territory-ot { background:#DDDBDA;color:#3E3E3C;border-radius:12px;padding:2px 7px;font-size:0.7rem;font-weight:600;white-space:nowrap; }
+  /* Toast notification */
+  #copyToast { position:fixed;bottom:2rem;right:2rem;z-index:9999;background:#032D60;color:#fff;padding:0.75rem 1.25rem;border-radius:0.75rem;font-size:0.9rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.18);transform:translateY(0);transition:opacity 0.3s,transform 0.3s;pointer-events:none; }
+  #copyToast.hidden { opacity:0;transform:translateY(1.5rem); }
+  /* Language switcher */
+  .lang-btn { background:transparent;border:1px solid rgba(255,255,255,0.4);color:rgba(255,255,255,0.7);padding:2px 8px;border-radius:4px;font-size:0.75rem;cursor:pointer;transition:all 0.15s; }
+  .lang-btn.active, .lang-btn:hover { background:rgba(255,255,255,0.15);color:#fff;border-color:#fff; }
+  /* Local filter bar */
+  .local-filter-bar { background:#F8FAFC;border:1px solid #DDDBDA;border-radius:0.5rem;padding:0.75rem 1rem;margin-bottom:1rem; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -66,27 +80,35 @@
     </svg>
     <div>
       <h1 class="text-xl font-bold text-white">LATAM PS Pipeline Dashboard</h1>
-      <p class="text-sm mt-0.5" style="color:#A8C8E8;">Professional Services SSSM Team &middot; Generado: <span id="genDate"></span></p>
+      <p class="text-sm mt-0.5" style="color:#A8C8E8;">Professional Services SSSM Team &middot; <span data-i18n="generated">Generated:</span> <span id="genDate"></span></p>
     </div>
   </div>
-  <button onclick="refreshAlert()" class="text-sm font-medium px-4 py-2 rounded-lg transition-colors border border-white text-white hover:bg-white" style="hover:color:#032D60;" onmouseover="this.style.color='#032D60'" onmouseout="this.style.color='white'">
-    🔄 Actualizar datos
-  </button>
+  <div class="flex items-center gap-3">
+    <div class="flex gap-1">
+      <button onclick="setLang('en')" id="langEN" class="lang-btn active">EN</button>
+      <button onclick="setLang('es')" id="langES" class="lang-btn">ES</button>
+      <button onclick="setLang('pt')" id="langPT" class="lang-btn">PT</button>
+    </div>
+    <button onclick="refreshCopy()" class="text-sm font-medium px-4 py-2 rounded-lg transition-colors border border-white text-white hover:bg-white" onmouseover="this.style.color='#032D60'" onmouseout="this.style.color='white'">
+      <span data-i18n="btn_refresh">🔄 Update data</span>
+    </button>
+  </div>
 </div>
+<div id="copyToast" class="hidden">✅ <span data-i18n="toast_copied">Copied! Paste in Slack: @Claude ps-dashboard</span></div>
 
 <!-- FILTER BAR -->
 <div class="bg-white border-b border-[#DDDBDA] px-6 py-3 shadow-sm">
   <div class="flex flex-wrap gap-3 items-end">
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;">SSSM</label>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_sssm">SSSM</label>
       <select id="fSSSM" onchange="applyFilters()" class="min-w-32">
-        <option value="">Todos</option>
+        <option value="" data-i18n="opt_all">All</option>
       </select>
     </div>
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;">Stage</label>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_stage">Stage</label>
       <select id="fStage" onchange="applyFilters()" class="min-w-36">
-        <option value="">Todos</option>
+        <option value="" data-i18n="opt_all">All</option>
         <option>01 - Discovery</option>
         <option>02 - Scoping</option>
         <option>03 - Initial Proposal</option>
@@ -94,9 +116,9 @@
       </select>
     </div>
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;">Forecast</label>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_forecast">Forecast</label>
       <select id="fForecast" onchange="applyFilters()">
-        <option value="">Todos</option>
+        <option value="" data-i18n="opt_all">All</option>
         <option>Commit</option>
         <option>Best Case</option>
         <option>Pipeline</option>
@@ -104,9 +126,9 @@
       </select>
     </div>
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;">Status</label>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_status">Status</label>
       <select id="fStatus" onchange="applyFilters()">
-        <option value="">Todos</option>
+        <option value="" data-i18n="opt_all">All</option>
         <option>Working</option>
         <option>On Hold</option>
         <option>In Queue</option>
@@ -114,49 +136,49 @@
       </select>
     </div>
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;">Cierre Desde</label>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_date_from">Close From</label>
       <input type="date" id="fDateFrom" onchange="applyFilters()">
     </div>
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;">Cierre Hasta</label>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_date_to">Close To</label>
       <input type="date" id="fDateTo" onchange="applyFilters()">
     </div>
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;">Monto Mín ($K)</label>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_amt_min">Min Amount ($K)</label>
       <input type="number" id="fAmtMin" onchange="applyFilters()" placeholder="0" style="width:80px">
     </div>
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;">Monto Máx ($M)</label>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_amt_max">Max Amount ($M)</label>
       <input type="number" id="fAmtMax" onchange="applyFilters()" placeholder="30" style="width:80px">
     </div>
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;">Calificación</label>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_qual">Qualification</label>
       <select id="fQual" onchange="applyFilters()">
-        <option value="">Todos</option>
-        <option value="qualified">Calificado</option>
-        <option value="not_qualified">No Calificado</option>
-        <option value="pending">Pendiente</option>
+        <option value="" data-i18n="opt_all">All</option>
+        <option value="qualified" data-i18n="opt_qualified">Qualified</option>
+        <option value="not_qualified" data-i18n="opt_not_qualified">Not Qualified</option>
+        <option value="pending" data-i18n="opt_pending">Pending</option>
       </select>
     </div>
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;">Delivery Model</label>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_delivery">Delivery Model</label>
       <select id="fDelivery" onchange="applyFilters()" class="min-w-36">
-        <option value="">Todos</option>
+        <option value="" data-i18n="opt_all">All</option>
         <option>AI-Native Agentic</option>
         <option>AI-Augmented</option>
         <option>Traditional</option>
         <option>Not Qualified</option>
-        <option value="pending_dm">Pendiente</option>
+        <option value="pending_dm" data-i18n="opt_pending">Pending</option>
       </select>
     </div>
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;">País</label>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_country">Country</label>
       <select id="fCountry" onchange="applyFilters()">
-        <option value="">Todos</option>
+        <option value="" data-i18n="opt_all">All</option>
       </select>
     </div>
     <div class="flex items-end">
-      <button onclick="resetFilters()" class="text-sm px-3 py-1.5 rounded transition-colors border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]">↺ Reset</button>
+      <button onclick="resetFilters()" class="text-sm px-3 py-1.5 rounded transition-colors border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]" data-i18n="btn_reset">↺ Reset</button>
     </div>
   </div>
 </div>
@@ -167,13 +189,13 @@
 <!-- TABS -->
 <div class="bg-white border-b border-[#DDDBDA] px-6 shadow-sm">
   <div class="flex gap-0 overflow-x-auto">
-    <button class="tab-btn active px-5 py-3 text-sm font-medium" onclick="showTab('t1',this)">📋 Resumen</button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('tsssm',this)">👤 Vista SSSM</button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t2',this)">👥 Cobertura SSSM</button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t3',this)">🔻 Funnel</button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t4',this)">🤖 AI Readiness</button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t5',this)">🚨 Risk Radar</button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t6',this)">📄 Detalle DSR</button>
+    <button class="tab-btn active px-5 py-3 text-sm font-medium" onclick="showTab('t1',this)"><span data-i18n="tab_summary">📋 Summary</span></button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('tsssm',this)"><span data-i18n="tab_sssm_view">👤 SSSM View</span></button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t2',this)"><span data-i18n="tab_sssm_coverage">👥 SSSM Coverage</span></button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t3',this)"><span data-i18n="tab_funnel">🔻 Funnel</span></button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t4',this)"><span data-i18n="tab_ai">🤖 AI Readiness</span></button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t5',this)"><span data-i18n="tab_risk">🚨 Risk Radar</span></button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t6',this)"><span data-i18n="tab_detail">📄 DSR Detail</span></button>
   </div>
 </div>
 
@@ -183,11 +205,11 @@
 <!-- TAB 1: EXECUTIVE SUMMARY -->
 <div id="t1" class="tab-content">
   <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">DSRs Activos</div><div id="k1" class="text-2xl font-bold" style="color:#032D60;"></div></div>
-    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">Pipeline Total</div><div id="k2" class="text-2xl font-bold" style="color:#0176D3;"></div></div>
-    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">Commit ARR</div><div id="k3" class="text-2xl font-bold" style="color:#04844B;"></div></div>
-    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">% Calificados</div><div id="k4" class="text-2xl font-bold" style="color:#C56200;"></div></div>
-    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;">Avg PS Score</div><div id="k5" class="text-2xl font-bold" style="color:#7B5EA7;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;" data-i18n="kpi_active_dsrs">Active DSRs</div><div id="k1" class="text-2xl font-bold" style="color:#032D60;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;" data-i18n="kpi_total_pipeline">Total Pipeline</div><div id="k2" class="text-2xl font-bold" style="color:#0176D3;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;" data-i18n="kpi_commit_arr">Commit ARR</div><div id="k3" class="text-2xl font-bold" style="color:#04844B;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;" data-i18n="kpi_pct_qualified">% Qualified</div><div id="k4" class="text-2xl font-bold" style="color:#C56200;"></div></div>
+    <div class="kpi-card"><div class="text-xs mb-1" style="color:#706E6B;" data-i18n="kpi_avg_score">Avg PS Score</div><div id="k5" class="text-2xl font-bold" style="color:#7B5EA7;"></div></div>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
     <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Forecast Category</h3><div class="chart-container"><canvas id="chartForecast"></canvas></div></div>
@@ -203,13 +225,32 @@
 
 <!-- TAB: VISTA SSSM (grouped) -->
 <div id="tsssm" class="tab-content hidden">
-  <div class="flex items-center justify-between mb-4">
-    <p class="text-sm" style="color:#706E6B;">Vista agrupada por SSSM → Stage → Status · igual al reporte org62</p>
-    <div class="flex gap-2">
-      <button onclick="toggleAllGroups(true)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#0176D3] hover:bg-[#EAF5FE]">⊞ Expandir todo</button>
-      <button onclick="toggleAllGroups(false)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#706E6B] hover:bg-[#F3F3F3]">⊟ Colapsar todo</button>
+  <div class="local-filter-bar flex flex-wrap gap-3 items-end">
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_sssm">SSSM</label>
+      <select id="sssmF" onchange="applySSSmFilters()" class="min-w-40">
+        <option value="" data-i18n="opt_all_sssms">All SSSMs</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_territory">Territory</label>
+      <select id="terrF" onchange="applySSSmFilters()">
+        <option value="" data-i18n="opt_all_territories">All Territories</option>
+        <option value="Mexico">Mexico</option>
+        <option value="Growth Norte">Growth Norte</option>
+        <option value="Growth Sur">Growth Sur</option>
+        <option value="Brazil">Brazil</option>
+      </select>
+    </div>
+    <div class="flex items-end">
+      <button onclick="resetSSSmFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]" data-i18n="btn_reset">↺ Reset</button>
+    </div>
+    <div class="flex items-end ml-auto gap-2">
+      <button onclick="toggleAllGroups(true)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#0176D3] hover:bg-[#EAF5FE]"><span data-i18n="btn_expand_all">⊞ Expand all</span></button>
+      <button onclick="toggleAllGroups(false)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#706E6B] hover:bg-[#F3F3F3]"><span data-i18n="btn_collapse_all">⊟ Collapse all</span></button>
     </div>
   </div>
+  <p class="text-xs mb-3" style="color:#706E6B;" data-i18n="sssm_view_desc">Grouped view: SSSM → Stage → Status · matches org62 report</p>
   <div id="sssmGroupedContainer"></div>
 </div>
 
@@ -297,11 +338,28 @@
 
 <!-- TAB 6: DSR DETAIL -->
 <div id="t6" class="tab-content hidden">
-  <div class="flex items-center justify-between mb-4">
-    <div class="text-sm" style="color:#706E6B;">Mostrando <span id="detailCount">0</span> DSRs · Página <span id="curPage">1</span>/<span id="totalPages">1</span></div>
+  <div class="local-filter-bar flex flex-wrap gap-3 items-end mb-3">
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_sssm">SSSM</label>
+      <select id="dSSSM" onchange="renderTab6()" class="min-w-40">
+        <option value="" data-i18n="opt_all_sssms">All SSSMs</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_ap">Account Partner</label>
+      <select id="dAP" onchange="renderTab6()" class="min-w-44">
+        <option value="" data-i18n="opt_all_aps">All APs</option>
+      </select>
+    </div>
+    <div class="flex items-end">
+      <button onclick="resetDetailFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]" data-i18n="btn_reset">↺ Reset</button>
+    </div>
+  </div>
+  <div class="flex items-center justify-between mb-2">
+    <div class="text-sm" style="color:#706E6B;"><span data-i18n="showing">Showing</span> <span id="detailCount">0</span> DSRs · <span data-i18n="page">Page</span> <span id="curPage">1</span>/<span id="totalPages">1</span></div>
     <div class="flex gap-2">
-      <button onclick="prevPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]">← Prev</button>
-      <button onclick="nextPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]">Sig →</button>
+      <button onclick="prevPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]" data-i18n="btn_prev">← Prev</button>
+      <button onclick="nextPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]" data-i18n="btn_next">Next →</button>
     </div>
   </div>
   <div class="overflow-x-auto bg-white border border-[#DDDBDA] rounded-xl shadow-sm">
@@ -310,21 +368,22 @@
       <th class="text-center sort-btn" onclick="sortTable('heat')">Heat ▲▼</th>
       <th class="sort-btn" onclick="sortTable('dsr')">DSR ▲▼</th>
       <th class="sort-btn" onclick="sortTable('sssm')">SSSM ▲▼</th>
-      <th class="sort-btn" onclick="sortTable('account')">Cuenta ▲▼</th>
-      <th>Oportunidad</th>
-      <th>País</th>
+      <th class="sort-btn" onclick="sortTable('account')" data-i18n="th_account">Account ▲▼</th>
+      <th data-i18n="th_opp">Opportunity</th>
+      <th data-i18n="th_country">Country</th>
+      <th data-i18n="th_territory">Territory</th>
       <th class="sort-btn" onclick="sortTable('stage')">Stage ▲▼</th>
-      <th class="text-right sort-btn" onclick="sortTable('amount')">Monto ▲▼</th>
+      <th class="text-right sort-btn" onclick="sortTable('amount')" data-i18n="th_amount">Amount ▲▼</th>
       <th class="sort-btn" onclick="sortTable('forecast')">Forecast ▲▼</th>
-      <th class="sort-btn" onclick="sortTable('closeDate')">Cierre ▲▼</th>
+      <th class="sort-btn" onclick="sortTable('closeDate')" data-i18n="th_close">Close ▲▼</th>
       <th class="sort-btn" onclick="sortTable('status')">Status ▲▼</th>
-      <th>Account Partner</th>
-      <th>Tipo</th>
+      <th data-i18n="th_ap">Account Partner</th>
+      <th data-i18n="th_type">Type</th>
       <th class="text-right sort-btn" onclick="sortTable('score')">Score ▲▼</th>
       <th>Delivery</th>
-      <th>Calificado</th>
+      <th data-i18n="th_qualified">Qualified</th>
       <th>Offering</th>
-      <th>Copiar</th>
+      <th data-i18n="th_copy">Copy</th>
     </tr></thead>
     <tbody id="detailBody"></tbody>
   </table>
@@ -4166,8 +4225,142 @@ let currentPage = 1;
 const PAGE_SIZE = 25;
 let charts = {};
 
-function refreshAlert() {
-  alert("Para actualizar los datos:\n\n1. En Slack, escribe: @Claude ps-dashboard\n2. Claude fetcha datos frescos de org62 y Quali_DB\n3. Genera HTML actualizado y lo sube a GitSoma\n4. Posta resumen ejecutivo en el canal");
+// ── i18n ──────────────────────────────────────────────
+let currentLang = 'en';
+const i18n = {
+  en: {
+    generated: 'Generated:', btn_refresh: '🔄 Update data', toast_copied: 'Copied! Paste in Slack: @Claude ps-dashboard',
+    lbl_sssm: 'SSSM', lbl_stage: 'Stage', lbl_forecast: 'Forecast', lbl_status: 'Status',
+    lbl_date_from: 'Close From', lbl_date_to: 'Close To', lbl_amt_min: 'Min Amount ($K)', lbl_amt_max: 'Max Amount ($M)',
+    lbl_qual: 'Qualification', lbl_delivery: 'Delivery Model', lbl_country: 'Country', lbl_territory: 'Territory', lbl_ap: 'Account Partner',
+    opt_all: 'All', opt_all_sssms: 'All SSSMs', opt_all_territories: 'All Territories', opt_all_aps: 'All APs',
+    opt_qualified: 'Qualified', opt_not_qualified: 'Not Qualified', opt_pending: 'Pending',
+    btn_reset: '↺ Reset', btn_expand_all: '⊞ Expand all', btn_collapse_all: '⊟ Collapse all',
+    tab_summary: '📋 Summary', tab_sssm_view: '👤 SSSM View', tab_sssm_coverage: '👥 SSSM Coverage',
+    tab_funnel: '🔻 Funnel', tab_ai: '🤖 AI Readiness', tab_risk: '🚨 Risk Radar', tab_detail: '📄 DSR Detail',
+    kpi_active_dsrs: 'Active DSRs', kpi_total_pipeline: 'Total Pipeline', kpi_commit_arr: 'Commit ARR',
+    kpi_pct_qualified: '% Qualified', kpi_avg_score: 'Avg PS Score',
+    sssm_view_desc: 'Grouped view: SSSM → Stage → Status · matches org62 report',
+    showing: 'Showing', page: 'Page', btn_prev: '← Prev', btn_next: 'Next →',
+    th_account: 'Account ▲▼', th_opp: 'Opportunity', th_country: 'Country', th_territory: 'Territory',
+    th_amount: 'Amount ▲▼', th_close: 'Close ▲▼', th_ap: 'Account Partner', th_type: 'Type',
+    th_qualified: 'Qualified', th_copy: 'Copy'
+  },
+  es: {
+    generated: 'Generado:', btn_refresh: '🔄 Actualizar datos', toast_copied: 'Copiado! Pega en Slack: @Claude ps-dashboard',
+    lbl_sssm: 'SSSM', lbl_stage: 'Etapa', lbl_forecast: 'Forecast', lbl_status: 'Estado',
+    lbl_date_from: 'Cierre Desde', lbl_date_to: 'Cierre Hasta', lbl_amt_min: 'Monto Mín ($K)', lbl_amt_max: 'Monto Máx ($M)',
+    lbl_qual: 'Calificación', lbl_delivery: 'Delivery Model', lbl_country: 'País', lbl_territory: 'Territorio', lbl_ap: 'Account Partner',
+    opt_all: 'Todos', opt_all_sssms: 'Todos los SSSM', opt_all_territories: 'Todos los Territorios', opt_all_aps: 'Todos los APs',
+    opt_qualified: 'Calificado', opt_not_qualified: 'No Calificado', opt_pending: 'Pendiente',
+    btn_reset: '↺ Reset', btn_expand_all: '⊞ Expandir todo', btn_collapse_all: '⊟ Colapsar todo',
+    tab_summary: '📋 Resumen', tab_sssm_view: '👤 Vista SSSM', tab_sssm_coverage: '👥 Cobertura SSSM',
+    tab_funnel: '🔻 Funnel', tab_ai: '🤖 AI Readiness', tab_risk: '🚨 Risk Radar', tab_detail: '📄 Detalle DSR',
+    kpi_active_dsrs: 'DSRs Activos', kpi_total_pipeline: 'Pipeline Total', kpi_commit_arr: 'Commit ARR',
+    kpi_pct_qualified: '% Calificados', kpi_avg_score: 'Avg PS Score',
+    sssm_view_desc: 'Vista agrupada: SSSM → Stage → Status · igual al reporte org62',
+    showing: 'Mostrando', page: 'Página', btn_prev: '← Prev', btn_next: 'Sig →',
+    th_account: 'Cuenta ▲▼', th_opp: 'Oportunidad', th_country: 'País', th_territory: 'Territorio',
+    th_amount: 'Monto ▲▼', th_close: 'Cierre ▲▼', th_ap: 'Account Partner', th_type: 'Tipo',
+    th_qualified: 'Calificado', th_copy: 'Copiar'
+  },
+  pt: {
+    generated: 'Gerado:', btn_refresh: '🔄 Atualizar dados', toast_copied: 'Copiado! Cole no Slack: @Claude ps-dashboard',
+    lbl_sssm: 'SSSM', lbl_stage: 'Etapa', lbl_forecast: 'Forecast', lbl_status: 'Status',
+    lbl_date_from: 'Fechamento De', lbl_date_to: 'Fechamento Até', lbl_amt_min: 'Valor Mín ($K)', lbl_amt_max: 'Valor Máx ($M)',
+    lbl_qual: 'Qualificação', lbl_delivery: 'Delivery Model', lbl_country: 'País', lbl_territory: 'Território', lbl_ap: 'Account Partner',
+    opt_all: 'Todos', opt_all_sssms: 'Todos os SSSMs', opt_all_territories: 'Todos os Territórios', opt_all_aps: 'Todos os APs',
+    opt_qualified: 'Qualificado', opt_not_qualified: 'Não Qualificado', opt_pending: 'Pendente',
+    btn_reset: '↺ Reset', btn_expand_all: '⊞ Expandir tudo', btn_collapse_all: '⊟ Recolher tudo',
+    tab_summary: '📋 Resumo', tab_sssm_view: '👤 Visão SSSM', tab_sssm_coverage: '👥 Cobertura SSSM',
+    tab_funnel: '🔻 Funil', tab_ai: '🤖 AI Readiness', tab_risk: '🚨 Risk Radar', tab_detail: '📄 Detalhe DSR',
+    kpi_active_dsrs: 'DSRs Ativos', kpi_total_pipeline: 'Pipeline Total', kpi_commit_arr: 'Commit ARR',
+    kpi_pct_qualified: '% Qualificados', kpi_avg_score: 'Avg PS Score',
+    sssm_view_desc: 'Visão agrupada: SSSM → Etapa → Status · igual ao relatório org62',
+    showing: 'Mostrando', page: 'Página', btn_prev: '← Ant', btn_next: 'Próx →',
+    th_account: 'Conta ▲▼', th_opp: 'Oportunidade', th_country: 'País', th_territory: 'Território',
+    th_amount: 'Valor ▲▼', th_close: 'Fechamento ▲▼', th_ap: 'Account Partner', th_type: 'Tipo',
+    th_qualified: 'Qualificado', th_copy: 'Copiar'
+  }
+};
+
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  ['EN','ES','PT'].forEach(l => {
+    const btn = document.getElementById('lang'+l);
+    if (btn) btn.classList.toggle('active', l.toLowerCase() === lang);
+  });
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const t = i18n[currentLang] || i18n.en;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.textContent = t[key];
+  });
+}
+
+// ── Territory ─────────────────────────────────────────
+const TERRITORY_MAP = {
+  MX: 'Mexico',
+  CO: 'Growth Norte', VE: 'Growth Norte', PE: 'Growth Norte', EC: 'Growth Norte',
+  BO: 'Growth Norte', GT: 'Growth Norte', HN: 'Growth Norte', SV: 'Growth Norte',
+  NI: 'Growth Norte', CR: 'Growth Norte', PA: 'Growth Norte', DO: 'Growth Norte',
+  PR: 'Growth Norte', CU: 'Growth Norte', JM: 'Growth Norte',
+  AR: 'Growth Sur', CL: 'Growth Sur', UY: 'Growth Sur', PY: 'Growth Sur',
+  BR: 'Brazil'
+};
+
+function getTerritory(country) {
+  return TERRITORY_MAP[country] || 'Other';
+}
+
+function territoryBadge(country) {
+  const t = getTerritory(country);
+  const cls = {Mexico:'badge-territory-mx','Growth Norte':'badge-territory-gn','Growth Sur':'badge-territory-gs','Brazil':'badge-territory-br','Other':'badge-territory-ot'}[t] || 'badge-territory-ot';
+  return `<span class="${cls}">${t}</span>`;
+}
+
+// ── Refresh → clipboard copy + toast ──────────────────
+function refreshCopy() {
+  navigator.clipboard.writeText('@Claude ps-dashboard').then(() => {
+    const toast = document.getElementById('copyToast');
+    toast.classList.remove('hidden');
+    const btn = toast.querySelector('[data-i18n="btn_refresh"]') || toast;
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+  }).catch(() => {
+    const t = i18n[currentLang] || i18n.en;
+    alert(t.toast_copied);
+  });
+}
+
+// ── SSSM View local filters ────────────────────────────
+function applySSSmFilters() {
+  const sssmF = (document.getElementById('sssmF') || {}).value || '';
+  const terrF = (document.getElementById('terrF') || {}).value || '';
+  let data = [...filtered];
+  if (sssmF) data = data.filter(d => d.sssm === sssmF);
+  if (terrF) data = data.filter(d => getTerritory(d.country) === terrF);
+  renderSSSmGroupedView(data);
+}
+
+function resetSSSmFilters() {
+  const s = document.getElementById('sssmF');
+  const t = document.getElementById('terrF');
+  if (s) s.value = '';
+  if (t) t.value = '';
+  renderSSSmGroupedView(filtered);
+}
+
+// ── DSR Detail local filters ───────────────────────────
+function resetDetailFilters() {
+  const s = document.getElementById('dSSSM');
+  const a = document.getElementById('dAP');
+  if (s) s.value = '';
+  if (a) a.value = '';
+  renderTab6();
 }
 
 function fmt$(n) {
@@ -4220,9 +4413,21 @@ function statusBadge(s) {
 
 function initFilters() {
   document.getElementById('genDate').textContent = GENERATED;
-  const sssmSel = document.getElementById('fSSSM');
   const sssms = [...new Set(DSR_DATA.map(d => d.sssm))].sort();
+  // Global SSSM filter
+  const sssmSel = document.getElementById('fSSSM');
   sssms.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sssmSel.appendChild(o); });
+  // SSSM View local filter
+  const sssmF = document.getElementById('sssmF');
+  if (sssmF) sssms.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sssmF.appendChild(o); });
+  // DSR Detail SSSM filter
+  const dSSSM = document.getElementById('dSSSM');
+  if (dSSSM) sssms.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; dSSSM.appendChild(o); });
+  // DSR Detail AP filter
+  const aps = [...new Set(DSR_DATA.map(d => d.ap).filter(Boolean))].sort();
+  const dAP = document.getElementById('dAP');
+  if (dAP) aps.forEach(a => { const o = document.createElement('option'); o.value = a; o.textContent = a; dAP.appendChild(o); });
+  // Country filter
   const ctrySel = document.getElementById('fCountry');
   const countries = [...new Set(DSR_DATA.map(d => d.country).filter(Boolean))].sort();
   countries.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; ctrySel.appendChild(o); });
@@ -4230,6 +4435,7 @@ function initFilters() {
   const sixmo = new Date(GENERATED); sixmo.setDate(sixmo.getDate()+180);
   document.getElementById('fDateTo').value = sixmo.toISOString().split('T')[0];
   document.getElementById('fAmtMax').value = 30;
+  applyTranslations();
   applyFilters();
 }
 
@@ -4273,7 +4479,7 @@ function applyFilters() {
   renderTab4();
   renderTab5();
   renderTab6();
-  renderSSSmGroupedView(filtered);
+  applySSSmFilters();
 }
 
 function resetFilters() {
@@ -4570,7 +4776,11 @@ function renderTab5() {
 }
 
 function renderTab6() {
-  const data = [...filtered].map(d => ({...d, _heat: heatScore(d, QUALI_MAP[d.dsr]), _quali: QUALI_MAP[d.dsr]}));
+  const dSSSMv = (document.getElementById('dSSSM') || {}).value || '';
+  const dAPv = (document.getElementById('dAP') || {}).value || '';
+  let data = [...filtered].map(d => ({...d, _heat: heatScore(d, QUALI_MAP[d.dsr]), _quali: QUALI_MAP[d.dsr]}));
+  if (dSSSMv) data = data.filter(d => d.sssm === dSSSMv);
+  if (dAPv) data = data.filter(d => d.ap === dAPv);
   data.sort((a,b) => {
     let av = a[sortField] ?? a['_'+sortField] ?? '';
     let bv = b[sortField] ?? b['_'+sortField] ?? '';
@@ -4599,6 +4809,7 @@ function renderTab6() {
       <td class="px-2 max-w-xs truncate" title="${d.account}">${d.account}</td>
       <td class="px-2" title="${d.oppName}"><a href="${link}" target="_blank" class="opp-link" style="font-size:0.72rem;">${oppNameShort}</a></td>
       <td class="px-2 text-center font-mono" style="color:#706E6B;font-size:0.72rem;">${d.country||'--'}</td>
+      <td class="px-2 whitespace-nowrap">${territoryBadge(d.country)}</td>
       <td class="px-2 whitespace-nowrap" style="font-size:0.72rem;">${d.stage.split(' - ')[1]||d.stage}</td>
       <td class="px-2 text-right font-semibold">${fmt$(d.amount)}</td>
       <td class="px-2 whitespace-nowrap">${forecastBadge(d.forecast)}</td>
