@@ -68,6 +68,10 @@
   .lang-btn.active, .lang-btn:hover { background:rgba(255,255,255,0.15);color:#fff;border-color:#fff; }
   /* Local filter bar */
   .local-filter-bar { background:#F8FAFC;border:1px solid #DDDBDA;border-radius:0.5rem;padding:0.75rem 1rem;margin-bottom:1rem; }
+  /* SSSM sidebar nav */
+  .sssm-nav-item { padding: 0.45rem 0.75rem; cursor: pointer; border-bottom: 1px solid #F3F3F3; transition: background 0.12s; }
+  .sssm-nav-item:hover { background: #EAF5FE; }
+  .sssm-nav-item.active { background: #D8EDFF; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -397,7 +401,7 @@
       <th class="sort-btn" onclick="sortTable('status')">Status ▲▼</th>
       <th data-i18n="th_ap">Account Partner</th>
       <th data-i18n="th_type">Type</th>
-      <th>Contract</th>
+      <th title="Opp Contract Type | Estimate Billing Type">Contract</th>
       <th class="text-right sort-btn" onclick="sortTable('score')">Score ▲▼</th>
       <th>Delivery</th>
       <th data-i18n="th_qualified">Qualified</th>
@@ -4700,6 +4704,26 @@ function heatBadge(score) {
   return `<span class="heat-low px-2 py-0.5 rounded text-xs font-bold">${score}</span>`;
 }
 
+function contractAbbr(val) {
+  if (!val) return '--';
+  const v = val.toLowerCase();
+  if (v.includes('fixed')) return 'FP';
+  if (v.includes('time') || v.includes('material')) return 'T&M';
+  if (v.includes('milestone')) return 'Mile.';
+  return val.length > 6 ? val.substring(0,6)+'…' : val;
+}
+function contractNorm(val) {
+  if (!val) return '';
+  return val.toLowerCase().replace(/&/g,'and').replace(/[^a-z]/g,' ').replace(/\s+/g,' ').trim();
+}
+function contractCell(oppType, estBillingType) {
+  const o = contractAbbr(oppType);
+  const e = estBillingType ? contractAbbr(estBillingType) : null;
+  if (!e) return `<span style="color:#706E6B;">${o}</span>`;
+  const mismatch = contractNorm(oppType) !== contractNorm(estBillingType);
+  return `<span style="color:#706E6B;">${o}</span><span style="color:#DDDBDA;margin:0 2px;">|</span><span style="color:#706E6B;">${e}</span>${mismatch ? ' <span title="Opp/Estimate contract types differ" style="color:#C23934;font-size:0.72rem;">⚠</span>' : ''}`;
+}
+
 function forecastBadge(f) {
   if (f === 'Commit') return `<span class="badge-commit">${f}</span>`;
   if (f === 'Best Case') return `<span class="badge-bestcase">${f}</span>`;
@@ -5145,7 +5169,7 @@ function renderTab6() {
       <td class="px-2 whitespace-nowrap">${statusBadge(d.status)}</td>
       <td class="px-2 max-w-xs truncate" style="color:#3E3E3C;font-size:0.72rem;" title="${d.ap||''}">${d.ap||'--'}</td>
       <td class="px-2" style="color:#706E6B;font-size:0.72rem;">${d.requestTypeDetail||'--'}</td>
-      <td class="px-2 whitespace-nowrap" style="color:#706E6B;font-size:0.72rem;">${d.contractType||'--'}</td>
+      <td class="px-2 whitespace-nowrap" style="font-size:0.72rem;">${contractCell(d.contractType, est?.billingType)}</td>
       <td class="px-2 text-right font-bold" style="color:#032D60;">${q?.score||'--'}</td>
       <td class="px-2 whitespace-nowrap">${deliveryBadge(q?.deliveryModel)}</td>
       <td class="px-2">${qualBadge}</td>
@@ -5210,8 +5234,38 @@ function renderSSSmGroupedView(data) {
   if (!container) return;
 
   const STAGE_ORDER = ['01 - Discovery','02 - Scoping','03 - Initial Proposal','04 - Active Negotiation'];
+  const activeSSSM = (document.getElementById('sssmF') || {}).value || '';
 
-  // Group: sssm → stage → status → rows
+  // Sidebar: built from ALL currently filtered data (not just data param)
+  const sidebarMap = {};
+  filtered.forEach(d => {
+    if (!sidebarMap[d.sssm]) sidebarMap[d.sssm] = {count:0, arr:0};
+    sidebarMap[d.sssm].count++;
+    sidebarMap[d.sssm].arr += d.amount;
+  });
+  const allNames = Object.keys(sidebarMap).sort();
+
+  const totalCount = filtered.length;
+  const sidebarHtml = [
+    `<div class="sssm-nav-item ${!activeSSSM ? 'active' : ''}" onclick="selectSSSmSidebar('')">
+      <div style="font-weight:700;font-size:0.78rem;color:#032D60;">Todos</div>
+      <div style="color:#706E6B;font-size:0.7rem;">${totalCount} DSRs</div>
+    </div>`,
+    ...allNames.map(sssm => {
+      const info = sidebarMap[sssm];
+      const parts = sssm.split(' ');
+      const first = parts[0];
+      const last = parts.slice(1).join(' ');
+      const isActive = activeSSSM === sssm;
+      return `<div class="sssm-nav-item${isActive ? ' active' : ''}" onclick="selectSSSmSidebar('${sssm.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
+        <div style="font-weight:700;font-size:0.78rem;color:#032D60;">${first}</div>
+        ${last ? `<div style="font-size:0.72rem;color:#3E3E3C;">${last}</div>` : ''}
+        <div style="color:#706E6B;font-size:0.69rem;">${info.count} DSRs · ${fmt$(info.arr)}</div>
+      </div>`;
+    })
+  ].join('');
+
+  // Right panel: group data by sssm → stage → status
   const bySSM = {};
   data.forEach(d => {
     if (!bySSM[d.sssm]) bySSM[d.sssm] = {};
@@ -5219,37 +5273,56 @@ function renderSSSmGroupedView(data) {
     if (!bySSM[d.sssm][d.stage][d.status]) bySSM[d.sssm][d.stage][d.status] = [];
     bySSM[d.sssm][d.stage][d.status].push(d);
   });
+  const panelNames = activeSSSM ? [activeSSSM] : Object.keys(bySSM).sort();
 
-  const sssmNames = Object.keys(bySSM).sort();
-
-  container.innerHTML = sssmNames.map(sssm => {
+  let tbodyHtml = '';
+  panelNames.forEach(sssm => {
     const stages = bySSM[sssm];
-    const sssmTotal = Object.values(stages).reduce((t, s) => t + Object.values(s).reduce((tt, rows) => tt + rows.length, 0), 0);
-    const sssmArr = Object.values(stages).reduce((t, s) => t + Object.values(s).reduce((tt, rows) => tt + rows.reduce((a, d) => a + d.amount, 0), 0), 0);
+    if (!stages) return;
 
-    const stageHtml = STAGE_ORDER.filter(st => stages[st]).map(st => {
+    if (!activeSSSM) {
+      const sssmRows = Object.values(stages).reduce((a, st) => a.concat(Object.values(st).flat()), []);
+      const sssmArr = sssmRows.reduce((s, d) => s + d.amount, 0);
+      tbodyHtml += `<tr><td colspan="13" style="padding:0;">
+        <div style="background:#032D60;color:#fff;font-weight:700;font-size:0.8rem;padding:0.4rem 0.75rem;display:flex;justify-content:space-between;align-items:center;">
+          <span>${sssm}</span>
+          <span style="font-weight:400;opacity:0.65;font-size:0.71rem;">${sssmRows.length} DSRs · ${fmt$(sssmArr)}</span>
+        </div>
+      </td></tr>`;
+    }
+
+    STAGE_ORDER.filter(st => stages[st]).forEach(st => {
       const statuses = stages[st];
       const stageRows = Object.values(statuses).flat();
-      const stageTotal = stageRows.length;
       const stageArr = stageRows.reduce((a, d) => a + d.amount, 0);
+      tbodyHtml += `<tr><td colspan="13" style="padding:0;">
+        <div class="stage-group-header" style="margin:0;border-radius:0;">
+          <span>${st}</span>
+          <span style="color:#706E6B;font-size:0.72rem;margin-left:8px;">${stageRows.length} DSRs · ${fmt$(stageArr)}</span>
+        </div>
+      </td></tr>`;
 
-      const stageTbodyRows = Object.keys(statuses).sort().map(status => {
+      Object.keys(statuses).sort().forEach(status => {
         const rows = statuses[status];
-        const dataRows = rows.map(d => {
+        tbodyHtml += `<tr><td colspan="13" style="padding:3px 0 0 0;">
+          <span class="status-label">${status}</span>
+          <span style="color:#706E6B;font-size:0.71rem;margin-left:8px;">(${rows.length})</span>
+        </td></tr>`;
+        rows.forEach(d => {
           const q = QUALI_MAP[d.dsr];
           const hs = heatScore(d, q);
           const link = d.oppId ? `https://org62.my.salesforce.com/${d.oppId}` : '#';
           const oppShort = d.oppName && d.oppName.length > 50 ? d.oppName.substring(0,50)+'…' : (d.oppName||'--');
           const estV = d.oppId ? ESTIMATE_MAP[d.oppId] : null;
           const estCellV = estV ? `<a href="https://org62.my.salesforce.com/${estV.id}" target="_blank" title="${estV.name}" class="opp-link" style="font-size:0.72rem;">📋</a>` : '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
-          return `<tr class="inner-row">
+          tbodyHtml += `<tr class="inner-row">
             <td>${heatBadge(hs)}</td>
             <td><a href="${link}" target="_blank" class="opp-link font-mono" style="font-size:0.72rem;">${d.dsr}</a></td>
             <td class="text-center">${estCellV}</td>
             <td class="truncate" title="${d.oppName}"><a href="${link}" target="_blank" class="opp-link" style="font-size:0.72rem;">${oppShort}</a></td>
             <td class="truncate">${d.account}</td>
             <td style="color:#706E6B;font-size:0.72rem;">${d.country||'--'}</td>
-            <td class="text-right"><span class="font-semibold">${fmt$(d.amount)}</span>${d.contractType?`<br><span style="color:#706E6B;font-size:0.67rem;">${d.contractType}</span>`:''}</td>
+            <td class="text-right"><span class="font-semibold">${fmt$(d.amount)}</span>${(d.contractType||estV?.billingType)?`<br><span style="font-size:0.67rem;">${contractCell(d.contractType, estV?.billingType)}</span>`:''}</td>
             <td>${forecastBadge(d.forecast)}</td>
             <td class="text-center">${mgrJudgeBadge(d.mgrJudgement)}</td>
             <td style="color:#706E6B;font-size:0.72rem;">${d.closeDate}</td>
@@ -5257,44 +5330,42 @@ function renderSSSmGroupedView(data) {
             <td>${deliveryBadge(q?.deliveryModel)}</td>
             <td class="text-right" style="color:#032D60;font-weight:600;">${q?.score||'--'}</td>
           </tr>`;
-        }).join('');
-        return `<tr><td colspan="13" style="padding:4px 0 0 0;">
-          <span class="status-label">${status}</span>
-          <span style="color:#706E6B;font-size:0.72rem;margin-left:8px;">(${rows.length})</span>
-        </td></tr>${dataRows}`;
-      }).join('');
+        });
+      });
+    });
+  });
 
-      return `<tr><td colspan="13" style="padding:0;">
-        <div class="stage-group-header" style="margin:0;border-radius:0;">
-          <span>${st}</span>
-          <span style="color:#706E6B;font-size:0.75rem;margin-left:8px;">${stageTotal} DSRs · ${fmt$(stageArr)}</span>
-        </div>
-      </td></tr>${stageTbodyRows}`;
-    }).join('');
+  if (!tbodyHtml) tbodyHtml = `<tr><td colspan="13" style="text-align:center;padding:2rem;color:#706E6B;">Sin DSRs para los filtros actuales</td></tr>`;
 
-    return `<div class="sssm-group card-panel mb-4">
-      <div class="sssm-group-header" onclick="toggleGroup(this)" style="cursor:pointer;">
-        <span><span class="toggle-icon">▾</span> ${sssm}</span>
-        <span style="font-size:0.8rem;font-weight:400;">${sssmTotal} DSRs · ${fmt$(sssmArr)}</span>
-      </div>
-      <div class="sssm-group-body" style="padding:0 1rem 1rem;">
-        <table class="inner-table w-full" style="font-size:0.78rem;table-layout:fixed;">
-          <colgroup>
-            <col style="width:38px"><col style="width:88px"><col style="width:32px">
-            <col style="width:22%"><col style="width:14%"><col style="width:34px">
-            <col style="width:68px"><col style="width:80px"><col style="width:50px">
-            <col style="width:78px"><col style="width:13%"><col style="width:90px"><col style="width:38px">
-          </colgroup>
-          <thead><tr>
-            <th>Heat</th><th>DSR</th><th>Est.</th><th>Oportunidad</th><th>Cuenta</th>
-            <th>País</th><th class="text-right">Monto</th><th>Forecast</th><th>Mgr</th>
-            <th>Cierre</th><th>Account Partner</th><th>Delivery</th><th class="text-right">Score</th>
-          </tr></thead>
-          <tbody>${stageHtml}</tbody>
-        </table>
-      </div>
-    </div>`;
-  }).join('');
+  const tableHtml = `<table class="inner-table w-full" style="font-size:0.78rem;table-layout:fixed;">
+    <colgroup>
+      <col style="width:38px"><col style="width:88px"><col style="width:32px">
+      <col style="width:22%"><col style="width:14%"><col style="width:34px">
+      <col style="width:68px"><col style="width:80px"><col style="width:50px">
+      <col style="width:78px"><col style="width:13%"><col style="width:90px"><col style="width:38px">
+    </colgroup>
+    <thead style="position:sticky;top:0;z-index:2;"><tr>
+      <th>Heat</th><th>DSR</th><th>Est.</th><th>Oportunidad</th><th>Cuenta</th>
+      <th>País</th><th class="text-right">Monto</th><th>Forecast</th><th>Mgr</th>
+      <th>Cierre</th><th>Account Partner</th><th>Delivery</th><th class="text-right">Score</th>
+    </tr></thead>
+    <tbody>${tbodyHtml}</tbody>
+  </table>`;
+
+  container.innerHTML = `<div class="flex" style="border:1px solid #DDDBDA;border-radius:0.75rem;overflow:hidden;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+    <div style="width:170px;min-width:150px;border-right:1px solid #DDDBDA;overflow-y:auto;max-height:78vh;background:#FAFBFC;">
+      ${sidebarHtml}
+    </div>
+    <div style="flex:1;overflow-x:auto;overflow-y:auto;max-height:78vh;">
+      ${tableHtml}
+    </div>
+  </div>`;
+}
+
+function selectSSSmSidebar(name) {
+  const sel = document.getElementById('sssmF');
+  if (sel) sel.value = name;
+  applySSSmFilters();
 }
 
 window.addEventListener('load', initFilters);
