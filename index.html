@@ -232,7 +232,7 @@
 </div>
 
 <!-- TABS -->
-<div class="bg-white border-b border-[#DDDBDA] px-6 shadow-sm">
+<div id="tab-bar-wrap" class="bg-white border-b border-[#DDDBDA] px-6 shadow-sm">
   <div class="flex gap-0 overflow-x-auto">
     <button class="tab-btn active px-5 py-3 text-sm font-medium" onclick="showTab('tsssm',this)"><span data-i18n="tab_sssm_view">👤 SSSM View</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t2',this)"><span data-i18n="tab_sssm_coverage">👥 SSSM Coverage</span></button>
@@ -13318,13 +13318,16 @@ function setInsights(tabLabel, items) {
     : '<span style="color:#04844B;font-size:0.8rem;font-weight:600">✅ Sin alertas activas</span>';
 }
 function positionInsightsSidebar() {
-  const wrap = document.getElementById('tab-content-wrap');
-  const sb   = document.getElementById('insights-sidebar');
-  if (!wrap || !sb) return;
-  const top = wrap.getBoundingClientRect().top + window.scrollY;
+  const tabBar = document.getElementById('tab-bar-wrap');
+  const wrap   = document.getElementById('tab-content-wrap');
+  const sb     = document.getElementById('insights-sidebar');
+  if (!tabBar || !wrap || !sb) return;
+  const top = tabBar.getBoundingClientRect().bottom;
   sb.style.top    = top + 'px';
   sb.style.height = 'calc(100vh - ' + top + 'px)';
-  document.body.style.marginRight = '264px';
+  tabBar.style.marginRight = '264px';
+  wrap.style.marginRight   = '264px';
+  document.body.style.marginRight = '';
 }
 window.addEventListener('DOMContentLoaded', positionInsightsSidebar);
 window.addEventListener('resize', positionInsightsSidebar);
