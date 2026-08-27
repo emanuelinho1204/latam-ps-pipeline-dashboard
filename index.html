@@ -231,6 +231,10 @@
   </div>
 </div>
 
+<!-- LAYOUT: main content + sidebar -->
+<div style="display:flex;align-items:flex-start;">
+<div id="main-content-area" style="flex:1;min-width:0;overflow:hidden;">
+
 <!-- TABS -->
 <div id="tab-bar-wrap" class="bg-white border-b border-[#DDDBDA] px-6 shadow-sm">
   <div class="flex gap-0 overflow-x-auto">
@@ -590,7 +594,7 @@
     </table>
   </div>
 </div>
-</div>
+</div><!-- end main-content-area -->
 
 <script>
 // Live data proxy URL — set to Heroku app URL after deploy, empty = use embedded data
@@ -13317,24 +13321,10 @@ function setInsights(tabLabel, items) {
     ? items.join('')
     : '<span style="color:#04844B;font-size:0.8rem;font-weight:600">✅ Sin alertas activas</span>';
 }
-function positionInsightsSidebar() {
-  const tabBar  = document.getElementById('tab-bar-wrap');
-  const kpiStrip = document.getElementById('kpiStrip');
-  const wrap    = document.getElementById('tab-content-wrap');
-  const sb      = document.getElementById('insights-sidebar');
-  if (!tabBar || !wrap || !sb) return;
-  const top = tabBar.getBoundingClientRect().bottom;
-  sb.style.top    = top + 'px';
-  sb.style.height = 'calc(100vh - ' + top + 'px)';
-  wrap.style.marginRight = '264px';
-  document.body.style.marginRight = '';
-}
-window.addEventListener('load', positionInsightsSidebar);
-window.addEventListener('resize', positionInsightsSidebar);
 </script>
 
-<!-- Fixed right insights sidebar (static, always visible) -->
-<div id="insights-sidebar" style="position:fixed;right:0;top:54px;width:264px;height:calc(100vh - 54px);background:#fff;border-left:3px solid #0176D3;box-shadow:-4px 0 14px rgba(0,0,0,0.1);overflow-y:auto;z-index:200;">
+<!-- Right insights sidebar — inside flex layout, position:sticky -->
+<div id="insights-sidebar" style="flex:0 0 264px;width:264px;position:sticky;top:0;height:100vh;background:#fff;border-left:3px solid #0176D3;box-shadow:-4px 0 14px rgba(0,0,0,0.1);overflow-y:auto;z-index:10;">
   <div style="padding:0.65rem 1rem;border-bottom:1px solid #E8E8E8;background:#F8FAFC;position:sticky;top:0;z-index:1;">
     <span style="font-weight:700;font-size:0.78rem;color:#032D60;letter-spacing:0.05em;">📊 INSIGHTS</span>
   </div>
@@ -13343,5 +13333,6 @@ window.addEventListener('resize', positionInsightsSidebar);
     <span style="color:#706E6B;">Cargando…</span>
   </div>
 </div>
+</div><!-- end layout flex -->
 </body>
 </html>
