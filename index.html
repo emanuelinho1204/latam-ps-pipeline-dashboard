@@ -298,15 +298,9 @@
     </div>
   </div>
   <p class="text-xs mb-3" style="color:#706E6B;" data-i18n="sssm_view_desc">Grouped view: SSSM → Stage → Status · matches org62 report</p>
-  <div class="flex gap-3 mb-3 items-start">
-    <div class="card-panel flex-1" style="padding:0.65rem 1rem;">
-      <div class="text-xs font-semibold mb-2" style="color:#706E6B;letter-spacing:0.04em;text-transform:uppercase;">Carga del Equipo</div>
-      <div id="sssmLoadBars"></div>
-    </div>
-    <div class="card-panel p-3" style="min-width:260px;max-width:300px;border-left:4px solid #7B5EA7;" id="sssm-insights">
-      <div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.5rem;letter-spacing:0.03em;">📊 INSIGHTS</div>
-      <span style="color:#706E6B;font-size:0.75rem;">Calculando...</span>
-    </div>
+  <div class="card-panel mb-3" style="padding:0.65rem 1rem;">
+    <div class="text-xs font-semibold mb-2" style="color:#706E6B;letter-spacing:0.04em;text-transform:uppercase;">Carga del Equipo</div>
+    <div id="sssmLoadBars"></div>
   </div>
   <div id="sssmGroupedContainer"></div>
 </div>
@@ -479,22 +473,16 @@
 
 <div id="testimates" class="tab-content hidden">
 <div class="p-4">
-  <div class="flex gap-3 mb-4 items-stretch">
-    <div class="grid grid-cols-5 gap-3 flex-1">
-      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Total Estimates</div><div class="text-2xl font-bold text-blue-900" id="est-kpiTotal">—</div></div>
-      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Monto Total</div><div class="text-2xl font-bold text-blue-900" id="est-kpiAmount">—</div></div>
-      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Margen Promedio</div><div class="text-2xl font-bold text-blue-900" id="est-kpiMargin">—</div></div>
-      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Bill Rate Promedio</div><div class="text-2xl font-bold text-blue-900" id="est-kpiBillRate">—</div></div>
-      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">T&amp;E Total</div><div class="text-2xl font-bold text-blue-900" id="est-kpiTE">—</div></div>
-    </div>
-    <div class="card-panel p-3" style="min-width:260px;max-width:300px;border-left:4px solid #0176D3;" id="est-insights">
-      <div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.5rem;letter-spacing:0.03em;">📊 INSIGHTS</div>
-      <span style="color:#706E6B;font-size:0.75rem;">Calculando...</span>
-    </div>
+  <div class="grid grid-cols-5 gap-3 mb-4">
+    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Total Estimates</div><div class="text-2xl font-bold text-blue-900" id="est-kpiTotal">—</div></div>
+    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Monto Total</div><div class="text-2xl font-bold text-blue-900" id="est-kpiAmount">—</div></div>
+    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Margen Promedio</div><div class="text-2xl font-bold text-blue-900" id="est-kpiMargin">—</div></div>
+    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Bill Rate Promedio</div><div class="text-2xl font-bold text-blue-900" id="est-kpiBillRate">—</div></div>
+    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">T&amp;E Total</div><div class="text-2xl font-bold text-blue-900" id="est-kpiTE">—</div></div>
   </div>
   <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-center">
-    <select id="est-fStatus" onchange="renderEstimatesTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">Approval Status (Todos)</option><option>Draft</option><option>Pending</option><option>Approved</option></select>
-    <select id="est-fBilling" onchange="renderEstimatesTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">Billing Type (Todos)</option><option>Fixed Price</option><option>Time and Materials</option><option>Order Form</option></select>
+    <select id="est-fStatus" onchange="renderEstimatesTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">Approval Status (Todos)</option></select>
+    <select id="est-fBilling" onchange="renderEstimatesTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">Billing Type (Todos)</option></select>
     <select id="est-fStage" onchange="renderEstimatesTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">Stage (Todos)</option></select>
     <select id="est-fEM" onchange="renderEstimatesTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">EM (Todos)</option></select>
     <input id="est-fSearch" type="text" placeholder="Buscar cuenta / opp / estimate..." oninput="renderEstimatesTab()" style="width:250px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem">
@@ -528,10 +516,6 @@
 
 <div id="twon" class="tab-content hidden">
 <div class="p-4">
-  <div id="won-insights" class="card-panel p-3 mb-3" style="border-left:4px solid #04844B;">
-    <div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.5rem;letter-spacing:0.03em;">📊 INSIGHTS</div>
-    <span style="color:#706E6B;font-size:0.75rem;">Calculando...</span>
-  </div>
   <div class="flex flex-wrap gap-3 mb-3 items-center">
     <select id="won-fSSM" onchange="renderWonTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">SSSM (Todos)</option></select>
     <select id="won-fAP" onchange="renderWonTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">AP (Todos)</option></select>
@@ -559,17 +543,11 @@
 </div>
 <div id="trrlatam" class="tab-content hidden">
 <div class="p-4">
-  <div class="flex gap-3 mb-4 items-stretch">
-    <div class="grid grid-cols-4 gap-3 flex-1">
-      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Total RRs</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiTotal">—</div></div>
-      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Sin Asignar</div><div class="text-2xl font-bold" id="rr-kpiUnassigned" style="color:#C56200">—</div></div>
-      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">% Asignados</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiPct">—</div></div>
-      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Oportunidades</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiOpps">—</div></div>
-    </div>
-    <div class="card-panel p-3" style="min-width:280px;max-width:310px;border-left:4px solid #0176D3;" id="rr-insights">
-      <div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.5rem;letter-spacing:0.03em;">📊 INSIGHTS</div>
-      <span style="color:#706E6B;font-size:0.75rem;">Calculando...</span>
-    </div>
+  <div class="grid grid-cols-4 gap-3 mb-4">
+    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Total RRs</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiTotal">—</div></div>
+    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Sin Asignar</div><div class="text-2xl font-bold" id="rr-kpiUnassigned" style="color:#C56200">—</div></div>
+    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">% Asignados</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiPct">—</div></div>
+    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Oportunidades</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiOpps">—</div></div>
   </div>
   <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-center">
     <select id="rr-fStatus" onchange="renderRRTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">Status (Todos)</option></select>
@@ -12057,9 +12035,7 @@ function renderSSSmLoadBars() {
   if (warned.length) parts.push(`<span style="color:#C56200;">🟡 ${warned.length} en atención 13–15</span>`);
   if (!overloaded.length && !warned.length) parts.push(`<span style="color:#04844B;">✅ Carga normal</span>`);
   el.innerHTML = `<span style="font-size:0.75rem;color:#706E6B;">${sorted.length} SSSMs &nbsp;·&nbsp; ${parts.join(' &nbsp;·&nbsp; ')}</span>`;
-  // Insights panel dinámico
-  const insEl = document.getElementById('sssm-insights');
-  if (!insEl) return;
+  // Insights sidebar
   const sssmNow = new Date().toISOString().slice(0,10);
   const sssmD30 = new Date(Date.now()+30*86400000).toISOString().slice(0,10);
   const allRROppIds = new Set(RR_DATA.map(d=>d.oppId).filter(Boolean));
@@ -12067,13 +12043,12 @@ function renderSSSmLoadBars() {
   const noRRStage3 = filtered.filter(d=>(d.stage||'').match(/^0[3-9]/)&&!allRROppIds.has(d.oppId)&&(d.closeDate||'')>=sssmNow);
   const noEstimate = filtered.filter(d=>(d.stage||'').match(/^0[3-9]/)&&!ESTIMATE_MAP[d.oppId]&&(d.closeDate||'')>=sssmNow);
   const overloadedSSSMs = sorted.filter(([,c])=>c>15).map(([n])=>n.split(' ')[0]);
-  const items = [];
-  if (urgentDSRs.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C23934;font-weight:700">⚡ ${urgentDSRs.length} DSR${urgentDSRs.length>1?'s':''} close &lt; 30d</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(urgentDSRs.map(d=>d.account||''))].filter(Boolean).slice(0,2).join(', ')}${urgentDSRs.length>2?` +${urgentDSRs.length-2}`:''}</span></div>`);
-  if (noRRStage3.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C56200;font-weight:700">⚠ ${noRRStage3.length} opp${noRRStage3.length>1?'s':''} Stage 03+ sin RR</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(noRRStage3.map(d=>d.account||''))].filter(Boolean).slice(0,2).join(', ')}${noRRStage3.length>2?` +${noRRStage3.length-2}`:''}</span></div>`);
-  if (noEstimate.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C56200;font-weight:700">📋 ${noEstimate.length} Stage 03+ sin estimate</span></div>`);
-  if (overloadedSSSMs.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C23934;font-weight:700">🔴 Sobrecargados: ${overloadedSSSMs.slice(0,3).join(', ')}</span></div>`);
-  if (!items.length) items.push('<span style="color:#04844B;font-size:0.8rem;font-weight:600">✅ Sin alertas activas</span>');
-  insEl.innerHTML = `<div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.6rem;letter-spacing:0.03em;">📊 INSIGHTS</div>`+items.join('');
+  const sssmItems = [];
+  if (urgentDSRs.length) sssmItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">⚡ ${urgentDSRs.length} DSR${urgentDSRs.length>1?'s':''} close &lt; 30d</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(urgentDSRs.map(d=>d.account||''))].filter(Boolean).slice(0,2).join(', ')}${urgentDSRs.length>2?` +${urgentDSRs.length-2}`:''}</span></div>`);
+  if (noRRStage3.length) sssmItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠ ${noRRStage3.length} opp${noRRStage3.length>1?'s':''} Stage 03+ sin RR</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(noRRStage3.map(d=>d.account||''))].filter(Boolean).slice(0,2).join(', ')}${noRRStage3.length>2?` +${noRRStage3.length-2}`:''}</span></div>`);
+  if (noEstimate.length) sssmItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">📋 ${noEstimate.length} Stage 03+ sin estimate</span></div>`);
+  if (overloadedSSSMs.length) sssmItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🔴 Sobrecargados:</span><br><span style="font-size:0.7rem;color:#706E6B">${overloadedSSSMs.slice(0,4).join(', ')}</span></div>`);
+  setInsights('SSSM View', sssmItems);
 }
 
 function resetSSSmFilters() {
@@ -12122,7 +12097,7 @@ function heatScore(dsr, quali) {
   const fmap = {Commit:3,'Best Case':2,Pipeline:1,Omitted:0};
   const f = fmap[dsr.forecast] || 0;
   const amt = dsr.amount > 1000000 ? 3 : dsr.amount > 500000 ? 2 : dsr.amount > 100000 ? 1 : 0;
-  const today = new Date(GENERATED);
+  const today = new Date();
   const close = new Date(dsr.closeDate);
   const days = (close - today) / 86400000;
   const urg = days < 14 ? 3 : days < 30 ? 2 : days < 90 ? 1 : 0;
@@ -12135,7 +12110,7 @@ function priorityScore(dsr) {
   if (dsr.amount > 500000) score += 3;
   else if (dsr.amount > 200000) score += 2;
   else if (dsr.amount > 50000) score += 1;
-  const today = new Date(GENERATED);
+  const today = new Date();
   const close = new Date(dsr.closeDate);
   const days = (close - today) / 86400000;
   if (days < 30) score += 4;
@@ -12235,8 +12210,9 @@ function initFilters() {
   const ctrySel = document.getElementById('fCountry');
   const countries = [...new Set(DSR_DATA.map(d => d.country).filter(Boolean))].sort();
   countries.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; ctrySel.appendChild(o); });
-  document.getElementById('fDateFrom').value = GENERATED;
-  const sixmo = new Date(GENERATED); sixmo.setDate(sixmo.getDate()+180);
+  const todayStr = new Date().toISOString().slice(0,10);
+  document.getElementById('fDateFrom').value = todayStr;
+  const sixmo = new Date(); sixmo.setDate(sixmo.getDate()+180);
   document.getElementById('fDateTo').value = sixmo.toISOString().split('T')[0];
   document.getElementById('fAmtMax').value = 30;
   applyTranslations();
@@ -12291,8 +12267,9 @@ function resetFilters() {
   document.getElementById('fStage').value = '';
   document.getElementById('fForecast').value = '';
   document.getElementById('fStatus').value = '';
-  document.getElementById('fDateFrom').value = GENERATED;
-  const sixmo = new Date(GENERATED); sixmo.setDate(sixmo.getDate()+180);
+  const todayStr = new Date().toISOString().slice(0,10);
+  document.getElementById('fDateFrom').value = todayStr;
+  const sixmo = new Date(); sixmo.setDate(sixmo.getDate()+180);
   document.getElementById('fDateTo').value = sixmo.toISOString().split('T')[0];
   document.getElementById('fAmtMin').value = '';
   document.getElementById('fAmtMax').value = 30;
@@ -12303,7 +12280,7 @@ function resetFilters() {
 }
 
 function updateAlerts() {
-  const today = new Date(GENERATED);
+  const today = new Date();
   const alerts = [];
   const imminent = filtered.filter(d => {
     const days = (new Date(d.closeDate) - today) / 86400000;
@@ -12316,7 +12293,7 @@ function updateAlerts() {
   filtered.forEach(d => sssmCnt[d.sssm] = (sssmCnt[d.sssm]||0)+1);
   const overloaded = Object.entries(sssmCnt).filter(([,c]) => c > 15);
   if (overloaded.length) alerts.push(`<span class="alert-chip" style="background:#FFF3E0;color:#C56200;border-color:#C56200;">🟠 ${overloaded.length} SSSM con &gt;15 DSRs</span>`);
-  const past = filtered.filter(d => d.closeDate < GENERATED);
+  const past = filtered.filter(d => d.closeDate < new Date().toISOString().slice(0,10));
   if (past.length) alerts.push(`<span class="alert-chip" style="background:#FFFBE6;color:#C56200;border-color:#C56200;">⏰ ${past.length} DSRs con cierre pasado</span>`);
   document.getElementById('alertBar').innerHTML = alerts.length ? alerts.join('') : '<span class="text-sm" style="color:#706E6B;">✅ Sin alertas activas</span>';
 }
@@ -12382,9 +12359,9 @@ function renderTab1() {
     {plugins:{legend:{position:'right',labels:{color:'#3E3E3C',font:{size:10}}}}}
   );
 
-  // Stage chart
-  const stages = ['01 - Discovery','02 - Scoping','03 - Initial Proposal','04 - Active Negotiation'];
-  const stageLbls = ['Discovery','Scoping','Initial Prop','Active Neg'];
+  // Stage chart (dynamic from data)
+  const stages = [...new Set(filtered.map(d=>d.stage).filter(Boolean))].sort();
+  const stageLbls = stages.map(s=>s.split(' - ')[1]||s);
   const stageCnts = stages.map(s => filtered.filter(d => d.stage===s).length);
   makeChart('chartStage','bar',stageLbls,[{label:'DSRs',data:stageCnts,backgroundColor:'#0176D3',borderRadius:4}]);
 
@@ -12455,8 +12432,8 @@ function renderTab2() {
 }
 
 function renderTab3() {
-  const stages = ['01 - Discovery','02 - Scoping','03 - Initial Proposal','04 - Active Negotiation'];
-  const stageLbls = ['Discovery','Scoping','Initial Prop','Active Neg'];
+  const stages = [...new Set(filtered.map(d=>d.stage).filter(Boolean))].sort();
+  const stageLbls = stages.map(s=>s.split(' - ')[1]||s);
   const stageCounts = stages.map(s => filtered.filter(d => d.stage===s).length);
   const stageArr = stages.map(s => filtered.filter(d=>d.stage===s).reduce((a,d)=>a+d.amount,0)/1e6);
   makeChart('chartFunnel','bar',stageLbls,[
@@ -12573,7 +12550,7 @@ function renderTab4() {
 }
 
 function renderTab5() {
-  const today = new Date(GENERATED);
+  const today = new Date();
   const imminent = filtered.filter(d => {
     const days = (new Date(d.closeDate) - today) / 86400000;
     return days >= 0 && days < 14 && d.status !== 'Working';
@@ -12921,35 +12898,31 @@ function renderEstimatesTab() {
   document.getElementById('est-kpiBillRate').textContent = avgRate !== '--' ? '$'+avgRate+'/hr' : '--';
   document.getElementById('est-kpiTE').textContent = totalTE > 0 ? fmtAmt(totalTE) : '--';
   // Populate stage & EM dropdowns on first run
-  const stageEl = document.getElementById('est-fStage');
-  const emEl = document.getElementById('est-fEM');
-  if (stageEl && stageEl.options.length <= 1) {
-    [...new Set(ESTIMATE_DATA.map(d=>d.stage).filter(Boolean))].sort().forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; stageEl.appendChild(o); });
-  }
-  if (emEl && emEl.options.length <= 1) {
-    [...new Set(ESTIMATE_DATA.map(d=>d.em).filter(Boolean))].sort().forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; emEl.appendChild(o); });
-  }
+  ['est-fStage','est-fEM','est-fStatus','est-fBilling'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || el.options.length > 1) return;
+    const keyMap = {'est-fStage':'stage','est-fEM':'em','est-fStatus':'approvalStatus','est-fBilling':'billingType'};
+    [...new Set(ESTIMATE_DATA.map(d=>d[keyMap[id]]).filter(Boolean))].sort().forEach(v => {
+      const o = document.createElement('option'); o.value=v; o.textContent=v; el.appendChild(o);
+    });
+  });
   document.getElementById('est-rowCount').textContent = data.length + ' registros';
-  // Insights (siempre desde ESTIMATE_DATA completo, no filtrado)
+  // Insights sidebar (siempre desde ESTIMATE_DATA completo, no filtrado)
   const estNow = new Date().toISOString().slice(0,10);
   const estD30 = new Date(Date.now()+30*86400000).toISOString().slice(0,10);
-  const estInsEl = document.getElementById('est-insights');
-  if (estInsEl) {
-    const activeEst = ESTIMATE_DATA.filter(e=>(e.closeDate||'')>=estNow);
-    const urgentEstClose = activeEst.filter(e=>e.closeDate<=estD30);
-    const highDisc = ESTIMATE_DATA.filter(e=>(e.discountPct||0)>=15);
-    const fpCount = ESTIMATE_DATA.filter(e=>e.billingType==='Fixed Price').length;
-    const tmCount = ESTIMATE_DATA.filter(e=>e.billingType==='Time and Materials').length;
-    const noEstDSRs = DSR_DATA.filter(d=>(d.stage||'').match(/^0[3-9]/)&&!ESTIMATE_MAP[d.oppId]&&(d.closeDate||'')>=estNow);
-    const noEstOpps = [...new Set(noEstDSRs.map(d=>d.account||''))].filter(Boolean);
-    const items = [];
-    if (urgentEstClose.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C23934;font-weight:700">⚡ ${urgentEstClose.length} estimate${urgentEstClose.length>1?'s':''} close &lt; 30d</span><br><span style="font-size:0.7rem;color:#706E6B">${urgentEstClose.slice(0,2).map(e=>e.account||e.oppName||'').filter(Boolean).join(', ')}${urgentEstClose.length>2?` +${urgentEstClose.length-2}`:''}</span></div>`);
-    if (highDisc.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C56200;font-weight:700">⚠ ${highDisc.length} con descuento ≥15%</span><br><span style="font-size:0.7rem;color:#706E6B">Máx: ${Math.max(...highDisc.map(e=>e.discountPct||0))}%</span></div>`);
-    if (noEstOpps.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C56200;font-weight:700">📋 ${noEstOpps.length} acct Stage 03+ sin estimate</span><br><span style="font-size:0.7rem;color:#706E6B">${noEstOpps.slice(0,2).join(', ')}${noEstOpps.length>2?` +${noEstOpps.length-2}`:''}</span></div>`);
-    if (!items.length) items.push('<span style="color:#04844B;font-size:0.8rem;font-weight:600">✅ Sin alertas activas</span>');
-    items.push(`<div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid #E8E8E8;font-size:0.7rem;color:#706E6B">Fixed Price: ${fpCount} &nbsp;·&nbsp; T&amp;M: ${tmCount}</div>`);
-    estInsEl.innerHTML = `<div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.6rem;letter-spacing:0.03em;">📊 INSIGHTS</div>`+items.join('');
-  }
+  const activeEst = ESTIMATE_DATA.filter(e=>(e.closeDate||'')>=estNow);
+  const urgentEstClose = activeEst.filter(e=>e.closeDate<=estD30);
+  const highDisc = ESTIMATE_DATA.filter(e=>(e.discountPct||0)>=15);
+  const fpCount = ESTIMATE_DATA.filter(e=>e.billingType==='Fixed Price').length;
+  const tmCount = ESTIMATE_DATA.filter(e=>e.billingType==='Time and Materials').length;
+  const noEstDSRs = DSR_DATA.filter(d=>(d.stage||'').match(/^0[3-9]/)&&!ESTIMATE_MAP[d.oppId]&&(d.closeDate||'')>=estNow);
+  const noEstOpps = [...new Set(noEstDSRs.map(d=>d.account||''))].filter(Boolean);
+  const estItems = [];
+  if (urgentEstClose.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">⚡ ${urgentEstClose.length} estimate${urgentEstClose.length>1?'s':''} close &lt; 30d</span><br><span style="font-size:0.7rem;color:#706E6B">${urgentEstClose.slice(0,2).map(e=>e.account||e.oppName||'').filter(Boolean).join(', ')}${urgentEstClose.length>2?` +${urgentEstClose.length-2}`:''}</span></div>`);
+  if (highDisc.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠ ${highDisc.length} con descuento ≥15%</span><br><span style="font-size:0.7rem;color:#706E6B">Máx: ${Math.max(...highDisc.map(e=>e.discountPct||0))}%</span></div>`);
+  if (noEstOpps.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">📋 ${noEstOpps.length} acct Stage 03+ sin estimate</span><br><span style="font-size:0.7rem;color:#706E6B">${noEstOpps.slice(0,2).join(', ')}${noEstOpps.length>2?` +${noEstOpps.length-2}`:''}</span></div>`);
+  estItems.push(`<div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid #E8E8E8;font-size:0.7rem;color:#706E6B">Fixed Price: ${fpCount} &nbsp;·&nbsp; T&amp;M: ${tmCount}</div>`);
+  setInsights('Estimates', estItems);
   // Table
   const stageColors = {'01 - Discovery':'#706E6B','02 - Scoping':'#0176D3','03 - Initial Proposal':'#C56200','04 - Active Negotiation':'#7B5EA7','05 - Negotiation/Review':'#C23934'};
   const billingBadge = b => { if(!b) return '<span style="color:#706E6B">--</span>'; const m={'Fixed Price':'#D8EDFF:#0176D3','Time and Materials':'#EEF1FF:#4C4C94','Order Form':'#FFF3CD:#C56200'}; const p=(m[b]||'#F3F2F2:#706E6B').split(':'); return `<span style="background:${p[0]};color:${p[1]};padding:1px 7px;border-radius:12px;font-size:0.68rem;font-weight:600">${b}</span>`; };
@@ -13015,23 +12988,22 @@ function renderWonTab() {
   const sfBase = 'https://org62.lightning.force.com/lightning/r';
   const countEl = document.getElementById('won-count');
   if (countEl) countEl.textContent = wonOpps.length + ' oportunidades (' + data.length + ' DSRs)';
-  // Insights panel (desde WON_DATA completo)
-  const wonInsEl = document.getElementById('won-insights');
-  if (wonInsEl && WON_DATA.length) {
-    const allOpps = Object.values((() => { const m={}; WON_DATA.forEach(d=>{ const k=d.oppId||d.oppName||'_'; if(!m[k]) m[k]={amount:d.amount||0,closeDate:d.closeDate,account:d.account,sssm:d.sssm}; }); return m; })());
+  // Insights sidebar (desde WON_DATA completo)
+  if (WON_DATA.length) {
+    const allWonOpps = Object.values((() => { const m={}; WON_DATA.forEach(d=>{ const k=d.oppId||d.oppName||'_'; if(!m[k]) m[k]={amount:d.amount||0,closeDate:d.closeDate,account:d.account}; }); return m; })());
     const thisMonth = new Date().toISOString().slice(0,7);
-    const wonThisMonth = allOpps.filter(o=>(o.closeDate||'').startsWith(thisMonth));
-    const totalArr = allOpps.reduce((s,o)=>s+(o.amount||0),0);
-    const biggestDeal = allOpps.sort((a,b)=>(b.amount||0)-(a.amount||0))[0];
+    const wonThisMonth = allWonOpps.filter(o=>(o.closeDate||'').startsWith(thisMonth));
+    const totalWonArr = allWonOpps.reduce((s,o)=>s+(o.amount||0),0);
+    const biggestWon = [...allWonOpps].sort((a,b)=>(b.amount||0)-(a.amount||0))[0];
     const bySssm = {}; WON_DATA.forEach(d=>{ bySssm[d.sssm||'N/A']=(bySssm[d.sssm||'N/A']||0)+1; });
     const topSssm = Object.entries(bySssm).sort((a,b)=>b[1]-a[1])[0];
     const fmtW = v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':'$'+v;
-    const items = [];
-    items.push(`<div style="margin-bottom:0.4rem"><span style="color:#04844B;font-weight:700">🏆 ${allOpps.length} opps · ${fmtW(totalArr)} ARR total</span></div>`);
-    if (wonThisMonth.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#0176D3;font-weight:700">📅 ${wonThisMonth.length} ganados este mes</span><br><span style="font-size:0.7rem;color:#706E6B">${wonThisMonth.slice(0,2).map(o=>o.account||'').filter(Boolean).join(', ')}${wonThisMonth.length>2?` +${wonThisMonth.length-2}`:''}</span></div>`);
-    if (biggestDeal) items.push(`<div style="margin-bottom:0.4rem"><span style="font-weight:700;color:#032D60">💰 Mayor deal: ${fmtW(biggestDeal.amount||0)}</span><br><span style="font-size:0.7rem;color:#706E6B">${biggestDeal.account||''}</span></div>`);
-    if (topSssm) items.push(`<div><span style="font-weight:700;color:#7B5EA7">⭐ Top SSSM: ${topSssm[0].split(' ')[0]}</span><span style="font-size:0.7rem;color:#706E6B"> (${topSssm[1]} DSRs)</span></div>`);
-    wonInsEl.innerHTML = `<div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.6rem;letter-spacing:0.03em;">📊 INSIGHTS</div>`+items.join('');
+    const wonItems = [];
+    wonItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#04844B;font-weight:700">🏆 ${allWonOpps.length} opps ganadas</span><br><span style="font-size:0.7rem;color:#706E6B">ARR total: ${fmtW(totalWonArr)}</span></div>`);
+    if (wonThisMonth.length) wonItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#0176D3;font-weight:700">📅 ${wonThisMonth.length} ganados este mes</span><br><span style="font-size:0.7rem;color:#706E6B">${wonThisMonth.slice(0,2).map(o=>o.account||'').filter(Boolean).join(', ')}${wonThisMonth.length>2?` +${wonThisMonth.length-2}`:''}</span></div>`);
+    if (biggestWon) wonItems.push(`<div style="margin-bottom:0.5rem"><span style="font-weight:700;color:#032D60">💰 Mayor: ${fmtW(biggestWon.amount||0)}</span><br><span style="font-size:0.7rem;color:#706E6B">${biggestWon.account||''}</span></div>`);
+    if (topSssm) wonItems.push(`<div><span style="font-weight:700;color:#7B5EA7">⭐ Top SSSM: ${topSssm[0].split(' ')[0]}</span><span style="font-size:0.7rem;color:#706E6B"> (${topSssm[1]} DSRs)</span></div>`);
+    setInsights('Won Deals', wonItems);
   }
   // Summary panel
   const wonSumEl = document.getElementById('won-summary');
@@ -13115,15 +13087,12 @@ function renderRRTab() {
   const urgentClose = RR_DATA.filter(r =>
     r.closeDate && r.closeDate >= nowStr && r.closeDate <= d30Str
   );
-  const insightsEl = document.getElementById('rr-insights');
-  if (insightsEl) {
-    let items = [];
-    if (vencidosInsight.length) items.push(`<div style="margin-bottom:0.4rem;"><span style="color:#C23934;font-weight:700;">🚩 ${vencidosInsight.length} RR${vencidosInsight.length>1?'s':''} con inicio vencido</span><br><span style="font-size:0.7rem;color:#706E6B;">${vencidosInsight.slice(0,3).map(r=>r.oppName||r.name||'').filter(Boolean).join(', ')}${vencidosInsight.length>3?` +${vencidosInsight.length-3}`:''}</span></div>`);
-    if (urgentClose.length) items.push(`<div style="margin-bottom:0.4rem;"><span style="color:#C56200;font-weight:700;">⚡ ${urgentClose.length} RR${urgentClose.length>1?'s':''} con close &lt; 30 días</span><br><span style="font-size:0.7rem;color:#706E6B;">${[...new Set(urgentClose.map(r=>r.oppName||''))].filter(Boolean).slice(0,3).join(', ')}${urgentClose.length>3?` +${urgentClose.length-3}`:''}</span></div>`);
-    if (stage3PlusNoRR.length) items.push(`<div style="margin-bottom:0.4rem;"><span style="color:#C56200;font-weight:700;">⚠ ${stage3PlusNoRR.length} opp${stage3PlusNoRR.length>1?'s':''} Stage 03+ sin RR</span><br><span style="font-size:0.7rem;color:#706E6B;">${stage3PlusNoRR.slice(0,3).map(e=>e.oppName||'').filter(Boolean).join(', ')}${stage3PlusNoRR.length>3?` +${stage3PlusNoRR.length-3}`:''}</span></div>`);
-    if (!items.length) items.push(`<span style="color:#04844B;font-size:0.8rem;font-weight:600;">✅ Sin alertas activas</span>`);
-    insightsEl.innerHTML = `<div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.6rem;letter-spacing:0.03em;">📊 INSIGHTS</div>` + items.join('');
-  }
+  // Insights sidebar
+  const rrItems = [];
+  if (vencidosInsight.length) rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 ${vencidosInsight.length} RR${vencidosInsight.length>1?'s':''} con inicio vencido</span><br><span style="font-size:0.7rem;color:#706E6B">${vencidosInsight.slice(0,3).map(r=>r.oppName||r.name||'').filter(Boolean).join(', ')}${vencidosInsight.length>3?` +${vencidosInsight.length-3}`:''}</span></div>`);
+  if (urgentClose.length) rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚡ ${urgentClose.length} RR${urgentClose.length>1?'s':''} con close &lt; 30d</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(urgentClose.map(r=>r.oppName||''))].filter(Boolean).slice(0,3).join(', ')}${urgentClose.length>3?` +${urgentClose.length-3}`:''}</span></div>`);
+  if (stage3PlusNoRR.length) rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠ ${stage3PlusNoRR.length} opp${stage3PlusNoRR.length>1?'s':''} Stage 03+ sin RR</span><br><span style="font-size:0.7rem;color:#706E6B">${stage3PlusNoRR.slice(0,3).map(e=>e.oppName||'').filter(Boolean).join(', ')}${stage3PlusNoRR.length>3?` +${stage3PlusNoRR.length-3}`:''}</span></div>`);
+  setInsights('RR LATAM', rrItems);
   // KPIs
   const unassigned = data.filter(d=>!d.resource).length;
   const pctAssigned = data.length ? Math.round((data.length-unassigned)/data.length*100) : 0;
@@ -13250,6 +13219,37 @@ function renderRRTab() {
   }
   document.getElementById('rr-tableBody').innerHTML = rows;
 }
+
+// ── Global Insights Sidebar ────────────────────────────
+function setInsights(tabLabel, items) {
+  const content = document.getElementById('insights-content');
+  const label   = document.getElementById('insights-tab-label');
+  if (!content) return;
+  if (label) label.textContent = tabLabel;
+  content.innerHTML = (items && items.length)
+    ? items.join('')
+    : '<span style="color:#04844B;font-size:0.8rem;font-weight:600">✅ Sin alertas activas</span>';
+}
+function toggleInsights(show) {
+  const sb  = document.getElementById('insights-sidebar');
+  const btn = document.getElementById('insights-toggle-btn');
+  if (!sb) return;
+  sb.style.transform  = show ? 'translateX(0)'    : 'translateX(100%)';
+  if (btn) btn.style.display = show ? 'none' : 'flex';
+}
 </script>
+
+<!-- Fixed right insights sidebar -->
+<div id="insights-sidebar" style="position:fixed;right:0;top:54px;width:264px;height:calc(100vh - 54px);background:#fff;border-left:3px solid #0176D3;box-shadow:-4px 0 14px rgba(0,0,0,0.1);overflow-y:auto;z-index:200;transition:transform 0.22s ease;">
+  <div style="padding:0.65rem 1rem;border-bottom:1px solid #E8E8E8;display:flex;justify-content:space-between;align-items:center;background:#F8FAFC;position:sticky;top:0;z-index:1;">
+    <span style="font-weight:700;font-size:0.78rem;color:#032D60;letter-spacing:0.05em;">📊 INSIGHTS</span>
+    <button onclick="toggleInsights(false)" style="background:none;border:none;cursor:pointer;color:#706E6B;font-size:1.2rem;line-height:1;padding:0 2px;">×</button>
+  </div>
+  <div id="insights-tab-label" style="font-size:0.62rem;color:#706E6B;padding:0.3rem 1rem;background:#F8FAFC;border-bottom:1px solid #F3F2F2;text-transform:uppercase;letter-spacing:0.06em;"></div>
+  <div id="insights-content" style="padding:0.85rem 1rem;font-size:0.78rem;color:#3E3E3C;line-height:1.5;">
+    <span style="color:#706E6B;">Selecciona un tab para ver insights.</span>
+  </div>
+</div>
+<button id="insights-toggle-btn" onclick="toggleInsights(true)" style="display:none;position:fixed;right:0;top:50%;transform:translateY(-50%);background:#0176D3;color:#fff;border:none;cursor:pointer;padding:10px 5px;border-radius:4px 0 0 4px;z-index:201;writing-mode:vertical-rl;font-size:0.7rem;font-weight:700;letter-spacing:0.04em;align-items:center;justify-content:center;">INSIGHTS</button>
 </body>
 </html>
