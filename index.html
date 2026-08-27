@@ -580,6 +580,8 @@
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('ap')">AP <span class="sort-icon" id="rr-si-ap">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">RRs</th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Estado</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Estimate</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">SSSM</th>
       </tr></thead>
       <tbody id="rr-tableBody"></tbody>
     </table>
@@ -8841,6 +8843,8 @@ function renderRRTab() {
       <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${opp.ap||'--'}</td>
       <td class="px-3 py-2" style="font-size:0.73rem;color:#3E3E3C;max-width:280px;white-space:normal;">${rrText}</td>
       <td class="px-3 py-2">${violBadge||'<span style="color:#04844B;font-size:0.75rem;">✅</span>'}</td>
+      <td class="px-3 py-2" style="font-size:0.73rem;">${(()=>{ const est=ESTIMATE_MAP[opp.oppId]; return est ? `<a href="${sfBase}/ffscpq__Estimate__c/${est.id}/view" target="_blank" style="color:#0176D3;">${est.name}</a>` : '<span style="color:#706E6B;">—</span>'; })()}</td>
+      <td class="px-3 py-2" style="font-size:0.73rem;">${(()=>{ const dsr=DSR_DATA.find(d=>d.oppId===opp.oppId); return dsr ? `<a href="${sfBase}/Deal_Support_Request__c/${dsr.dsrId}/view" target="_blank" style="color:#0176D3;">${dsr.sssm}</a>` : '<span style="color:#706E6B;">—</span>'; })()}</td>
     </tr>`;
   }).join('');
   document.getElementById('rr-tableBody').innerHTML = rows;
