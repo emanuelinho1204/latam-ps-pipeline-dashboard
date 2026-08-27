@@ -21,8 +21,9 @@
   .heat-low { background: #FEEFEE; color: #C23934; border: 1px solid rgba(194,57,52,0.2); }
   .sort-btn { cursor: pointer; user-select: none; color: #0176D3; }
   .sort-btn:hover { color: #014486; }
-  .rr-table { table-layout: fixed; width: 100%; }
+  .rr-table { table-layout: auto; width: 100%; }
   .rr-table th { resize: horizontal; overflow: hidden; position: relative; min-width: 50px; }
+  .rr-table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
   .chart-container { position: relative; height: 260px; }
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: #F3F3F3; }
@@ -574,16 +575,16 @@
   <div class="card-panel overflow-auto">
     <table class="rr-table border-collapse" style="font-size:0.78rem;color:#3E3E3C;">
       <thead><tr>
-        <th class="px-3 py-2 text-center" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:80px;">Bandera</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;width:190px;" onclick="rrSortBy('oppName')">Oportunidad <span class="sort-icon" id="rr-si-oppName">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;width:140px;" onclick="rrSortBy('account')">Cuenta <span class="sort-icon" id="rr-si-account">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:80px;">Stage</th>
-        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;width:90px;" onclick="rrSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="rr-si-closeDate">▲</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;width:120px;" onclick="rrSortBy('ap')">AP <span class="sort-icon" id="rr-si-ap">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:170px;">RRs</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:90px;">Estado</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:160px;">Estimate</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:120px;">SSSM</th>
+        <th class="px-3 py-2 text-center" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:80px;">Bandera</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:170px;" onclick="rrSortBy('oppName')">Oportunidad <span class="sort-icon" id="rr-si-oppName">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:120px;" onclick="rrSortBy('account')">Cuenta <span class="sort-icon" id="rr-si-account">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:80px;">Stage</th>
+        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:90px;" onclick="rrSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="rr-si-closeDate">▲</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:110px;" onclick="rrSortBy('ap')">AP <span class="sort-icon" id="rr-si-ap">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:150px;">RRs</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:90px;">Estado</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:150px;">Estimate</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:110px;">SSSM</th>
       </tr></thead>
       <tbody id="rr-tableBody"></tbody>
     </table>
@@ -8854,6 +8855,53 @@ function renderRRTab() {
       <td class="px-3 py-2" style="font-size:0.73rem;">${(()=>{ const dsr=DSR_DATA.find(d=>d.oppId===opp.oppId); return dsr ? `<a href="${sfBase}/Deal_Support_Request__c/${dsr.dsrId}/view" target="_blank" style="color:#0176D3;">${dsr.sssm}</a>` : '<span style="color:#706E6B;">—</span>'; })()}</td>
     </tr>`;
   }).join('');
+  // Also add ESTIMATE_DATA Stage 03+ opps with no RRs
+  const allRROppIdsSet = new Set(RR_DATA.map(d=>d.oppId).filter(Boolean));
+  const estNoRR = (typeof ESTIMATE_DATA !== 'undefined' ? ESTIMATE_DATA : []).filter(e =>
+    (e.stage||'').match(/^0[3-9]/) &&
+    !allRROppIdsSet.has(e.oppId) &&
+    e.closeDate >= today
+  );
+  if (estNoRR.length) {
+    const estRows = estNoRR.sort((a,b)=>(a.closeDate||'')>(b.closeDate||'')?1:-1).map(e => {
+      const daysLeft = e.closeDate ? Math.round((new Date(e.closeDate) - new Date(today)) / 86400000) : null;
+      let flagHtml = '<span style="color:#706E6B;">—</span>';
+      if (daysLeft !== null) {
+        if (daysLeft < 31) flagHtml = `<span style="background:#FDDCDB;color:#C23934;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🚩 ${daysLeft}d</span>`;
+        else if (daysLeft <= 45) flagHtml = `<span style="background:#FEF0C7;color:#7A4504;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${daysLeft}d</span>`;
+        else flagHtml = `<span style="background:#D4EDDA;color:#027E46;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${daysLeft}d</span>`;
+      }
+      const closeStyle = e.closeDate <= d30 ? 'color:#C56200;font-weight:600' : 'color:#706E6B';
+      const est = ESTIMATE_MAP[e.oppId];
+      const dsr = DSR_DATA.find(d=>d.oppId===e.oppId);
+      return `<tr class="table-row" style="background:#FFFBF0;">
+        <td class="px-3 py-2 text-center">${flagHtml}</td>
+        <td class="px-3 py-2"><a href="${sfBase}/Opportunity/${e.oppId}/view" target="_blank" style="color:#0176D3;">${(e.oppName||'').substring(0,42)}${(e.oppName||'').length>42?'…':''}</a></td>
+        <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${e.account||'--'}</td>
+        <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${e.stage||'--'}</td>
+        <td class="px-3 py-2 text-right" style="${closeStyle};white-space:nowrap;">${e.closeDate||'--'}</td>
+        <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${e.ap||'--'}</td>
+        <td class="px-3 py-2"><span style="color:#706E6B;">—</span></td>
+        <td class="px-3 py-2"><span style="background:#FFF3E0;color:#C56200;padding:1px 6px;border-radius:12px;font-size:0.68rem;font-weight:600;">⚠ Sin RR</span></td>
+        <td class="px-3 py-2" style="font-size:0.73rem;">${est ? `<a href="${sfBase}/ffscpq__Estimate__c/${est.id}/view" target="_blank" style="color:#0176D3;">${est.name}</a>` : '<span style="color:#706E6B;">—</span>'}</td>
+        <td class="px-3 py-2" style="font-size:0.73rem;">${dsr ? `<a href="${sfBase}/Deal_Support_Request__c/${dsr.dsrId}/view" target="_blank" style="color:#0176D3;">${dsr.sssm}</a>` : '<span style="color:#706E6B;">—</span>'}</td>
+      </tr>`;
+    }).join('');
+    rows += estRows;
+  }
+  // Also update violations panel with estNoRR
+  if (estNoRR.length) {
+    const violEl2 = document.getElementById('rr-violations');
+    if (violEl2) {
+      const existingHtml = violEl2.innerHTML;
+      const noRRHtml = `<div style="margin-top:${existingHtml&&!existingHtml.includes('Sin incumplimientos')?'0.5rem':'0'}"><strong style="color:#C56200;">⚠ ${estNoRR.length} opp${estNoRR.length>1?'s':''} en Stage 03+ sin RRs (vía Estimate)</strong>: ${estNoRR.slice(0,5).map(e=>`<span style="font-size:0.75rem;color:#3E3E3C;">${e.oppName||e.oppId}</span>`).join(', ')}${estNoRR.length>5?` y ${estNoRR.length-5} más`:''}</div>`;
+      if (existingHtml.includes('Sin incumplimientos')) {
+        violEl2.innerHTML = noRRHtml;
+      } else {
+        violEl2.innerHTML += noRRHtml;
+      }
+    }
+  }
   document.getElementById('rr-tableBody').innerHTML = rows;
 }
 </script>
