@@ -13317,38 +13317,28 @@ function setInsights(tabLabel, items) {
     ? items.join('')
     : '<span style="color:#04844B;font-size:0.8rem;font-weight:600">✅ Sin alertas activas</span>';
 }
-function toggleInsights(show) {
-  const sb  = document.getElementById('insights-sidebar');
-  const btn = document.getElementById('insights-toggle-btn');
-  if (!sb) return;
-  sb.style.transform  = show ? 'translateX(0)'    : 'translateX(100%)';
-  if (btn) btn.style.display = show ? 'none' : 'flex';
-}
 function positionInsightsSidebar() {
   const wrap = document.getElementById('tab-content-wrap');
   const sb   = document.getElementById('insights-sidebar');
-  const btn  = document.getElementById('insights-toggle-btn');
   if (!wrap || !sb) return;
   const top = wrap.getBoundingClientRect().top + window.scrollY;
   sb.style.top    = top + 'px';
   sb.style.height = 'calc(100vh - ' + top + 'px)';
-  if (btn) { btn.style.top = (top + (window.innerHeight - top) / 2) + 'px'; btn.style.transform = 'none'; }
+  wrap.style.paddingRight = (264 + 16) + 'px';
 }
 window.addEventListener('DOMContentLoaded', positionInsightsSidebar);
 window.addEventListener('resize', positionInsightsSidebar);
 </script>
 
-<!-- Fixed right insights sidebar -->
-<div id="insights-sidebar" style="position:fixed;right:0;top:54px;width:264px;height:calc(100vh - 54px);background:#fff;border-left:3px solid #0176D3;box-shadow:-4px 0 14px rgba(0,0,0,0.1);overflow-y:auto;z-index:200;transition:transform 0.22s ease;">
-  <div style="padding:0.65rem 1rem;border-bottom:1px solid #E8E8E8;display:flex;justify-content:space-between;align-items:center;background:#F8FAFC;position:sticky;top:0;z-index:1;">
+<!-- Fixed right insights sidebar (static, always visible) -->
+<div id="insights-sidebar" style="position:fixed;right:0;top:54px;width:264px;height:calc(100vh - 54px);background:#fff;border-left:3px solid #0176D3;box-shadow:-4px 0 14px rgba(0,0,0,0.1);overflow-y:auto;z-index:200;">
+  <div style="padding:0.65rem 1rem;border-bottom:1px solid #E8E8E8;background:#F8FAFC;position:sticky;top:0;z-index:1;">
     <span style="font-weight:700;font-size:0.78rem;color:#032D60;letter-spacing:0.05em;">📊 INSIGHTS</span>
-    <button onclick="toggleInsights(false)" style="background:none;border:none;cursor:pointer;color:#706E6B;font-size:1.2rem;line-height:1;padding:0 2px;">×</button>
   </div>
   <div id="insights-tab-label" style="font-size:0.62rem;color:#706E6B;padding:0.3rem 1rem;background:#F8FAFC;border-bottom:1px solid #F3F2F2;text-transform:uppercase;letter-spacing:0.06em;"></div>
   <div id="insights-content" style="padding:0.85rem 1rem;font-size:0.78rem;color:#3E3E3C;line-height:1.5;">
-    <span style="color:#706E6B;">Selecciona un tab para ver insights.</span>
+    <span style="color:#706E6B;">Cargando…</span>
   </div>
 </div>
-<button id="insights-toggle-btn" onclick="toggleInsights(true)" style="display:none;position:fixed;right:0;top:50%;transform:translateY(-50%);background:#0176D3;color:#fff;border:none;cursor:pointer;padding:10px 5px;border-radius:4px 0 0 4px;z-index:201;writing-mode:vertical-rl;font-size:0.7rem;font-weight:700;letter-spacing:0.04em;align-items:center;justify-content:center;">INSIGHTS</button>
 </body>
 </html>
