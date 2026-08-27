@@ -546,14 +546,17 @@
 </div>
 <div id="trrlatam" class="tab-content hidden">
 <div class="p-4">
-  <div class="grid grid-cols-4 gap-3 mb-4">
-    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Total RRs</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiTotal">—</div></div>
-    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Sin Asignar</div><div class="text-2xl font-bold" id="rr-kpiUnassigned" style="color:#C56200">—</div></div>
-    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">% Asignados</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiPct">—</div></div>
-    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Oportunidades</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiOpps">—</div></div>
-  </div>
-  <div class="card-panel p-3 mb-3" style="border-left:4px solid #C23934;" id="rr-violations">
-    <span style="color:#706E6B;font-size:0.8rem;">Calculando incumplimientos...</span>
+  <div class="flex gap-3 mb-4 items-stretch">
+    <div class="grid grid-cols-4 gap-3 flex-1">
+      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Total RRs</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiTotal">—</div></div>
+      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Sin Asignar</div><div class="text-2xl font-bold" id="rr-kpiUnassigned" style="color:#C56200">—</div></div>
+      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">% Asignados</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiPct">—</div></div>
+      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Oportunidades</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiOpps">—</div></div>
+    </div>
+    <div class="card-panel p-3" style="min-width:280px;max-width:310px;border-left:4px solid #0176D3;" id="rr-insights">
+      <div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.5rem;letter-spacing:0.03em;">📊 INSIGHTS</div>
+      <span style="color:#706E6B;font-size:0.75rem;">Calculando...</span>
+    </div>
   </div>
   <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-center">
     <select id="rr-fStatus" onchange="renderRRTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">Status (Todos)</option></select>
@@ -13024,24 +13027,34 @@ function renderRRTab() {
     const va = a[rrSortCol]||'', vb = b[rrSortCol]||'';
     return va < vb ? rrSortDir : va > vb ? -rrSortDir : 0;
   });
-  // Violations
+  // Insights (only active deals — exclude past close dates)
+  const nowStr = new Date().toISOString().slice(0,10);
+  const d30Str = new Date(Date.now()+30*86400000).toISOString().slice(0,10);
   const allRROpps = new Set(RR_DATA.map(d=>d.oppId).filter(Boolean));
-  const stage3PlusNoRR = filtered.filter(d =>
-    (d.stage||'').match(/^0[3-9]|^[1-9][0-9]/) &&
-    !allRROpps.has(d.oppId)
+  const stage3PlusNoRR = (typeof ESTIMATE_DATA !== 'undefined' ? ESTIMATE_DATA : []).filter(e =>
+    (e.stage||'').match(/^0[3-9]/) && !allRROpps.has(e.oppId) && (e.closeDate||'') >= nowStr
   );
   const tooClose = RR_DATA.filter(d => {
-    if (!d.startDate || !d.closeDate) return false;
+    if (!d.startDate || !d.closeDate || d.closeDate < nowStr) return false;
     const diff = (new Date(d.closeDate) - new Date(d.startDate)) / 86400000;
     return diff >= 0 && diff < 30;
   });
-  const violEl = document.getElementById('rr-violations');
-  if (violEl) {
-    let html = '';
-    if (tooClose.length) html += `<div style="margin-bottom:0.5rem;"><strong style="color:#C23934;">⚠ ${tooClose.length} RR${tooClose.length>1?'s':''} con inicio &lt; 30 días del close date</strong>: ${tooClose.slice(0,5).map(d=>`<span style="font-size:0.75rem;color:#3E3E3C;">${d.oppName||d.oppId}</span>`).join(', ')}${tooClose.length>5?` y ${tooClose.length-5} más`:''}</div>`;
-    if (stage3PlusNoRR.length) html += `<div><strong style="color:#C56200;">⚠ ${stage3PlusNoRR.length} opp${stage3PlusNoRR.length>1?'s':''} en Stage 03+ sin RRs</strong>: ${stage3PlusNoRR.slice(0,5).map(d=>`<span style="font-size:0.75rem;color:#3E3E3C;">${d.oppName||d.oppId}</span>`).join(', ')}${stage3PlusNoRR.length>5?` y ${stage3PlusNoRR.length-5} más`:''}</div>`;
-    if (!html) html = `<span style="color:#04844B;font-size:0.8rem;">✅ Sin incumplimientos detectados</span>`;
-    violEl.innerHTML = html;
+  const vencidosInsight = RR_DATA.filter(r =>
+    r.startDate && r.startDate < nowStr &&
+    (!r.closeDate || r.closeDate >= nowStr) &&
+    (r.status === 'Draft' || r.status === 'Ready to Staff')
+  );
+  const urgentClose = RR_DATA.filter(r =>
+    r.closeDate && r.closeDate >= nowStr && r.closeDate <= d30Str
+  );
+  const insightsEl = document.getElementById('rr-insights');
+  if (insightsEl) {
+    let items = [];
+    if (vencidosInsight.length) items.push(`<div style="margin-bottom:0.4rem;"><span style="color:#C23934;font-weight:700;">🚩 ${vencidosInsight.length} RR${vencidosInsight.length>1?'s':''} con inicio vencido</span><br><span style="font-size:0.7rem;color:#706E6B;">${vencidosInsight.slice(0,3).map(r=>r.oppName||r.name||'').filter(Boolean).join(', ')}${vencidosInsight.length>3?` +${vencidosInsight.length-3}`:''}</span></div>`);
+    if (urgentClose.length) items.push(`<div style="margin-bottom:0.4rem;"><span style="color:#C56200;font-weight:700;">⚡ ${urgentClose.length} RR${urgentClose.length>1?'s':''} con close &lt; 30 días</span><br><span style="font-size:0.7rem;color:#706E6B;">${[...new Set(urgentClose.map(r=>r.oppName||''))].filter(Boolean).slice(0,3).join(', ')}${urgentClose.length>3?` +${urgentClose.length-3}`:''}</span></div>`);
+    if (stage3PlusNoRR.length) items.push(`<div style="margin-bottom:0.4rem;"><span style="color:#C56200;font-weight:700;">⚠ ${stage3PlusNoRR.length} opp${stage3PlusNoRR.length>1?'s':''} Stage 03+ sin RR</span><br><span style="font-size:0.7rem;color:#706E6B;">${stage3PlusNoRR.slice(0,3).map(e=>e.oppName||'').filter(Boolean).join(', ')}${stage3PlusNoRR.length>3?` +${stage3PlusNoRR.length-3}`:''}</span></div>`);
+    if (!items.length) items.push(`<span style="color:#04844B;font-size:0.8rem;font-weight:600;">✅ Sin alertas activas</span>`);
+    insightsEl.innerHTML = `<div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.6rem;letter-spacing:0.03em;">📊 INSIGHTS</div>` + items.join('');
   }
   // KPIs
   const unassigned = data.filter(d=>!d.resource).length;
@@ -13074,9 +13087,7 @@ function renderRRTab() {
   document.getElementById('rr-summaryBody').innerHTML = summaryRows;
   // Status badge
   const statusBadge = s => { const m={'Assigned':'#D4EDDA:#04844B','Draft':'#F3F2F2:#706E6B','Submitted':'#D8EDFF:#0176D3','Cancelled':'#FBE8E8:#C23934','Canceled':'#FBE8E8:#C23934'}; const p=(m[s]||'#F3F2F2:#706E6B').split(':'); return `<span style="background:${p[0]};color:${p[1]};padding:1px 7px;border-radius:12px;font-size:0.68rem;font-weight:600">${s||'--'}</span>`; };
-  const today = new Date().toISOString().slice(0,10);
-  const d30 = new Date(Date.now() + 30*86400000).toISOString().slice(0,10);
-  const startStyle = d => { if(!d) return 'color:#706E6B'; if(d<=today) return 'color:#C23934;font-weight:600'; if(d<=d30) return 'color:#C56200;font-weight:600'; return 'color:#04844B'; };
+  const startStyle = d => { if(!d) return 'color:#706E6B'; if(d<=nowStr) return 'color:#C23934;font-weight:600'; if(d<=d30Str) return 'color:#C56200;font-weight:600'; return 'color:#04844B'; };
   // Group by opportunity
   const oppGroups = {};
   data.forEach(d => {
@@ -13097,7 +13108,7 @@ function renderRRTab() {
   });
   let rows = sortedGroups.map(opp => {
     const hasViol = opp.rrs.some(rr => {
-      if (!rr.startDate || !opp.closeDate) return false;
+      if (!rr.startDate || !opp.closeDate || opp.closeDate < nowStr) return false;
       const diff = (new Date(opp.closeDate) - new Date(rr.startDate)) / 86400000;
       return diff < 30 && diff >= 0;
     });
@@ -13113,10 +13124,9 @@ function renderRRTab() {
       ? (rrExtra > 0 ? `${rrTrunc} <span style="color:#706E6B;font-size:0.7rem;">+${rrExtra} más</span>` : rrTrunc)
       : '<span style="color:#706E6B;">—</span>';
     const rrTitle = rrNames.join(' · ');
-    const closeStyle = opp.closeDate <= today ? 'color:#C23934;font-weight:600' : opp.closeDate <= d30 ? 'color:#C56200;font-weight:600' : 'color:#706E6B';
+    const closeStyle = opp.closeDate <= nowStr ? 'color:#C23934;font-weight:600' : opp.closeDate <= d30Str ? 'color:#C56200;font-weight:600' : 'color:#706E6B';
     // Flag column: inicio vencido (Draft/ReadyToStaff with past startDate) takes priority, then days-to-close
     let flagHtml = '<span style="color:#706E6B;">—</span>';
-    const nowStr = new Date().toISOString().slice(0,10);
     const vencidos = opp.rrs.filter(r => r.startDate && r.startDate < nowStr && (r.status === 'Draft' || r.status === 'Ready to Staff'));
     if (vencidos.length) {
       flagHtml = `<span style="background:#FDDCDB;color:#C23934;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🚩 Inicio vencido (${vencidos.length})</span>`;
@@ -13140,23 +13150,19 @@ function renderRRTab() {
       <td class="px-3 py-2" style="font-size:0.73rem;">${(()=>{ const dsr=DSR_DATA.find(d=>d.oppId===opp.oppId); return dsr ? `<a href="${sfBase}/Deal_Support_Request__c/${dsr.dsrId}/view" target="_blank" style="color:#0176D3;">${dsr.sssm}</a>` : '<span style="color:#706E6B;">—</span>'; })()}</td>
     </tr>`;
   }).join('');
-  // Also add ESTIMATE_DATA Stage 03+ opps with no RRs
+  // Also add ESTIMATE_DATA Stage 03+ opps with no RRs (active only)
   const allRROppIdsSet = new Set(RR_DATA.map(d=>d.oppId).filter(Boolean));
-  const estNoRR = (typeof ESTIMATE_DATA !== 'undefined' ? ESTIMATE_DATA : []).filter(e =>
-    (e.stage||'').match(/^0[3-9]/) &&
-    !allRROppIdsSet.has(e.oppId) &&
-    e.closeDate >= today
-  );
-  if (estNoRR.length) {
-    const estRows = estNoRR.sort((a,b)=>(a.closeDate||'')>(b.closeDate||'')?1:-1).map(e => {
-      const daysLeft = e.closeDate ? Math.round((new Date(e.closeDate) - new Date(today)) / 86400000) : null;
+  const estNoRRRows = stage3PlusNoRR; // already computed above (active, closeDate >= today)
+  if (estNoRRRows.length) {
+    const estRows = estNoRRRows.sort((a,b)=>(a.closeDate||'')>(b.closeDate||'')?1:-1).map(e => {
+      const daysLeft = e.closeDate ? Math.round((new Date(e.closeDate) - new Date(nowStr)) / 86400000) : null;
       let flagHtml = '<span style="color:#706E6B;">—</span>';
       if (daysLeft !== null) {
         if (daysLeft < 31) flagHtml = `<span style="background:#FDDCDB;color:#C23934;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🚩 ${daysLeft}d</span>`;
         else if (daysLeft <= 45) flagHtml = `<span style="background:#FEF0C7;color:#7A4504;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${daysLeft}d</span>`;
         else flagHtml = `<span style="background:#D4EDDA;color:#027E46;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${daysLeft}d</span>`;
       }
-      const closeStyle = e.closeDate <= d30 ? 'color:#C56200;font-weight:600' : 'color:#706E6B';
+      const closeStyle = e.closeDate <= d30Str ? 'color:#C56200;font-weight:600' : 'color:#706E6B';
       const est = ESTIMATE_MAP[e.oppId];
       const dsr = DSR_DATA.find(d=>d.oppId===e.oppId);
       return `<tr class="table-row" style="background:#FFFBF0;">
@@ -13173,19 +13179,6 @@ function renderRRTab() {
       </tr>`;
     }).join('');
     rows += estRows;
-  }
-  // Also update violations panel with estNoRR
-  if (estNoRR.length) {
-    const violEl2 = document.getElementById('rr-violations');
-    if (violEl2) {
-      const existingHtml = violEl2.innerHTML;
-      const noRRHtml = `<div style="margin-top:${existingHtml&&!existingHtml.includes('Sin incumplimientos')?'0.5rem':'0'}"><strong style="color:#C56200;">⚠ ${estNoRR.length} opp${estNoRR.length>1?'s':''} en Stage 03+ sin RRs (vía Estimate)</strong>: ${estNoRR.slice(0,5).map(e=>`<span style="font-size:0.75rem;color:#3E3E3C;">${e.oppName||e.oppId}</span>`).join(', ')}${estNoRR.length>5?` y ${estNoRR.length-5} más`:''}</div>`;
-      if (existingHtml.includes('Sin incumplimientos')) {
-        violEl2.innerHTML = noRRHtml;
-      } else {
-        violEl2.innerHTML += noRRHtml;
-      }
-    }
   }
   document.getElementById('rr-tableBody').innerHTML = rows;
 }
