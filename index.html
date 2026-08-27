@@ -238,6 +238,7 @@
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t5',this)"><span data-i18n="tab_risk">🚨 Risk Radar</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t6',this)"><span data-i18n="tab_detail">📄 DSR Detail</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('testimates',this)">📋 Estimates</button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('twon',this)">🏆 Won Deals</button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('trrlatam',this)">👥 RR LATAM</button>
   </div>
 </div>
@@ -437,6 +438,7 @@
   <table class="w-full" style="font-size:0.78rem;">
     <thead><tr>
       <th class="text-center sort-btn" onclick="sortTable('heat')">Heat ▲▼</th>
+      <th class="text-center sort-btn" onclick="sortTable('priority')">Prioridad ▲▼</th>
       <th class="sort-btn" onclick="sortTable('dsr')">DSR ▲▼</th>
       <th>Est.</th>
       <th class="sort-btn" onclick="sortTable('sssm')">SSSM ▲▼</th>
@@ -503,6 +505,35 @@
 </div>
 </div>
 
+<div id="twon" class="tab-content hidden">
+<div class="p-4">
+  <div class="card-panel p-3 mb-3" style="background:#EAF5FE;">
+    <span style="font-size:0.82rem;color:#032D60;">DSRs de oportunidades ganadas (06 - Project Booked) desde Feb 2026. Solo EM/Admin/SOW Support LATAM/LACA.</span>
+  </div>
+  <div class="flex flex-wrap gap-3 mb-3 items-center">
+    <select id="won-fSSM" onchange="renderWonTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">SSSM (Todos)</option></select>
+    <select id="won-fAP" onchange="renderWonTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">AP (Todos)</option></select>
+    <input id="won-fSearch" type="text" placeholder="Buscar cuenta / oportunidad..." oninput="renderWonTab()" style="width:260px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem">
+    <span class="text-xs ml-auto" style="color:#706E6B;" id="won-count"></span>
+  </div>
+  <div class="card-panel overflow-auto">
+    <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
+      <thead><tr>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">DSR</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Cuenta</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Oportunidad</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">SSSM</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">AP</th>
+        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Monto</th>
+        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Close</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Tipo</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">País</th>
+      </tr></thead>
+      <tbody id="won-tableBody"></tbody>
+    </table>
+  </div>
+</div>
+</div>
 <div id="trrlatam" class="tab-content hidden">
 <div class="p-4">
   <div class="grid grid-cols-4 gap-3 mb-4">
@@ -511,6 +542,9 @@
     <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">% Asignados</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiPct">—</div></div>
     <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Oportunidades</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiOpps">—</div></div>
   </div>
+  <div class="card-panel p-3 mb-3" style="border-left:4px solid #C23934;" id="rr-violations">
+    <span style="color:#706E6B;font-size:0.8rem;">Calculando incumplimientos...</span>
+  </div>
   <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-center">
     <select id="rr-fStatus" onchange="renderRRTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">Status (Todos)</option></select>
     <select id="rr-fCountry" onchange="renderRRTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">País (Todos)</option></select>
@@ -518,7 +552,7 @@
     <input id="rr-fSearch" type="text" placeholder="Buscar RR / opp / cuenta / recurso..." oninput="renderRRTab()" style="width:280px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem">
     <span class="text-xs text-gray-500 ml-auto" id="rr-rowCount"></span>
   </div>
-  <details open class="card-panel p-3 mb-3">
+  <details class="card-panel p-3 mb-3">
     <summary style="cursor:pointer;font-weight:600;font-size:0.875rem;color:#3E3E3C">Resumen por Oportunidad</summary>
     <div class="overflow-auto mt-2">
       <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C">
@@ -5786,6 +5820,1730 @@ let ESTIMATE_MAP = {
     "billingType": "Time and Materials"
   }
 };
+let WON_DATA = [
+  {
+    "dsrId": "a25ed000001ghXpAAI",
+    "dsr": "DS-1697867",
+    "sssm": "Diego Castro",
+    "status": "Closed - Resolved",
+    "oppName": "Telecom Argentina - AR - Core - CTO with AELA (Year 3)",
+    "oppId": "006ed00000O0hTlAAJ",
+    "amount": 936360,
+    "closeDate": "2027-10-31",
+    "ap": "Gustavo Marcelo Pulitano",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Telecom Argentina S.A.",
+    "country": "AR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Ratable",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001ghRNAAY",
+    "dsr": "DS-1697863",
+    "sssm": "SOW/EM Support: LATAM",
+    "status": "Closed - Resolved",
+    "oppName": "Telecom Argentina - AR - Core - CTO with AELA (Year 2)",
+    "oppId": "006ed00000O0cNdAAJ",
+    "amount": 936360,
+    "closeDate": "2026-10-31",
+    "ap": "Gustavo Marcelo Pulitano",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Telecom Argentina S.A.",
+    "country": "AR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Ratable",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000026Xo9AAE",
+    "dsr": "DS-1723905",
+    "sssm": "Nelson Stebulaitis Filho",
+    "status": "Closed - Resolved",
+    "oppName": "DTP Agentforce Implementation CSG New (4)",
+    "oppId": "006ed00000f6qFfAAI",
+    "amount": 3503544.8,
+    "closeDate": "2026-08-17",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed00000290pFAAQ",
+    "dsr": "DS-1729880",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "Apsen SWE Advisory Services - Life Sciences CSG Accelerate Program",
+    "oppId": "006ed00000i6RozAAE",
+    "amount": 0,
+    "closeDate": "2026-08-10",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Apsen Farmaceutica S/A",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Ratable",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001DGSzAAO",
+    "dsr": "DS-1674350",
+    "sssm": "Juan Schunck",
+    "status": "Closed - Resolved",
+    "oppName": "ARI Investment - GTD - CL - iComms - B2C MVP MACD and Services",
+    "oppId": "006ed00000VIjrFAAT",
+    "amount": 664753.5,
+    "closeDate": "2026-08-09",
+    "ap": "Juan María Aguirre",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "GTD Manquehue S A",
+    "country": "CL",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001md1hAAA",
+    "dsr": "DS-1703343",
+    "sssm": "Irineu Silva",
+    "status": "Closed - Resolved",
+    "oppName": "Siigo Colombia -ARI Implementation Sales + Service + Revenue #QL",
+    "oppId": "006ed00000bi76vAAA",
+    "amount": 0,
+    "closeDate": "2026-07-31",
+    "ap": "Eliana Rueda",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Siigo Colombia",
+    "country": "CO",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001GTOrAAO",
+    "dsr": "DS-1677061",
+    "sssm": "Alejandra Acuña",
+    "status": "Closed - Resolved",
+    "oppName": "BAC  Credomatic - ARI - Loyalty #QL",
+    "oppId": "006ed00000Vu7WQAAZ",
+    "amount": 191436,
+    "closeDate": "2026-07-31",
+    "ap": "Eliana Rueda",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "BAC LATAM SSC, SOCIEDAD ANONIMA",
+    "country": "CR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000y8FdAAI",
+    "dsr": "DS-1644733",
+    "sssm": "Ixchel Saucedo",
+    "status": "Closed - Resolved",
+    "oppName": "CDF - MX - SOW - CG, Tabeau, Data 360, Mulesoft - Implementation  #QL",
+    "oppId": "006ed00000O4cdZAAR",
+    "amount": 4146443.41,
+    "closeDate": "2026-07-31",
+    "ap": "Diego Ramos",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Compañia Embotelladora del Fuerte, S. de R.L. de C.V",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001iR2LAAU",
+    "dsr": "DS-1699684",
+    "sssm": "Alejandra Acuña",
+    "status": "Closed - Resolved",
+    "oppName": "Cibest Capital Implementation - Change Order #QL",
+    "oppId": "006ed00000aoMGjAAM",
+    "amount": 0,
+    "closeDate": "2026-07-31",
+    "ap": "Eliana Rueda",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Cibest Capital Holdings USA, LLC",
+    "country": "CO",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000027I2HAAU",
+    "dsr": "DS-1725721",
+    "sssm": "Amanda Basílio",
+    "status": "Closed - Resolved",
+    "oppName": "C6 - CTO - SOW - CSG",
+    "oppId": "006ed00000d8iDVAAY",
+    "amount": 1580337,
+    "closeDate": "2026-07-30",
+    "ap": "Ricardo de Oliveira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco C6 S.A.",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000025IzFAAU",
+    "dsr": "DS-1720945",
+    "sssm": "Amanda Basílio",
+    "status": "Closed - Resolved",
+    "oppName": "C6 - CTO - SOW - CSG",
+    "oppId": "006ed00000d8iDVAAY",
+    "amount": 1580337,
+    "closeDate": "2026-07-30",
+    "ap": "Ricardo de Oliveira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco C6 S.A.",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed00000115OTAAY",
+    "dsr": "DS-1651724",
+    "sssm": "Emmanuel Alejandro Moreno",
+    "status": "Closed - Resolved",
+    "oppName": "MX - Actinver - CTO",
+    "oppId": "006ed00000PTv1LAAT",
+    "amount": 170004.42,
+    "closeDate": "2026-07-29",
+    "ap": "Gabriel Arturo Rada",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "ACTINVER CASA DE BOLSA, S.A DE C.V., GRUPO FINANCIERO ACTINVER",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001sJ0HAAU",
+    "dsr": "DS-1707697",
+    "sssm": "Christian Salazar",
+    "status": "Closed - Resolved",
+    "oppName": "Expand - Inpsercom - Advisory - Proyecto Banco del Austro - EC - Sales",
+    "oppId": "006ed00000clu45AAA",
+    "amount": 41760,
+    "closeDate": "2026-07-28",
+    "ap": "Laura Salazar",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "EXPAND HONDURAS S.A.",
+    "country": "HN",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001sQmXAAU",
+    "dsr": "DS-1707750",
+    "sssm": "Luis Mauricio Pacheco",
+    "status": "Closed - Resolved",
+    "oppName": "PAE - AR - Core - Unificación de Catalogo",
+    "oppId": "006ed00000cvysnAAA",
+    "amount": 273067,
+    "closeDate": "2026-07-27",
+    "ap": "Juan María Aguirre",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Pan American Energy, S.L., Sucursal Argentina",
+    "country": "AR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001niTxAAI",
+    "dsr": "DS-1704415",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "SABESP - Mule - Capacity Model",
+    "oppId": "006ed00000btsldAAA",
+    "amount": 3857728.08,
+    "closeDate": "2026-07-26",
+    "ap": "Gabriela Pedrazzoli",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "SABESP - Cia de San Básico do Estado de São Paulo",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000auIDAAY",
+    "dsr": "DS-1589204",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "BAM - Guatemala - FSC - Implementacion MVP",
+    "oppId": "006ed000008mqm5AAA",
+    "amount": 0,
+    "closeDate": "2026-07-24",
+    "ap": "Eliana Rueda",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco Agromercantil de Guatemala S.A. (BAM)",
+    "country": "GT",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000mvFJAAY",
+    "dsr": "DS-1618057",
+    "sssm": "Alejandra Acuña",
+    "status": "Closed - Resolved",
+    "oppName": "BAM - Guatemala - FSC - Implementacion MVP",
+    "oppId": "006ed000008mqm5AAA",
+    "amount": 0,
+    "closeDate": "2026-07-24",
+    "ap": "Eliana Rueda",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco Agromercantil de Guatemala S.A. (BAM)",
+    "country": "GT",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000015yZFAAY",
+    "dsr": "DS-1663394",
+    "sssm": "Diego Castro",
+    "status": "Closed - Resolved",
+    "oppName": "Telecom Argentina - AR - Core - CTO Mulesoft",
+    "oppId": "006ed00000IuriPAAR",
+    "amount": 154224,
+    "closeDate": "2026-07-21",
+    "ap": "Laura Salazar",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Telecom Argentina S.A.",
+    "country": "AR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001Ssg1AAC",
+    "dsr": "DS-1687587",
+    "sssm": "Luis Mauricio Pacheco",
+    "status": "Closed - Resolved",
+    "oppName": "PAE - AR - Core - BRE Pricing Sucursales",
+    "oppId": "006ed00000YCWYPAA5",
+    "amount": 284903,
+    "closeDate": "2026-07-14",
+    "ap": "Juan María Aguirre",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Pan American Energy, S.L., Sucursal Argentina",
+    "country": "AR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed00000215vlAAA",
+    "dsr": "DS-1714442",
+    "sssm": "Amanda Basílio",
+    "status": "Closed - Resolved",
+    "oppName": "AG - Agibank - SWE - SOW - CSG",
+    "oppId": "006ed00000dQwTJAA0",
+    "amount": 0,
+    "closeDate": "2026-07-07",
+    "ap": "Ricardo de Oliveira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco Agibank S.A",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000024PLGAA2",
+    "dsr": "DS-1718794",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "VIBRA - Piloto Agentforce Services - Sales SWE",
+    "oppId": "006ed00000fn7dRAAQ",
+    "amount": 0,
+    "closeDate": "2026-07-06",
+    "ap": "Gabriela Pedrazzoli",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Vibra Energia S/A",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Percent Complete",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001zs7lAAA",
+    "dsr": "DS-1713454",
+    "sssm": "Amanda Basílio",
+    "status": "Closed - Resolved",
+    "oppName": "AG - Bow E - SOW - CSG",
+    "oppId": "006ed00000eUNMjAAO",
+    "amount": 1080504.69,
+    "closeDate": "2026-07-02",
+    "ap": "Ricardo de Oliveira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Bolt Energy (BOW-E)",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001v8ZlAAI",
+    "dsr": "DS-1709861",
+    "sssm": "Amanda Basílio",
+    "status": "Closed - Resolved",
+    "oppName": "AG - C6 - SWE - SOW - CSG",
+    "oppId": "006ed00000d2n6DAAQ",
+    "amount": 0,
+    "closeDate": "2026-07-01",
+    "ap": "Ricardo de Oliveira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco C6 S.A.",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000018MIvAAM",
+    "dsr": "DS-1669150",
+    "sssm": "Juan Schunck",
+    "status": "Closed - Resolved",
+    "oppName": "MX - PAM Hotels - Doble Autenticación OTP & Whatsapp Voice - Licenses SWE 271 KUSD 2176 Hours",
+    "oppId": "006ed00000Oi7b3AAB",
+    "amount": 0,
+    "closeDate": "2026-07-01",
+    "ap": "Gabriel Arturo Rada",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Solaya Hospitality Management Group S. de R.L. de C.V.",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000011zwvAAA",
+    "dsr": "DS-1653931",
+    "sssm": "Diego Castro",
+    "status": "Closed - Resolved",
+    "oppName": "Transbank (CL) - Sales - New Business - P&D Reemplazo Siebel y Dynamics - CSG",
+    "oppId": "006ed00000Pw0R4AAJ",
+    "amount": 1922477.2,
+    "closeDate": "2026-06-30",
+    "ap": "Juan María Aguirre",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Transbank S.A",
+    "country": "CL",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001gddtAAA",
+    "dsr": "DS-1697780",
+    "sssm": "Irineu Silva",
+    "status": "Closed - Resolved",
+    "oppName": "Raia Drogasil (Impulso) - SWE - New Business - Media Cloud -CSG",
+    "oppId": "006ed00000aUNbxAAG",
+    "amount": 0,
+    "closeDate": "2026-06-25",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Impulso Solucoes de Midia LTDA",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000020aWzAAI",
+    "dsr": "DS-1714065",
+    "sssm": "Nelson Stebulaitis Filho",
+    "status": "Closed - Resolved",
+    "oppName": "DTP Agentforce Implementation CSG New (3)",
+    "oppId": "006ed00000Y68CDAAZ",
+    "amount": 2335031.8,
+    "closeDate": "2026-06-24",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000016bFdAAI",
+    "dsr": "DS-1664905",
+    "sssm": "Luis Mauricio Pacheco",
+    "status": "Closed - Resolved",
+    "oppName": "VW OEM - MX - autocloud assessment_CO",
+    "oppId": "006ed00000SkVK1AAN",
+    "amount": 5310,
+    "closeDate": "2026-06-24",
+    "ap": "Daniel Isunza",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Volkswagen de México, S.A. de C.V.",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001gO6zAAE",
+    "dsr": "DS-1697626",
+    "sssm": "Luis Mauricio Pacheco",
+    "status": "Closed - Resolved",
+    "oppName": "BANORTE - POC - New Business - Agentforce - SOW TM_Licenses SWE - 75 KUSD 600 Hours",
+    "oppId": "006ed00000aGluHAAS",
+    "amount": 0,
+    "closeDate": "2026-06-22",
+    "ap": "Daniel Isunza",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco Mercantil del Norte S.A.",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001lCjVAAU",
+    "dsr": "DS-1701682",
+    "sssm": "Nelson Stebulaitis Filho",
+    "status": "Closed - Resolved",
+    "oppName": "DTP SWE Agentforce Implementation UNA CSG",
+    "oppId": "006ed00000ZNP9fAAH",
+    "amount": 0,
+    "closeDate": "2026-06-22",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000yXNhAAM",
+    "dsr": "DS-1645706",
+    "sssm": "Juan Schunck",
+    "status": "Closed - Resolved",
+    "oppName": "Banco Macro - Loyalty - Prime Implementation",
+    "oppId": "006ed00000OFfxuAAD",
+    "amount": 513881,
+    "closeDate": "2026-06-12",
+    "ap": "Juan María Aguirre",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco Macro S.A.",
+    "country": "AR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001fNOHAA2",
+    "dsr": "DS-1696630",
+    "sssm": "Alejandra Acuña",
+    "status": "Closed - Resolved",
+    "oppName": "Banco Macro - Loyalty - Prime Implementation",
+    "oppId": "006ed00000OFfxuAAD",
+    "amount": 513881,
+    "closeDate": "2026-06-12",
+    "ap": "Juan María Aguirre",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco Macro S.A.",
+    "country": "AR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001oiLRAAY",
+    "dsr": "DS-1705107",
+    "sssm": "Nelson Stebulaitis Filho",
+    "status": "Closed - Resolved",
+    "oppName": "Prodesp - Desenvolve SP Expertise Hours CSG New",
+    "oppId": "006ed00000cDTazAAG",
+    "amount": 2691642.8,
+    "closeDate": "2026-06-08",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Prodesp - Empresa de TI do Estado de São Paulo_PPT",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000wwd7AAA",
+    "dsr": "DS-1641892",
+    "sssm": "Diego Castro",
+    "status": "Closed - Resolved",
+    "oppName": "Nissan - Dealer Assessment - Licenses SWE #2 - 83 KUSD - 664 Hours",
+    "oppId": "006ed00000NZIpeAAH",
+    "amount": 0,
+    "closeDate": "2026-05-29",
+    "ap": "Daniel Isunza",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Nissan Mexicana SA de CV",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001g3tlAAA",
+    "dsr": "DS-1697222",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "Ouro Verde (Unidas) - SWE - New Business - CPQ - CSG",
+    "oppId": "006ed00000aGRnWAAW",
+    "amount": 0,
+    "closeDate": "2026-05-21",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Unidas Locacoes E Servicos S/A",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Ratable",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001PQ6nAAG",
+    "dsr": "DS-1684489",
+    "sssm": "Amanda Basílio",
+    "status": "Closed - Resolved",
+    "oppName": "BTG - ARI Investment - investment",
+    "oppId": "006ed00000R46SHAAZ",
+    "amount": 0,
+    "closeDate": "2026-05-20",
+    "ap": "Ricardo de Oliveira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco BTG Pactual S.A.",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000VcDtAAK",
+    "dsr": "DS-1576682",
+    "sssm": "Irineu Silva",
+    "status": "Closed - Resolved",
+    "oppName": "DTP Parceria - Umbrella Ratecard - CSG",
+    "oppId": "006ed00000BB48PAAT",
+    "amount": 0,
+    "closeDate": "2026-05-19",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001lGn7AAE",
+    "dsr": "DS-1701809",
+    "sssm": "Diego Castro",
+    "status": "Closed - Resolved",
+    "oppName": "Honda - Services SWE - (Non Paperwork)",
+    "oppId": "006ed00000bLgi5AAC",
+    "amount": 0,
+    "closeDate": "2026-05-19",
+    "ap": "Jorge Salafia",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Honda de Mexico S.A. DE C.V.",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001f2YLAAY",
+    "dsr": "DS-1696138",
+    "sssm": "Amanda Basílio",
+    "status": "Closed - Resolved",
+    "oppName": "BANCO INTER S.A. - ARI Investment",
+    "oppId": "006ed00000QMUEzAAP",
+    "amount": 0,
+    "closeDate": "2026-05-18",
+    "ap": "Ricardo de Oliveira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "BANCO INTER S.A.",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000018TyjAAE",
+    "dsr": "DS-1669451",
+    "sssm": "Nelson Stebulaitis Filho",
+    "status": "Closed - Resolved",
+    "oppName": "DTP Agentforce Implementation CSG New (2)",
+    "oppId": "006ed00000TwGQIAA3",
+    "amount": 2335031.8,
+    "closeDate": "2026-05-18",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001TwhZAAS",
+    "dsr": "DS-1688365",
+    "sssm": "Ixchel Saucedo",
+    "status": "Closed - Resolved",
+    "oppName": "Liverpool - MX - Cosmetics CO",
+    "oppId": "006ed00000YFCWjAAP",
+    "amount": 263201,
+    "closeDate": "2026-05-15",
+    "ap": "Diego Ramos",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "SERVICIOS LIVERPOOL S.A. DE C.V.",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000028xrNAAQ",
+    "dsr": "DS-1729766",
+    "sssm": "Julio Carmo",
+    "status": "Closed - Resolved",
+    "oppName": "Petrobras - CoE / CTO / Prototype - CSG -  Part II",
+    "oppId": "006ed00000dYMIzAAO",
+    "amount": 65351660.27,
+    "closeDate": "2026-05-14",
+    "ap": "Gabriela Pedrazzoli",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "PETRÓLEO BRASILEIRO S.A. - PETROBRAS",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000012JfVAAU",
+    "dsr": "DS-1654701",
+    "sssm": "Julio Carmo",
+    "status": "Closed - Resolved",
+    "oppName": "Petrobras - CoE / CTO / Prototype - CSG - Part I",
+    "oppId": "006ed00000FFzSMAA1",
+    "amount": 32675830.13,
+    "closeDate": "2026-05-14",
+    "ap": "Gabriela Pedrazzoli",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "PETRÓLEO BRASILEIRO S.A. - PETROBRAS",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001X6VtAAK",
+    "dsr": "DS-1690562",
+    "sssm": "Amanda Basílio",
+    "status": "Closed - Resolved",
+    "oppName": "MC - Acerto - SWE - CSG",
+    "oppId": "006ed00000Xb1BrAAJ",
+    "amount": 0,
+    "closeDate": "2026-05-12",
+    "ap": "Ricardo de Oliveira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Acerto",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000tQ57AAE",
+    "dsr": "DS-1633519",
+    "sssm": "Amanda Basílio",
+    "status": "Closed - Resolved",
+    "oppName": "GEQ - CTO PHASE 2 - New Business - Core - CSG",
+    "oppId": "006ed00000M0fmUAAR",
+    "amount": 3437616.24,
+    "closeDate": "2026-05-11",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "NACIONAL GAS BUTANO DISTRIBUIDORA LTDA",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001fO2bAAE",
+    "dsr": "DS-1696636",
+    "sssm": "Amanda Basílio",
+    "status": "Closed - Resolved",
+    "oppName": "Porto Seguro - Agentforce - OF - CSG",
+    "oppId": "006ed00000WUpgzAAD",
+    "amount": 0,
+    "closeDate": "2026-05-08",
+    "ap": "Ricardo de Oliveira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Porto Bank (PortoSeg SA)",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Ratable",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000tCoXAAU",
+    "dsr": "DS-1633003",
+    "sssm": "Christian Salazar",
+    "status": "Closed - Resolved",
+    "oppName": "MX - RCD - Technical Org Assessment - Services SWE 160 Hours 20 KUSD - SOW",
+    "oppId": "006ed00000LuxisAAB",
+    "amount": 0,
+    "closeDate": "2026-05-04",
+    "ap": "Gabriel Arturo Rada",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Solaya Hospitality Management Group S. de R.L. de C.V.",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001O6bZAAS",
+    "dsr": "DS-1683187",
+    "sssm": "SOW/EM Support: LATAM",
+    "status": "Closed - Resolved",
+    "oppName": "Cirion Technologies - AR - Core - Advisory SWAP",
+    "oppId": "006ed00000WlwVzAAJ",
+    "amount": 163080,
+    "closeDate": "2026-04-30",
+    "ap": "Gustavo Marcelo Pulitano",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Cirion Technologies Solutions, LLC",
+    "country": "US",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Ratable",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000019zq5AAA",
+    "dsr": "DS-1670872",
+    "sssm": "Alejandra Acuña",
+    "status": "Closed - Resolved",
+    "oppName": "El Palacio - RFC - PHI830429MG6- ARI - 5600 Hrs 700 KUSD",
+    "oppId": "006ed00000SmI8zAAF",
+    "amount": 0,
+    "closeDate": "2026-04-30",
+    "ap": "Jorge Salafia",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "El Palacio de Hierro, SA de CV - RFC - PHI830429MG6",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000018ZMbAAM",
+    "dsr": "DS-1669577",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "Ifood Personalization Implementation (SWE) CSG New",
+    "oppId": "006ed00000TxXk2AAF",
+    "amount": 0,
+    "closeDate": "2026-04-24",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "iFood.com Agencia de Restaurantes Online S.A.",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed00000159DNAAY",
+    "dsr": "DS-1661527",
+    "sssm": "Alejandra Acuña",
+    "status": "Closed - Resolved",
+    "oppName": "SWE - Banco Estado - POC UCP - CSG",
+    "oppId": "006ed00000RoL06AAF",
+    "amount": 0,
+    "closeDate": "2026-04-23",
+    "ap": "Juan María Aguirre",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco Del Estado De Chile",
+    "country": "CL",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001OUh7AAG",
+    "dsr": "DS-1683683",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "SERASA - CORE - #DC+TAB - SOW - CSG",
+    "oppId": "006ed00000XDrTJAA1",
+    "amount": 1121398.16,
+    "closeDate": "2026-04-17",
+    "ap": "Isac Nudelman",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Serasa Experian",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000wGyrAAE",
+    "dsr": "DS-1640258",
+    "sssm": "Irineu Silva",
+    "status": "Closed - Resolved",
+    "oppName": "HCL - Agentforce - OF - SWE - CSG",
+    "oppId": "006ed00000NHiiYAAT",
+    "amount": 0,
+    "closeDate": "2026-04-17",
+    "ap": "Alex Siqueira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco do Brasil SA",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Ratable",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000oIJVAA2",
+    "dsr": "DS-1621168",
+    "sssm": "Diego Castro",
+    "status": "Closed - Resolved",
+    "oppName": "NISSAN - Implement - New Business -",
+    "oppId": "006ed00000JbJ3yAAF",
+    "amount": 1650960,
+    "closeDate": "2026-04-14",
+    "ap": "Daniel Isunza",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Nissan Mexicana SA de CV",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000016C7aAAE",
+    "dsr": "DS-1664073",
+    "sssm": "Irineu Silva",
+    "status": "Closed - Resolved",
+    "oppName": "HCL-BB - Resources - Inv - SOW",
+    "oppId": "006ed00000QBpTGAA1",
+    "amount": 3390606,
+    "closeDate": "2026-04-10",
+    "ap": "Alex Siqueira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "HCL (BRAZIL) Tecnologia da Informação Ltda",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001A04bAAC",
+    "dsr": "DS-1670881",
+    "sssm": "Luis Mauricio Pacheco",
+    "status": "Closed - Resolved",
+    "oppName": "SERVICIOS LIVERPOOL S.A. DE C.V. - ARI Investment (Core)",
+    "oppId": "006ed00000TbxGXAAZ",
+    "amount": 0,
+    "closeDate": "2026-04-08",
+    "ap": "Diego Ramos",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "SERVICIOS LIVERPOOL S.A. DE C.V.",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001J2TlAAK",
+    "dsr": "DS-1678755",
+    "sssm": "Laura Salazar",
+    "status": "Closed - Resolved",
+    "oppName": "MX-CBU Naturgy México CTO SVCS",
+    "oppId": "006ed00000V3gLpAAJ",
+    "amount": 139296.4,
+    "closeDate": "2026-04-08",
+    "ap": "Abelardo Rojas",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Naturgy Mexico S.A. de C.V (Loc)",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000017VRVAA2",
+    "dsr": "DS-1667089",
+    "sssm": "Nelson Stebulaitis Filho",
+    "status": "Closed - Resolved",
+    "oppName": "DTP (SWE delivery capacity) Plataforma de IA Implementation CSG New",
+    "oppId": "006ed00000TL1IAAA1",
+    "amount": 0,
+    "closeDate": "2026-03-31",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Ratable",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001JhQTAA0",
+    "dsr": "DS-1679160",
+    "sssm": "Diego Castro",
+    "status": "Closed - Resolved",
+    "oppName": "NRFM - Implement - New Business - seguridad BOT - SOW TM",
+    "oppId": "006ed00000WNiQvAAL",
+    "amount": 78998.4,
+    "closeDate": "2026-03-30",
+    "ap": "Daniel Isunza",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "NR Finance México, S.A. de C.V.",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001A07pAAC",
+    "dsr": "DS-1670883",
+    "sssm": "Luis Mauricio Pacheco",
+    "status": "Closed - Resolved",
+    "oppName": "SERVICIOS LIVERPOOL S.A. DE C.V.  - ARI Investment (MCP)",
+    "oppId": "006ed00000TLyRtAAL",
+    "amount": 0,
+    "closeDate": "2026-03-30",
+    "ap": "Diego Ramos",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "SERVICIOS LIVERPOOL S.A. DE C.V.",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000Dl5xAAC",
+    "dsr": "DS-1531004",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "Honda - CTO  - New Business - CTO - CSG",
+    "oppId": "006ed000004ctXRAAY",
+    "amount": 994768.4,
+    "closeDate": "2026-03-30",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Moto Honda da Amazonia Ltda",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000014aKTAAY",
+    "dsr": "DS-1660177",
+    "sssm": "Luis Mauricio Pacheco",
+    "status": "Closed - Resolved",
+    "oppName": "Seguros de Vida Suramericana S.A. - NIT 890903790-5  - ARI Investment",
+    "oppId": "006ed00000QxZikAAF",
+    "amount": 0,
+    "closeDate": "2026-03-27",
+    "ap": "Eliana Rueda",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Seguros de Vida Suramericana S.A. - NIT 890903790-5",
+    "country": "CO",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000019yh7AAA",
+    "dsr": "DS-1670828",
+    "sssm": "Sandro Alberto Thomas",
+    "status": "Closed - Resolved",
+    "oppName": "MS Totalplay 2 CTO's SOW SVCS",
+    "oppId": "006ed00000UCCIfAAP",
+    "amount": 322560,
+    "closeDate": "2026-03-20",
+    "ap": "Abelardo Rojas",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Totalplay Telecomunicaciones SAPI de CV // TPT890516JP5",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001CC4rAAG",
+    "dsr": "DS-1673592",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "MC - Acerto - SOW - CSG",
+    "oppId": "006ed00000V3CsPAAV",
+    "amount": 698256,
+    "closeDate": "2026-03-20",
+    "ap": "Ricardo de Oliveira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Acerto",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001LMmXAAW",
+    "dsr": "DS-1680890",
+    "sssm": "Julio Carmo",
+    "status": "Closed - Resolved",
+    "oppName": "Petrobras - SWE CMI RSS",
+    "oppId": "006ed00000TsVUMAA3",
+    "amount": 0,
+    "closeDate": "2026-03-20",
+    "ap": "Gabriela Pedrazzoli",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "PETRÓLEO BRASILEIRO S.A. - PETROBRAS",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Ratable",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000sMRlAAM",
+    "dsr": "DS-1630956",
+    "sssm": "Alejandra Acuña",
+    "status": "Closed - Resolved",
+    "oppName": "BCI (CL) - MC - New Business - CDP Roadmap- SWE - CSG",
+    "oppId": "006ed00000AYvEFAA1",
+    "amount": 0,
+    "closeDate": "2026-03-16",
+    "ap": "Alejandro Sáez",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco de Crédito e Inversiones S.A.",
+    "country": "CL",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001DnQXAA0",
+    "dsr": "DS-1674931",
+    "sssm": "Ixchel Saucedo",
+    "status": "Closed - Resolved",
+    "oppName": "CDF - MX - P&D Extension",
+    "oppId": "006ed00000US4sDAAT",
+    "amount": 365033.24,
+    "closeDate": "2026-03-15",
+    "ap": "Diego Ramos",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Compañia Embotelladora del Fuerte, S. de R.L. de C.V",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001AFtFAAW",
+    "dsr": "DS-1671268",
+    "sssm": "Christian Salazar",
+    "status": "Closed - Resolved",
+    "oppName": "CDF - MX - P&D Extension",
+    "oppId": "006ed00000US4sDAAT",
+    "amount": 365033.24,
+    "closeDate": "2026-03-15",
+    "ap": "Diego Ramos",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Compañia Embotelladora del Fuerte, S. de R.L. de C.V",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001BbenAAC",
+    "dsr": "DS-1672804",
+    "sssm": "Nelson Stebulaitis Filho",
+    "status": "Closed - Resolved",
+    "oppName": "Prodesp - SWE Agentforce implementation recovery CSG New (3)",
+    "oppId": "006ed00000UrmGXAAZ",
+    "amount": 0,
+    "closeDate": "2026-03-13",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Prodesp - Empresa de TI do Estado de São Paulo_PPT",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000014gmTAAQ",
+    "dsr": "DS-1660426",
+    "sssm": "Alejandra Acuña",
+    "status": "Closed - Resolved",
+    "oppName": "Bancolombia S.A. COL - Renewal - ARI Investment",
+    "oppId": "006ed00000R3g1aAAB",
+    "amount": 0,
+    "closeDate": "2026-03-06",
+    "ap": "Eliana Rueda",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Bancolombia S.A.",
+    "country": "CO",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a253y000000lNq3AAE",
+    "dsr": "DS-1488856",
+    "sssm": "Juan Schunck",
+    "status": "Closed - Resolved",
+    "oppName": "Banco Macro - AR - SWE for Core FSC and MKT Architects",
+    "oppId": "0063y00001AGQEPAA5",
+    "amount": 0,
+    "closeDate": "2026-03-05",
+    "ap": "Juan María Aguirre",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco Macro S.A.",
+    "country": "AR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Ratable",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000bd8rAAA",
+    "dsr": "DS-1590892",
+    "sssm": "Alejandra Acuña",
+    "status": "Closed - Resolved",
+    "oppName": "Aeromexico - Data Cloud - Additional Data Sources - Licenses SWE",
+    "oppId": "006ed00000DOUwjAAH",
+    "amount": 0,
+    "closeDate": "2026-02-28",
+    "ap": "Gabriel Arturo Rada",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Aerovías De México, S.A. De C.V.",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000017VPtAAM",
+    "dsr": "DS-1667088",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "Carrefour SWE Marketing Cloud New CSG",
+    "oppId": "006ed00000TKeBuAAL",
+    "amount": 0,
+    "closeDate": "2026-02-28",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Carrefour Comércio e Indústria Ltda.",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000001103pAAA",
+    "dsr": "DS-1651518",
+    "sssm": "Christian Salazar",
+    "status": "Closed - Resolved",
+    "oppName": "TELMEX - MX - ARI Investment - Marketing Cloud - SOW - Licenses ARI SWE 2400 Hours 300 KUSD",
+    "oppId": "006ed00000P4Js5AAF",
+    "amount": 0,
+    "closeDate": "2026-02-27",
+    "ap": "Julián Mesa",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "TELMEX",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed00000185RlAAI",
+    "dsr": "DS-1668489",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "Serasa S.A. - ARI Investment",
+    "oppId": "006ed00000TNMyRAAX",
+    "amount": 0,
+    "closeDate": "2026-02-27",
+    "ap": "Ricardo de Oliveira",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Serasa S.A.",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000x8snAAA",
+    "dsr": "DS-1642375",
+    "sssm": "Diego Alves",
+    "status": "Closed - Resolved",
+    "oppName": "Boticario  SWE DataCloud + MC Expertise Hours CSG New#QL",
+    "oppId": "006ed00000INRYGAA5",
+    "amount": 0,
+    "closeDate": "2026-02-23",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "BOTICARIO PRODUTOS DE BELEZA LTDA",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price - Ratable",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed000000pkwrAAA",
+    "dsr": "DS-1624659",
+    "sssm": "Diego Castro",
+    "status": "Closed - Resolved",
+    "oppName": "TV Azteca - CORE -  ProServ - Media Cloud, Sales, CPQ - SOW #QL",
+    "oppId": "006ed00000KS4uoAAD",
+    "amount": 1535523,
+    "closeDate": "2026-02-17",
+    "ap": "Gabriel Arturo Rada",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "account": "TV Azteca S.A.B. de C.V.",
+    "country": "MX",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000012fHpAAI",
+    "dsr": "DS-1655542",
+    "sssm": "Irineu Silva",
+    "status": "Closed - Resolved",
+    "oppName": "BANCO INTER S.A. - SWE 35769 - SOW - Fase 1",
+    "oppId": "006ed00000NBCF8AAP",
+    "amount": 0,
+    "closeDate": "2026-02-10",
+    "ap": "Isac Nudelman",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "BANCO INTER S.A.",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000010D1VAAU",
+    "dsr": "DS-1649719",
+    "sssm": "Nelson Stebulaitis Filho",
+    "status": "Closed - Resolved",
+    "oppName": "DTP - UNA & Salesforce Implementation (Phase 1) CSG New",
+    "oppId": "006ed00000P3yywAAB",
+    "amount": 1608787.78,
+    "closeDate": "2026-02-06",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000016nLdAAI",
+    "dsr": "DS-1665375",
+    "sssm": "Nelson Stebulaitis Filho",
+    "status": "Closed - Resolved",
+    "oppName": "DTP (UNA - Mulesoft) SF Implementation (Phase 1) CSG New",
+    "oppId": "006ed00000SrRpxAAF",
+    "amount": 328596,
+    "closeDate": "2026-02-06",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000014bejAAA",
+    "dsr": "DS-1660228",
+    "sssm": "Amanda Basílio",
+    "status": "Closed - Resolved",
+    "oppName": "EQT - SWE P&D Jornadas - CSG",
+    "oppId": "006ed00000RBWHyAAP",
+    "amount": 0,
+    "closeDate": "2026-02-04",
+    "ap": "Gabriela Pedrazzoli",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Equatorial Serviços S.A.",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Fixed Price",
+    "stage": "06 - Project Booked"
+  },
+  {
+    "dsrId": "a25ed0000016RJVAA2",
+    "dsr": "DS-1664518",
+    "sssm": "Nelson Stebulaitis Filho",
+    "status": "Closed - Resolved",
+    "oppName": "Prodesp - SWE Agentforce implementation recovery CSG New (2)",
+    "oppId": "006ed00000SQNTuAAP",
+    "amount": 0,
+    "closeDate": "2026-02-03",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Closed",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Prodesp - Empresa de TI do Estado de São Paulo_PPT",
+    "country": "BR",
+    "mgrJudgement": "IN",
+    "contractType": "Time & Materials",
+    "stage": "06 - Project Booked"
+  }
+];
 const LAST_SNAPSHOT = null;
 
 // ── Estimate & RR Data (embedded from org62) ──
@@ -5987,13 +7745,20 @@ function renderSSSmLoadBars() {
   const el = document.getElementById('sssmLoadBars');
   if (!el) return;
   const counts = {};
-  filtered.forEach(d => counts[d.sssm] = (counts[d.sssm]||0)+1);
+  let totalWorking = 0, totalHold = 0;
+  filtered.forEach(d => {
+    counts[d.sssm] = (counts[d.sssm]||0)+1;
+    if (d.status === 'Working') totalWorking++;
+    else if (d.status === 'On Hold') totalHold++;
+  });
   const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
   const overloaded = sorted.filter(([,c])=>c>15);
   const warned = sorted.filter(([,c])=>c>12&&c<=15);
   const top = sorted[0];
   const parts = [];
   if (top) parts.push(`<span>Top: <strong style="color:#032D60;">${top[0].split(' ')[0]}</strong> (${top[1]} DSRs)</span>`);
+  parts.push(`<span style="color:#04844B;">● ${totalWorking} Working</span>`);
+  parts.push(`<span style="color:#C56200;">● ${totalHold} On Hold</span>`);
   if (overloaded.length) parts.push(`<span style="color:#C23934;">🔴 ${overloaded.length} sobrecargado${overloaded.length>1?'s':''} &gt;15</span>`);
   if (warned.length) parts.push(`<span style="color:#C56200;">🟡 ${warned.length} en atención 13–15</span>`);
   if (!overloaded.length && !warned.length) parts.push(`<span style="color:#04844B;">✅ Carga normal</span>`);
@@ -6054,6 +7819,33 @@ function heatScore(dsr, quali) {
   return Math.max(0, Math.min(11, f + amt + urg + q));
 }
 
+function priorityScore(dsr) {
+  let score = 0;
+  if (dsr.amount > 500000) score += 3;
+  else if (dsr.amount > 200000) score += 2;
+  else if (dsr.amount > 50000) score += 1;
+  const today = new Date(GENERATED);
+  const close = new Date(dsr.closeDate);
+  const days = (close - today) / 86400000;
+  if (days < 30) score += 4;
+  else if (days < 60) score += 3;
+  else if (days < 90) score += 2;
+  else if (days < 180) score += 1;
+  if (dsr.forecast === 'Commit') score += 3;
+  else if (dsr.forecast === 'Best Case') score += 2;
+  else if (dsr.forecast === 'Pipeline') score += 1;
+  if (dsr.mgrJudgement === 'UP+' || dsr.mgrJudgement === 'UP-') score += 2;
+  else if (dsr.mgrJudgement === 'IN') score += 1;
+  if ((dsr.stage||'').includes('04')) score += 2;
+  else if ((dsr.stage||'').includes('03')) score += 1;
+  if (dsr.nextStep) score += 1;
+  return score;
+}
+function priorityBadge(score) {
+  if (score >= 10) return `<span style="background:#C23934;color:#fff;padding:2px 8px;border-radius:12px;font-size:0.68rem;font-weight:700;">🔴 Alta</span>`;
+  if (score >= 6)  return `<span style="background:#FFB75D;color:#2E1C00;padding:2px 8px;border-radius:12px;font-size:0.68rem;font-weight:700;">🟡 Media</span>`;
+  return `<span style="background:#D4EDDA;color:#027E46;padding:2px 8px;border-radius:12px;font-size:0.68rem;font-weight:700;">🟢 Baja</span>`;
+}
 function mgrJudgeBadge(val) {
   if (!val) return '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
   if (val==='UP+') return '<span style="background:#CDEFC4;color:#027A48;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;">↑+</span>';
@@ -6533,6 +8325,7 @@ function renderTab6() {
     let bv = b[sortField] ?? b['_'+sortField] ?? '';
     if (sortField === 'heat') { av = a._heat; bv = b._heat; }
     if (sortField === 'score') { av = a._quali?.score||0; bv = b._quali?.score||0; }
+    if (sortField === 'priority') { av = priorityScore(a); bv = priorityScore(b); }
     if (typeof av === 'string') return sortDir * av.localeCompare(bv);
     return sortDir * (av - bv);
   });
@@ -6554,6 +8347,7 @@ function renderTab6() {
     const estCell = est ? `<a href="https://org62.lightning.force.com/lightning/r/ffscpq__Estimate__c/${est.id}/view" target="_blank" title="${est.name}" class="opp-link" style="font-size:0.72rem;">📋</a>` : '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
     return `<tr class="table-row">
       <td class="px-2 text-center">${heatBadge(hs)}</td>
+      <td class="px-2 text-center">${priorityBadge(priorityScore(d))}</td>
       <td class="px-2"><a href="${dsrLink}" target="_blank" class="opp-link font-mono text-xs">${d.dsr}</a></td>
       <td class="px-2 text-center">${estCell}</td>
       <td class="px-2 whitespace-nowrap" style="color:#0176D3;font-size:0.72rem;cursor:pointer;text-decoration:underline;" onclick="selectSSSM('${d.sssm}')" title="${d.sssm}">${d.sssm.split(' ')[0]}</td>
@@ -6608,6 +8402,7 @@ function showTab(id, btn) {
     if (id === 'tsssm') renderSSSmGroupedView(filtered);
     if (id === 'testimates') renderEstimatesTab();
     if (id === 'trrlatam') renderRRTab();
+    if (id === 'twon') renderWonTab();
   }, 50);
 }
 
@@ -6641,9 +8436,11 @@ function renderSSSmGroupedView(data) {
   // Sidebar: built from ALL currently filtered data (not just data param)
   const sidebarMap = {};
   filtered.forEach(d => {
-    if (!sidebarMap[d.sssm]) sidebarMap[d.sssm] = {count:0, arr:0};
+    if (!sidebarMap[d.sssm]) sidebarMap[d.sssm] = {count:0, arr:0, working:0, hold:0};
     sidebarMap[d.sssm].count++;
     sidebarMap[d.sssm].arr += d.amount;
+    if (d.status === 'Working') sidebarMap[d.sssm].working++;
+    else if (d.status === 'On Hold') sidebarMap[d.sssm].hold++;
   });
   const allNames = Object.keys(sidebarMap).sort();
 
@@ -6662,7 +8459,7 @@ function renderSSSmGroupedView(data) {
       return `<div class="sssm-nav-item${isActive ? ' active' : ''}" onclick="selectSSSmSidebar('${sssm.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
         <div style="font-weight:700;font-size:0.78rem;color:#032D60;">${first}</div>
         ${last ? `<div style="font-size:0.72rem;color:#3E3E3C;">${last}</div>` : ''}
-        <div style="color:#706E6B;font-size:0.69rem;">${info.count} DSRs · ${fmt$(info.arr)}</div>
+        <div style="color:#706E6B;font-size:0.69rem;">${info.count} DSRs · ${fmt$(info.arr)}</div><div style="font-size:0.67rem;margin-top:1px;"><span style="color:#04844B;">●${info.working}W</span> <span style="color:#C56200;">●${info.hold}H</span></div>
       </div>`;
     })
   ].join('');
@@ -6846,6 +8643,46 @@ function renderEstimatesTab() {
   document.getElementById('est-tableBody').innerHTML = rows;
 }
 
+// ── Won Deals Tab ──────────────────────────────────────
+function renderWonTab() {
+  const fSSM = (document.getElementById('won-fSSM')||{}).value||'';
+  const fAP  = (document.getElementById('won-fAP')||{}).value||'';
+  const fSearch = ((document.getElementById('won-fSearch')||{}).value||'').toLowerCase();
+  ['won-fSSM','won-fAP'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || el.options.length > 1) return;
+    const key = id === 'won-fSSM' ? 'sssm' : 'ap';
+    [...new Set(WON_DATA.map(d=>d[key]).filter(Boolean))].sort().forEach(v => {
+      const o = document.createElement('option'); o.value=v; o.textContent=v; el.appendChild(o);
+    });
+  });
+  let data = WON_DATA.filter(d => {
+    if (fSSM && d.sssm !== fSSM) return false;
+    if (fAP && d.ap !== fAP) return false;
+    if (fSearch && !(d.account||'').toLowerCase().includes(fSearch) && !(d.oppName||'').toLowerCase().includes(fSearch) && !(d.dsr||'').toLowerCase().includes(fSearch)) return false;
+    return true;
+  });
+  data.sort((a,b) => new Date(b.closeDate) - new Date(a.closeDate));
+  const sfBase = 'https://org62.lightning.force.com/lightning/r';
+  const countEl = document.getElementById('won-count');
+  if (countEl) countEl.textContent = data.length + ' registros';
+  const tbody = document.getElementById('won-tableBody');
+  if (!tbody) return;
+  tbody.innerHTML = data.map(d =>
+    `<tr class="table-row">
+      <td class="px-3 py-1.5"><a href="${sfBase}/Deal_Support_Request__c/${d.dsrId}/view" target="_blank" style="color:#0176D3;font-family:monospace;font-size:0.72rem;">${d.dsr}</a></td>
+      <td class="px-3 py-1.5">${d.account||'--'}</td>
+      <td class="px-3 py-1.5"><a href="${sfBase}/Opportunity/${d.oppId}/view" target="_blank" style="color:#0176D3;">${(d.oppName||'').substring(0,45)}${(d.oppName||'').length>45?'\u2026':''}</a></td>
+      <td class="px-3 py-1.5" style="color:#706E6B;">${d.sssm||'--'}</td>
+      <td class="px-3 py-1.5" style="color:#706E6B;">${d.ap||'--'}</td>
+      <td class="px-3 py-1.5 text-right" style="color:#032D60;font-weight:600;">${fmt$(d.amount)}</td>
+      <td class="px-3 py-1.5 text-right" style="color:#706E6B;">${d.closeDate||'--'}</td>
+      <td class="px-3 py-1.5" style="color:#706E6B;font-size:0.72rem;">${d.requestTypeDetail||'--'}</td>
+      <td class="px-3 py-1.5" style="color:#706E6B;">${d.country||'--'}</td>
+    </tr>`
+  ).join('');
+}
+
 // ── RR LATAM Tab ───────────────────────────────────────────────────
 let rrSortCol = 'startDate', rrSortDir = 1;
 function rrSortBy(col) {
@@ -6868,6 +8705,25 @@ function renderRRTab() {
     const va = a[rrSortCol]||'', vb = b[rrSortCol]||'';
     return va < vb ? rrSortDir : va > vb ? -rrSortDir : 0;
   });
+  // Violations
+  const allRROpps = new Set(RR_DATA.map(d=>d.oppId).filter(Boolean));
+  const stage3PlusNoRR = filtered.filter(d =>
+    (d.stage||'').match(/^0[3-9]|^[1-9][0-9]/) &&
+    !allRROpps.has(d.oppId)
+  );
+  const tooClose = RR_DATA.filter(d => {
+    if (!d.startDate || !d.oppCloseDate) return false;
+    const diff = (new Date(d.oppCloseDate) - new Date(d.startDate)) / 86400000;
+    return diff < 30 && diff >= 0;
+  });
+  const violEl = document.getElementById('rr-violations');
+  if (violEl) {
+    let html = '';
+    if (tooClose.length) html += `<div style="margin-bottom:0.5rem;"><strong style="color:#C23934;">⚠ ${tooClose.length} RR${tooClose.length>1?'s':''} con inicio &lt; 30 días del close date</strong>: ${tooClose.slice(0,5).map(d=>`<span style="font-size:0.75rem;color:#3E3E3C;">${d.oppName||d.oppId}</span>`).join(', ')}${tooClose.length>5?` y ${tooClose.length-5} más`:''}</div>`;
+    if (stage3PlusNoRR.length) html += `<div><strong style="color:#C56200;">⚠ ${stage3PlusNoRR.length} opp${stage3PlusNoRR.length>1?'s':''} en Stage 03+ sin RRs</strong>: ${stage3PlusNoRR.slice(0,5).map(d=>`<span style="font-size:0.75rem;color:#3E3E3C;">${d.oppName||d.oppId}</span>`).join(', ')}${stage3PlusNoRR.length>5?` y ${stage3PlusNoRR.length-5} más`:''}</div>`;
+    if (!html) html = `<span style="color:#04844B;font-size:0.8rem;">✅ Sin incumplimientos detectados</span>`;
+    violEl.innerHTML = html;
+  }
   // KPIs
   const unassigned = data.filter(d=>!d.resource).length;
   const pctAssigned = data.length ? Math.round((data.length-unassigned)/data.length*100) : 0;
@@ -6899,8 +8755,8 @@ function renderRRTab() {
   document.getElementById('rr-summaryBody').innerHTML = summaryRows;
   // Status badge
   const statusBadge = s => { const m={'Assigned':'#D4EDDA:#04844B','Draft':'#F3F2F2:#706E6B','Submitted':'#D8EDFF:#0176D3','Cancelled':'#FBE8E8:#C23934','Canceled':'#FBE8E8:#C23934'}; const p=(m[s]||'#F3F2F2:#706E6B').split(':'); return `<span style="background:${p[0]};color:${p[1]};padding:1px 7px;border-radius:12px;font-size:0.68rem;font-weight:600">${s||'--'}</span>`; };
-  const today = '2026-08-26';
-  const d30 = new Date('2026-09-25').toISOString().slice(0,10);
+  const today = new Date().toISOString().slice(0,10);
+  const d30 = new Date(Date.now() + 30*86400000).toISOString().slice(0,10);
   const startStyle = d => { if(!d) return 'color:#706E6B'; if(d<=today) return 'color:#C23934;font-weight:600'; if(d<=d30) return 'color:#C56200;font-weight:600'; return 'color:#04844B'; };
   let rows = '';
   data.forEach(d => {
