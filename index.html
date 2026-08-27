@@ -247,7 +247,7 @@
 </div>
 
 <!-- TAB CONTENTS -->
-<div class="p-6">
+<div id="tab-content-wrap" class="p-6">
 
 <!-- TAB 1: EXECUTIVE SUMMARY (hidden — KPIs surfaced in strip above tabs) -->
 <div id="t1" class="tab-content hidden">
@@ -13237,6 +13237,18 @@ function toggleInsights(show) {
   sb.style.transform  = show ? 'translateX(0)'    : 'translateX(100%)';
   if (btn) btn.style.display = show ? 'none' : 'flex';
 }
+function positionInsightsSidebar() {
+  const wrap = document.getElementById('tab-content-wrap');
+  const sb   = document.getElementById('insights-sidebar');
+  const btn  = document.getElementById('insights-toggle-btn');
+  if (!wrap || !sb) return;
+  const top = wrap.getBoundingClientRect().top + window.scrollY;
+  sb.style.top    = top + 'px';
+  sb.style.height = 'calc(100vh - ' + top + 'px)';
+  if (btn) { btn.style.top = (top + (window.innerHeight - top) / 2) + 'px'; btn.style.transform = 'none'; }
+}
+window.addEventListener('DOMContentLoaded', positionInsightsSidebar);
+window.addEventListener('resize', positionInsightsSidebar);
 </script>
 
 <!-- Fixed right insights sidebar -->
