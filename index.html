@@ -70,7 +70,7 @@
   .lang-btn { background:transparent;border:1px solid rgba(255,255,255,0.4);color:rgba(255,255,255,0.7);padding:2px 8px;border-radius:4px;font-size:0.75rem;cursor:pointer;transition:all 0.15s; }
   .lang-btn.active, .lang-btn:hover { background:rgba(255,255,255,0.15);color:#fff;border-color:#fff; }
   /* Local filter bar */
-  .local-filter-bar { background:#F8FAFC;border:1px solid #DDDBDA;border-radius:0.5rem;padding:0.75rem 1rem;margin-bottom:1rem; }
+  .local-filter-bar { background:#FFFFFF;border:1px solid #DDDBDA;border-radius:0.75rem;padding:0.75rem 1rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.06); }
   /* SSSM sidebar nav */
   .sssm-nav-item { padding: 0.45rem 0.75rem; cursor: pointer; border-bottom: 1px solid #F3F3F3; transition: background 0.12s; }
   .sssm-nav-item:hover { background: #EAF5FE; }
@@ -520,13 +520,13 @@
 
 <div id="twon" class="tab-content hidden">
 <div class="p-4">
-  <div class="flex flex-wrap gap-3 mb-3 items-center">
+  <div id="won-summary" class="mb-3"></div>
+  <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-center">
     <select id="won-fSSM" onchange="renderWonTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">SSSM (Todos)</option></select>
     <select id="won-fAP" onchange="renderWonTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">AP (Todos)</option></select>
     <input id="won-fSearch" type="text" placeholder="Buscar cuenta / oportunidad..." oninput="renderWonTab()" style="width:260px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem">
     <span class="text-xs ml-auto" style="color:#706E6B;" id="won-count"></span>
   </div>
-  <div id="won-summary" class="mb-3"></div>
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
