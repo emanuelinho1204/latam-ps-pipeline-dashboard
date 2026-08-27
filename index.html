@@ -13326,9 +13326,7 @@ function positionInsightsSidebar() {
   const top = tabBar.getBoundingClientRect().bottom;
   sb.style.top    = top + 'px';
   sb.style.height = 'calc(100vh - ' + top + 'px)';
-  if (kpiStrip) kpiStrip.style.marginRight = '264px';
-  tabBar.style.marginRight = '264px';
-  wrap.style.marginRight   = '264px';
+  wrap.style.marginRight = '264px';
   document.body.style.marginRight = '';
 }
 window.addEventListener('load', positionInsightsSidebar);
