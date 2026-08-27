@@ -8818,9 +8818,9 @@ function renderRRTab() {
     let violBadge = '';
     if (hasViol) violBadge += '<span style="background:#FBE8E8;color:#C23934;padding:1px 6px;border-radius:12px;font-size:0.68rem;font-weight:600;display:inline-block;margin-bottom:2px;">🔴 inicio &lt;30d</span><br>';
     if (!opp.rrs.length && isStage3Plus) violBadge += '<span style="background:#FFF3E0;color:#C56200;padding:1px 6px;border-radius:12px;font-size:0.68rem;font-weight:600;display:inline-block;">⚠ Sin RR</span>';
-    const rrLinks = opp.rrs.map(rr =>
-      `<a href="${sfBase}/pse__Resource_Request__c/${rr.id}/view" target="_blank" style="color:#0176D3;font-size:0.72rem;">${rr.name||rr.id}</a> <span style="color:#706E6B;font-size:0.68rem;">(${rr.status||'--'}${rr.resource ? ', '+rr.resource.split(' ')[0] : ', <span style="color:#C56200">⚠ sin asignar</span>'})</span>`
-    ).join('<br>');
+    const rrText = opp.rrs.length
+      ? opp.rrs.map(rr => rr.name||rr.id).join(' · ')
+      : '<span style="color:#706E6B;">—</span>';
     const closeStyle = opp.closeDate <= today ? 'color:#C23934;font-weight:600' : opp.closeDate <= d30 ? 'color:#C56200;font-weight:600' : 'color:#706E6B';
     return `<tr class="table-row">
       <td class="px-3 py-2"><a href="${sfBase}/Opportunity/${opp.oppId}/view" target="_blank" style="color:#0176D3;">${(opp.oppName||'').substring(0,42)}${(opp.oppName||'').length>42?'…':''}</a></td>
@@ -8828,7 +8828,7 @@ function renderRRTab() {
       <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;white-space:nowrap;">${opp.stage||'--'}</td>
       <td class="px-3 py-2 text-right" style="${closeStyle};white-space:nowrap;">${opp.closeDate||'--'}</td>
       <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${opp.ap||'--'}</td>
-      <td class="px-3 py-2" style="white-space:normal;min-width:200px;">${rrLinks||'<span style="color:#C56200;font-size:0.75rem;">Sin RRs</span>'}</td>
+      <td class="px-3 py-2" style="font-size:0.73rem;color:#3E3E3C;max-width:280px;white-space:normal;">${rrText}</td>
       <td class="px-3 py-2">${violBadge||'<span style="color:#04844B;font-size:0.75rem;">✅</span>'}</td>
     </tr>`;
   }).join('');
