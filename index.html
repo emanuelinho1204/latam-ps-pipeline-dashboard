@@ -101,7 +101,7 @@
 <div id="copyToast" class="hidden">✅ <span data-i18n="toast_copied">Copied! Paste in Slack: @Claude ps-dashboard</span></div>
 
 <!-- Refresh Modal -->
-<div id="refreshModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;" onclick="if(event.target===this)closeRefreshModal()">
+<div id="refreshModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center;" onclick="if(event.target===this)closeRefreshModal()">
   <div style="background:#fff;border-radius:12px;padding:1.75rem;width:480px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,0.25);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
       <h2 style="font-size:1.1rem;font-weight:700;color:#032D60;">Estado de los datos</h2>
@@ -5965,10 +5965,11 @@ function territoryBadge(country) {
 
 // ── Refresh modal ──────────────────────────────────────
 function refreshCopy() {
-  document.getElementById('refreshModal').classList.remove('hidden');
+  const m = document.getElementById('refreshModal');
+  m.style.display = 'flex';
 }
 function closeRefreshModal() {
-  document.getElementById('refreshModal').classList.add('hidden');
+  document.getElementById('refreshModal').style.display = 'none';
 }
 
 // ── SSSM View local filters ────────────────────────────
