@@ -572,6 +572,7 @@
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
+        <th class="px-3 py-2 text-center" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Bandera</th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('oppName')">Oportunidad <span class="sort-icon" id="rr-si-oppName">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('account')">Cuenta <span class="sort-icon" id="rr-si-account">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Stage</th>
@@ -8822,7 +8823,18 @@ function renderRRTab() {
       ? opp.rrs.map(rr => rr.name||rr.id).join(' · ')
       : '<span style="color:#706E6B;">—</span>';
     const closeStyle = opp.closeDate <= today ? 'color:#C23934;font-weight:600' : opp.closeDate <= d30 ? 'color:#C56200;font-weight:600' : 'color:#706E6B';
+    // Flag column: based on days between earliest RR start and opp close date
+    const rrStartDates = opp.rrs.map(rr => rr.startDate).filter(Boolean);
+    let flagHtml = '<span style="color:#706E6B;">—</span>';
+    if (rrStartDates.length && opp.closeDate) {
+      const earliest = rrStartDates.sort()[0];
+      const days = Math.round((new Date(opp.closeDate) - new Date(earliest)) / 86400000);
+      if (days < 31) flagHtml = `<span style="background:#FDDCDB;color:#C23934;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🚩 ${days}d</span>`;
+      else if (days <= 45) flagHtml = `<span style="background:#FEF0C7;color:#7A4504;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${days}d</span>`;
+      else flagHtml = `<span style="background:#D4EDDA;color:#027E46;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${days}d</span>`;
+    }
     return `<tr class="table-row">
+      <td class="px-3 py-2 text-center">${flagHtml}</td>
       <td class="px-3 py-2"><a href="${sfBase}/Opportunity/${opp.oppId}/view" target="_blank" style="color:#0176D3;">${(opp.oppName||'').substring(0,42)}${(opp.oppName||'').length>42?'…':''}</a></td>
       <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${opp.account||'--'}</td>
       <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;white-space:nowrap;">${opp.stage||'--'}</td>
