@@ -174,12 +174,57 @@ def fetch(instance_url, token):
                     }
         log(f"{len(estimate_map)} estimates obtenidos.")
 
-    return dsr_data, estimate_map
+    # ── Resource Requests ──────────────────────────────────────────────────────
+    latam_region_ids = (
+        "a99300000000015AAA','a990M000000K1K3QAK"
+        "','a990M0000008OY3QAM','a990M0000008OXyQAM"
+    )
+    log("Consultando Resource Requests en org62...")
+    rr_records = soql(
+        "SELECT Id, Name, pse__Start_Date__c, pse__End_Date__c, pse__Status__c, "
+        "pse__Region__r.Name, pse__Resource__r.Name, "
+        "pse__Opportunity__c, pse__Opportunity__r.Name, pse__Opportunity__r.StageName, "
+        "pse__Opportunity__r.CloseDate, pse__Opportunity__r.Amount, "
+        "pse__Opportunity__r.Owner.Name, pse__Opportunity__r.Account.Name "
+        f"FROM pse__Resource_Request__c "
+        f"WHERE pse__Region__c IN ('{latam_region_ids}') "
+        "AND pse__Status__c IN ('Draft', 'Ready to Staff') "
+        "AND pse__Opportunity__r.StageName NOT IN ('06 - Project Booked', 'Dead - Lost') "
+        "AND pse__Opportunity__r.CloseDate >= TODAY "
+        "ORDER BY pse__Opportunity__r.CloseDate, pse__Start_Date__c "
+        "LIMIT 300",
+        instance_url, token
+    )
+    log(f"{len(rr_records)} RRs obtenidos.")
+
+    rr_data = []
+    for r in rr_records:
+        opp     = r.get("pse__Opportunity__r") or {}
+        region  = (r.get("pse__Region__r") or {}).get("Name", "")
+        resource = (r.get("pse__Resource__r") or {}).get("Name", None)
+        rr_data.append({
+            "id":        r["Id"],
+            "name":      r.get("Name", ""),
+            "oppId":     r.get("pse__Opportunity__c", ""),
+            "oppName":   opp.get("Name", ""),
+            "account":   (opp.get("Account") or {}).get("Name", ""),
+            "stage":     opp.get("StageName", ""),
+            "closeDate": opp.get("CloseDate", ""),
+            "ap":        (opp.get("Owner") or {}).get("Name", ""),
+            "resource":  resource,
+            "status":    r.get("pse__Status__c", ""),
+            "startDate": r.get("pse__Start_Date__c", ""),
+            "endDate":   r.get("pse__End_Date__c", ""),
+            "sowHours":  None,
+            "country":   region,
+        })
+
+    return dsr_data, estimate_map, rr_data
 
 
 # ── HTML Update ────────────────────────────────────────────────────────────────
 
-def update_html(dsr_data, estimate_map):
+def update_html(dsr_data, estimate_map, rr_data):
     log(f"Actualizando {INDEX_HTML}...")
     with open(INDEX_HTML, "r", encoding="utf-8") as f:
         content = f.read()
@@ -187,6 +232,7 @@ def update_html(dsr_data, estimate_map):
     today    = datetime.now().strftime("%Y-%m-%d")
     dsr_json = json.dumps(dsr_data,     ensure_ascii=False, indent=2)
     est_json = json.dumps(estimate_map, ensure_ascii=False, indent=2)
+    rr_json  = json.dumps(rr_data,      ensure_ascii=False, indent=2)
 
     content, n1 = re.subn(r'let DSR_DATA = \[.*?\];',
                           f'let DSR_DATA = {dsr_json};', content, flags=re.DOTALL)
@@ -194,15 +240,17 @@ def update_html(dsr_data, estimate_map):
                           f'let ESTIMATE_MAP = {est_json};', content, flags=re.DOTALL)
     content, n3 = re.subn(r'let GENERATED = "[^"]*"',
                           f'let GENERATED = "{today}"', content)
+    content, n4 = re.subn(r'const RR_DATA = \[.*?\];',
+                          f'const RR_DATA = {rr_json};', content, flags=re.DOTALL)
 
-    if not (n1 and n2 and n3):
+    if not (n1 and n2 and n3 and n4):
         raise RuntimeError(
-            f"Pattern replacements failed: DSR_DATA={n1}, ESTIMATE_MAP={n2}, GENERATED={n3}."
+            f"Pattern replacements failed: DSR_DATA={n1}, ESTIMATE_MAP={n2}, GENERATED={n3}, RR_DATA={n4}."
         )
 
     with open(INDEX_HTML, "w", encoding="utf-8") as f:
         f.write(content)
-    log(f"✅ index.html actualizado — {len(dsr_data)} DSRs, {len(estimate_map)} estimates, {today}")
+    log(f"✅ index.html actualizado — {len(dsr_data)} DSRs, {len(estimate_map)} estimates, {len(rr_data)} RRs, {today}")
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
@@ -210,8 +258,8 @@ def update_html(dsr_data, estimate_map):
 if __name__ == "__main__":
     try:
         token, instance_url = get_auth()
-        dsr_data, estimate_map = fetch(instance_url, token)
-        update_html(dsr_data, estimate_map)
+        dsr_data, estimate_map, rr_data = fetch(instance_url, token)
+        update_html(dsr_data, estimate_map, rr_data)
     except Exception as e:
         print(f"❌ Error: {e}", file=sys.stderr)
         sys.exit(1)
