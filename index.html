@@ -13318,18 +13318,20 @@ function setInsights(tabLabel, items) {
     : '<span style="color:#04844B;font-size:0.8rem;font-weight:600">✅ Sin alertas activas</span>';
 }
 function positionInsightsSidebar() {
-  const tabBar = document.getElementById('tab-bar-wrap');
-  const wrap   = document.getElementById('tab-content-wrap');
-  const sb     = document.getElementById('insights-sidebar');
+  const tabBar  = document.getElementById('tab-bar-wrap');
+  const kpiStrip = document.getElementById('kpiStrip');
+  const wrap    = document.getElementById('tab-content-wrap');
+  const sb      = document.getElementById('insights-sidebar');
   if (!tabBar || !wrap || !sb) return;
   const top = tabBar.getBoundingClientRect().bottom;
   sb.style.top    = top + 'px';
   sb.style.height = 'calc(100vh - ' + top + 'px)';
+  if (kpiStrip) kpiStrip.style.marginRight = '264px';
   tabBar.style.marginRight = '264px';
   wrap.style.marginRight   = '264px';
   document.body.style.marginRight = '';
 }
-window.addEventListener('DOMContentLoaded', positionInsightsSidebar);
+window.addEventListener('load', positionInsightsSidebar);
 window.addEventListener('resize', positionInsightsSidebar);
 </script>
 
