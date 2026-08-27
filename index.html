@@ -5965,14 +5965,7 @@ function territoryBadge(country) {
 
 // ── Refresh modal ──────────────────────────────────────
 function refreshCopy() {
-  const modal = document.getElementById('refreshModal');
-  modal.classList.remove('hidden');
-  const ld = document.getElementById('rm-lastDate');
-  if (ld) {
-    const d = new Date(GENERATED);
-    const days = Math.floor((Date.now() - d)/86400000);
-    ld.textContent = GENERATED + (days > 0 ? ` (hace ${days} día${days>1?'s':''})` : ' (hoy)');
-  }
+  document.getElementById('refreshModal').classList.remove('hidden');
 }
 function closeRefreshModal() {
   document.getElementById('refreshModal').classList.add('hidden');
@@ -6776,6 +6769,8 @@ function selectSSSmSidebar(name) {
 }
 
 window.addEventListener('load', function() {
+  const ld = document.getElementById('rm-lastDate');
+  if (ld) ld.textContent = GENERATED;
   initFilters();
 });
 
