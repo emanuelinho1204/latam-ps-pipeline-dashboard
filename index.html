@@ -516,16 +516,17 @@
     <input id="won-fSearch" type="text" placeholder="Buscar cuenta / oportunidad..." oninput="renderWonTab()" style="width:260px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem">
     <span class="text-xs ml-auto" style="color:#706E6B;" id="won-count"></span>
   </div>
+  <div id="won-summary" class="mb-3"></div>
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">DSR</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Cuenta</th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Oportunidad</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Cuenta</th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">SSSM</th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">AP</th>
         <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Monto</th>
         <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Close</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">DSRs</th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Tipo</th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">País</th>
       </tr></thead>
@@ -571,16 +572,13 @@
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('name')">RR <span class="sort-icon sort-active" id="rr-si-name">▲</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('oppName')">Oportunidad <span class="sort-icon" id="rr-si-oppName">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('account')">Cuenta <span class="sort-icon" id="rr-si-account">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Stage</th>
+        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="rr-si-closeDate">▲</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('ap')">AP <span class="sort-icon" id="rr-si-ap">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('resource')">Recurso <span class="sort-icon" id="rr-si-resource">▼</span></th>
-        <th class="px-3 py-2 text-center" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('status')">Status <span class="sort-icon" id="rr-si-status">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('startDate')">Inicio <span class="sort-icon" id="rr-si-startDate">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('endDate')">Fin <span class="sort-icon" id="rr-si-endDate">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('sowHours')">Horas SOW <span class="sort-icon" id="rr-si-sowHours">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('country')">País <span class="sort-icon" id="rr-si-country">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">RRs</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Estado</th>
       </tr></thead>
       <tbody id="rr-tableBody"></tbody>
     </table>
@@ -8662,29 +8660,63 @@ function renderWonTab() {
     if (fSearch && !(d.account||'').toLowerCase().includes(fSearch) && !(d.oppName||'').toLowerCase().includes(fSearch) && !(d.dsr||'').toLowerCase().includes(fSearch)) return false;
     return true;
   });
-  data.sort((a,b) => new Date(b.closeDate) - new Date(a.closeDate));
+  // Group by opportunity (same opp can have multiple DSRs)
+  const wonOppMap = {};
+  data.forEach(d => {
+    const key = d.oppId || d.oppName || '__no_opp__';
+    if (!wonOppMap[key]) wonOppMap[key] = {
+      oppId: d.oppId, oppName: d.oppName, account: d.account,
+      ap: d.ap, amount: d.amount, closeDate: d.closeDate,
+      country: d.country, requestTypeDetail: d.requestTypeDetail, dsrs: []
+    };
+    wonOppMap[key].dsrs.push(d);
+  });
+  const wonOpps = Object.values(wonOppMap).sort((a,b) => new Date(b.closeDate) - new Date(a.closeDate));
   const sfBase = 'https://org62.lightning.force.com/lightning/r';
   const countEl = document.getElementById('won-count');
-  if (countEl) countEl.textContent = data.length + ' registros';
+  if (countEl) countEl.textContent = wonOpps.length + ' oportunidades (' + data.length + ' DSRs)';
+  // Summary panel
+  const wonSumEl = document.getElementById('won-summary');
+  if (wonSumEl && wonOpps.length) {
+    const totalAmt = wonOpps.reduce((s,o)=>s+(o.amount||0),0);
+    const byTipo = {}, byPais = {}, bySssm = {};
+    data.forEach(d => {
+      const t = d.requestTypeDetail||'Otro'; byTipo[t]=(byTipo[t]||0)+1;
+      const p = d.country||'N/A'; byPais[p]=(byPais[p]||0)+1;
+      const s = d.sssm||'N/A'; bySssm[s]=(bySssm[s]||0)+1;
+    });
+    const topTipo = Object.entries(byTipo).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} (${v})`).join(' \u00b7 ');
+    const topPais = Object.entries(byPais).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} (${v})`).join(' \u00b7 ');
+    const topSssm = Object.entries(bySssm).sort((a,b)=>b[1]-a[1])[0];
+    wonSumEl.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+      <div class="card-panel p-3 text-center" style="min-width:100px;flex:1;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${wonOpps.length}</div><div style="font-size:0.72rem;color:#706E6B;">Oportunidades</div></div>
+      <div class="card-panel p-3 text-center" style="min-width:100px;flex:1;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${data.length}</div><div style="font-size:0.72rem;color:#706E6B;">DSRs soportados</div></div>
+      <div class="card-panel p-3 text-center" style="min-width:140px;flex:2;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${fmt$(totalAmt)}</div><div style="font-size:0.72rem;color:#706E6B;">ARR Total Soportado</div></div>
+      <div class="card-panel p-3" style="min-width:200px;flex:3;"><div style="font-size:0.72rem;color:#706E6B;margin-bottom:4px;">Por Tipo</div><div style="font-size:0.78rem;color:#3E3E3C;">${topTipo}</div></div>
+      <div class="card-panel p-3" style="min-width:180px;flex:2;"><div style="font-size:0.72rem;color:#706E6B;margin-bottom:4px;">Por Pa\u00eds</div><div style="font-size:0.78rem;color:#3E3E3C;">${topPais}</div></div>
+      ${topSssm ? `<div class="card-panel p-3 text-center" style="min-width:130px;flex:2;"><div style="font-size:1.1rem;font-weight:700;color:#032D60;">${topSssm[0].split(' ')[0]}</div><div style="font-size:0.72rem;color:#706E6B;">SSSM m\u00e1s activo (${topSssm[1]} DSRs)</div></div>` : ''}
+    </div>`;
+  } else if (wonSumEl) { wonSumEl.innerHTML = ''; }
+  // Table \u2014 one row per opportunity, DSRs as links
   const tbody = document.getElementById('won-tableBody');
   if (!tbody) return;
-  tbody.innerHTML = data.map(d =>
+  tbody.innerHTML = wonOpps.map(opp =>
     `<tr class="table-row">
-      <td class="px-3 py-1.5"><a href="${sfBase}/Deal_Support_Request__c/${d.dsrId}/view" target="_blank" style="color:#0176D3;font-family:monospace;font-size:0.72rem;">${d.dsr}</a></td>
-      <td class="px-3 py-1.5">${d.account||'--'}</td>
-      <td class="px-3 py-1.5"><a href="${sfBase}/Opportunity/${d.oppId}/view" target="_blank" style="color:#0176D3;">${(d.oppName||'').substring(0,45)}${(d.oppName||'').length>45?'\u2026':''}</a></td>
-      <td class="px-3 py-1.5" style="color:#706E6B;">${d.sssm||'--'}</td>
-      <td class="px-3 py-1.5" style="color:#706E6B;">${d.ap||'--'}</td>
-      <td class="px-3 py-1.5 text-right" style="color:#032D60;font-weight:600;">${fmt$(d.amount)}</td>
-      <td class="px-3 py-1.5 text-right" style="color:#706E6B;">${d.closeDate||'--'}</td>
-      <td class="px-3 py-1.5" style="color:#706E6B;font-size:0.72rem;">${d.requestTypeDetail||'--'}</td>
-      <td class="px-3 py-1.5" style="color:#706E6B;">${d.country||'--'}</td>
+      <td class="px-3 py-2"><a href="${sfBase}/Opportunity/${opp.oppId}/view" target="_blank" style="color:#0176D3;">${(opp.oppName||'').substring(0,45)}${(opp.oppName||'').length>45?'\u2026':''}</a></td>
+      <td class="px-3 py-2" style="color:#706E6B;">${opp.account||'--'}</td>
+      <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${[...new Set(opp.dsrs.map(d=>d.sssm).filter(Boolean))].join(', ')||'--'}</td>
+      <td class="px-3 py-2" style="color:#706E6B;">${opp.ap||'--'}</td>
+      <td class="px-3 py-2 text-right" style="color:#032D60;font-weight:600;">${fmt$(opp.amount)}</td>
+      <td class="px-3 py-2 text-right" style="color:#706E6B;">${opp.closeDate||'--'}</td>
+      <td class="px-3 py-2" style="white-space:normal;min-width:160px;">${opp.dsrs.map(d=>`<a href="${sfBase}/Deal_Support_Request__c/${d.dsrId}/view" target="_blank" style="color:#0176D3;font-family:monospace;font-size:0.7rem;">${d.dsr}</a>`).join('<br>')}</td>
+      <td class="px-3 py-2" style="color:#706E6B;font-size:0.72rem;">${opp.requestTypeDetail||'--'}</td>
+      <td class="px-3 py-2" style="color:#706E6B;">${opp.country||'--'}</td>
     </tr>`
   ).join('');
 }
 
 // ── RR LATAM Tab ───────────────────────────────────────────────────
-let rrSortCol = 'startDate', rrSortDir = 1;
+let rrSortCol = 'closeDate', rrSortDir = 1;
 function rrSortBy(col) {
   if (rrSortCol === col) rrSortDir *= -1; else { rrSortCol = col; rrSortDir = 1; }
   renderRRTab();
@@ -8758,21 +8790,48 @@ function renderRRTab() {
   const today = new Date().toISOString().slice(0,10);
   const d30 = new Date(Date.now() + 30*86400000).toISOString().slice(0,10);
   const startStyle = d => { if(!d) return 'color:#706E6B'; if(d<=today) return 'color:#C23934;font-weight:600'; if(d<=d30) return 'color:#C56200;font-weight:600'; return 'color:#04844B'; };
-  let rows = '';
+  // Group by opportunity
+  const oppGroups = {};
   data.forEach(d => {
-    rows += `<tr>
-      <td class="px-3 py-1.5"><a href="${sfBase}/pse__Resource_Request__c/${d.id}/view" target="_blank" style="color:#0176D3">${d.name||'--'}</a></td>
-      <td class="px-3 py-1.5"><a href="${sfBase}/Opportunity/${d.oppId}/view" target="_blank" style="color:#0176D3">${(d.oppName||'').substring(0,38)}${(d.oppName||'').length>38?'…':''}</a></td>
-      <td class="px-3 py-1.5" style="color:#706E6B">${d.account||'--'}</td>
-      <td class="px-3 py-1.5" style="color:#706E6B">${d.ap||'--'}</td>
-      <td class="px-3 py-1.5">${d.resource ? d.resource : '<span style="color:#C56200;font-weight:600">⚠ Sin asignar</span>'}</td>
-      <td class="px-3 py-1.5 text-center">${statusBadge(d.status)}</td>
-      <td class="px-3 py-1.5 text-right" style="${startStyle(d.startDate)}">${d.startDate||'--'}</td>
-      <td class="px-3 py-1.5 text-right" style="color:#706E6B">${d.endDate||'--'}</td>
-      <td class="px-3 py-1.5 text-right">${d.sowHours||'--'}</td>
-      <td class="px-3 py-1.5 text-right" style="color:#706E6B">${d.country||'--'}</td>
-    </tr>`;
+    const key = d.oppId || d.oppName || '__no_opp__';
+    if (!oppGroups[key]) oppGroups[key] = {
+      oppId: d.oppId, oppName: d.oppName, account: d.account,
+      stage: d.stage, closeDate: d.closeDate, ap: d.ap, rrs: []
+    };
+    oppGroups[key].rrs.push(d);
   });
+  // Sort groups by closeDate ascending (soonest first)
+  const sortedGroups = Object.values(oppGroups).sort((a,b) => {
+    if (rrSortCol === 'closeDate') return (a.closeDate||'') < (b.closeDate||'') ? -rrSortDir : (a.closeDate||'') > (b.closeDate||'') ? rrSortDir : 0;
+    if (rrSortCol === 'oppName') return (a.oppName||'') < (b.oppName||'') ? -rrSortDir : (a.oppName||'') > (b.oppName||'') ? rrSortDir : 0;
+    if (rrSortCol === 'ap') return (a.ap||'') < (b.ap||'') ? -rrSortDir : (a.ap||'') > (b.ap||'') ? rrSortDir : 0;
+    if (rrSortCol === 'account') return (a.account||'') < (b.account||'') ? -rrSortDir : (a.account||'') > (b.account||'') ? rrSortDir : 0;
+    return (a.closeDate||'') < (b.closeDate||'') ? -1 : (a.closeDate||'') > (b.closeDate||'') ? 1 : 0;
+  });
+  let rows = sortedGroups.map(opp => {
+    const hasViol = opp.rrs.some(rr => {
+      if (!rr.startDate || !opp.closeDate) return false;
+      const diff = (new Date(opp.closeDate) - new Date(rr.startDate)) / 86400000;
+      return diff < 30 && diff >= 0;
+    });
+    const isStage3Plus = (opp.stage||'').match(/^0[3-9]|^[1-9][0-9]/);
+    let violBadge = '';
+    if (hasViol) violBadge += '<span style="background:#FBE8E8;color:#C23934;padding:1px 6px;border-radius:12px;font-size:0.68rem;font-weight:600;display:inline-block;margin-bottom:2px;">🔴 inicio &lt;30d</span><br>';
+    if (!opp.rrs.length && isStage3Plus) violBadge += '<span style="background:#FFF3E0;color:#C56200;padding:1px 6px;border-radius:12px;font-size:0.68rem;font-weight:600;display:inline-block;">⚠ Sin RR</span>';
+    const rrLinks = opp.rrs.map(rr =>
+      `<a href="${sfBase}/pse__Resource_Request__c/${rr.id}/view" target="_blank" style="color:#0176D3;font-size:0.72rem;">${rr.name||rr.id}</a> <span style="color:#706E6B;font-size:0.68rem;">(${rr.status||'--'}${rr.resource ? ', '+rr.resource.split(' ')[0] : ', <span style="color:#C56200">⚠ sin asignar</span>'})</span>`
+    ).join('<br>');
+    const closeStyle = opp.closeDate <= today ? 'color:#C23934;font-weight:600' : opp.closeDate <= d30 ? 'color:#C56200;font-weight:600' : 'color:#706E6B';
+    return `<tr class="table-row">
+      <td class="px-3 py-2"><a href="${sfBase}/Opportunity/${opp.oppId}/view" target="_blank" style="color:#0176D3;">${(opp.oppName||'').substring(0,42)}${(opp.oppName||'').length>42?'…':''}</a></td>
+      <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${opp.account||'--'}</td>
+      <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;white-space:nowrap;">${opp.stage||'--'}</td>
+      <td class="px-3 py-2 text-right" style="${closeStyle};white-space:nowrap;">${opp.closeDate||'--'}</td>
+      <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${opp.ap||'--'}</td>
+      <td class="px-3 py-2" style="white-space:normal;min-width:200px;">${rrLinks||'<span style="color:#C56200;font-size:0.75rem;">Sin RRs</span>'}</td>
+      <td class="px-3 py-2">${violBadge||'<span style="color:#04844B;font-size:0.75rem;">✅</span>'}</td>
+    </tr>`;
+  }).join('');
   document.getElementById('rr-tableBody').innerHTML = rows;
 }
 </script>
