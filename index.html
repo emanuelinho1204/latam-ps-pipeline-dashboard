@@ -87,7 +87,7 @@
     </svg>
     <div>
       <h1 class="text-xl font-bold text-white">LATAM PS Pipeline Dashboard</h1>
-      <p class="text-sm mt-0.5" style="color:#A8C8E8;">Professional Services SSSM Team &middot; <span data-i18n="generated">Generated:</span> <span id="genDate"></span></p>
+      <p class="text-sm mt-0.5" style="color:#A8C8E8;">Professional Services SSSM Team &middot; <span data-i18n="generated">Generated:</span> <span id="genDate"></span><span id="staleDataBadge" style="display:none;margin-left:8px;background:#C56200;color:#fff;font-size:0.7rem;padding:1px 7px;border-radius:10px;vertical-align:middle;"></span></p>
     </div>
   </div>
   <div class="flex items-center gap-3">
@@ -437,6 +437,7 @@
   <div class="flex items-center justify-between mb-2">
     <div class="text-sm" style="color:#706E6B;"><span data-i18n="showing">Showing</span> <span id="detailCount">0</span> DSRs · <span data-i18n="page">Page</span> <span id="curPage">1</span>/<span id="totalPages">1</span></div>
     <div class="flex gap-2">
+      <button onclick="exportTab6CSV()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#706E6B] hover:bg-[#F3F3F3]" title="Exportar a CSV">⬇ CSV</button>
       <button onclick="prevPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]" data-i18n="btn_prev">← Prev</button>
       <button onclick="nextPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]" data-i18n="btn_next">Next →</button>
     </div>
@@ -12653,6 +12654,9 @@ let sortField = 'heat';
 let sortDir = -1;
 let currentPage = 1;
 const PAGE_SIZE = 25;
+let tab6Total = 0; // tracks locally-filtered row count for pagination
+let tab6Data = [];  // full sorted+filtered dataset for CSV export
+let activeTabId = 'tsssm'; // tracks visible tab to avoid re-rendering hidden tabs
 let charts = {};
 let sssmChartEntries = [];
 
@@ -13015,13 +13019,19 @@ function applyFilters() {
 
   currentPage = 1;
   updateAlerts();
-  try { renderTab1(); } catch(e) { console.warn('renderTab1', e); }
-  try { renderTab2(); } catch(e) { console.warn('renderTab2', e); }
-  try { renderTab3(); } catch(e) { console.warn('renderTab3', e); }
-  try { renderTab4(); } catch(e) { console.warn('renderTab4', e); }
-  try { renderTab5(); } catch(e) { console.warn('renderTab5', e); }
-  try { renderTab6(); } catch(e) { console.warn('renderTab6', e); }
-  applySSSmFilters();
+  // Only re-render the visible tab — hidden tabs render on demand in showTab()
+  try {
+    if (activeTabId === 't1') renderTab1();
+    else if (activeTabId === 't2') renderTab2();
+    else if (activeTabId === 't3') renderTab3();
+    else if (activeTabId === 't4') renderTab4();
+    else if (activeTabId === 't5') renderTab5();
+    else if (activeTabId === 't6') renderTab6();
+    else if (activeTabId === 'tsssm') applySSSmFilters();
+    else if (activeTabId === 'testimates') renderEstimatesTab();
+    else if (activeTabId === 'twon') renderWonTab();
+    else if (activeTabId === 'trrlatam') renderRRTab();
+  } catch(e) { console.warn('render '+activeTabId, e); }
 }
 
 function resetFilters() {
@@ -13237,6 +13247,17 @@ function renderTab3() {
     }
   });
 
+  // Close by month (built first — used in insights below)
+  const monthMap = {};
+  filtered.forEach(d => {
+    if (!d.closeDate) return;
+    const mo = d.closeDate.substring(0,7);
+    if (!monthMap[mo]) monthMap[mo] = {count:0,arr:0,commit:0};
+    monthMap[mo].count++;
+    monthMap[mo].arr += d.amount;
+    if (d.forecast==='Commit') monthMap[mo].commit += d.amount;
+  });
+
   // Insights
   const t3Items = [];
   const heaviestStage = stages.reduce((best,s) => {
@@ -13262,17 +13283,6 @@ function renderTab3() {
     const cells = forecasts.map(f => `<td class="text-right py-1.5 pr-3">${row.filter(d=>d.forecast===f).length}</td>`).join('');
     return `<tr class="table-row"><td class="py-1.5 pr-3" style="color:#3E3E3C;">${s.split(' - ')[1]||s}</td>${cells}<td class="text-right py-1.5 font-bold">${total}</td></tr>`;
   }).join('');
-
-  // Close by month
-  const monthMap = {};
-  filtered.forEach(d => {
-    if (!d.closeDate) return;
-    const mo = d.closeDate.substring(0,7);
-    if (!monthMap[mo]) monthMap[mo] = {count:0,arr:0,commit:0};
-    monthMap[mo].count++;
-    monthMap[mo].arr += d.amount;
-    if (d.forecast==='Commit') monthMap[mo].commit += d.amount;
-  });
   const months = Object.keys(monthMap).sort();
   document.getElementById('closeMonthBody').innerHTML = months.map(m => {
     const v = monthMap[m];
@@ -13323,6 +13333,15 @@ function renderTab4() {
     </tr>`;
   }).join('');
   document.getElementById('aiNote').textContent = `Solo muestra ${qualified.length} oportunidades calificadas de ${filtered.length} totales filtradas.`;
+
+  // AI Tool Impact (computed first — used in insights below)
+  const aiDeals = filtered.filter(d => {
+    const q = QUALI_MAP[d.dsr];
+    return q && q.psTools && q.psTools !== 'None' && q.psTools !== '';
+  });
+  const totalHours = aiDeals.reduce((s,d) => s+(Number(QUALI_MAP[d.dsr]?.hoursSaved)||0), 0);
+  const totalDollars = aiDeals.reduce((s,d) => s+(Number(QUALI_MAP[d.dsr]?.dollarSaved)||0), 0);
+
   // Insights
   const t4Items = [];
   const qualTotal = qualified.length;
@@ -13338,11 +13357,6 @@ function renderTab4() {
   if (!t4Items.length) t4Items.push('<div style="color:#706E6B;">Sin datos de AI Readiness</div>');
   setInsights('AI Readiness', t4Items);
 
-  // AI Tool Impact
-  const aiDeals = filtered.filter(d => {
-    const q = QUALI_MAP[d.dsr];
-    return q && q.psTools && q.psTools !== 'None' && q.psTools !== '';
-  });
   const toolMap = {};
   aiDeals.forEach(d => {
     const q = QUALI_MAP[d.dsr];
@@ -13354,8 +13368,6 @@ function renderTab4() {
       toolMap[tool].pctSum += Number(q.pctOptimization)||0;
     });
   });
-  const totalHours = aiDeals.reduce((s,d) => s+(Number(QUALI_MAP[d.dsr]?.hoursSaved)||0), 0);
-  const totalDollars = aiDeals.reduce((s,d) => s+(Number(QUALI_MAP[d.dsr]?.dollarSaved)||0), 0);
   document.getElementById('aiTool1').textContent = aiDeals.length;
   document.getElementById('aiTool2').textContent = totalHours ? totalHours+'h' : '--';
   document.getElementById('aiTool3').textContent = totalDollars ? fmt$(totalDollars) : '--';
@@ -13453,7 +13465,9 @@ function renderTab6() {
     if (typeof av === 'string') return sortDir * av.localeCompare(bv);
     return sortDir * (av - bv);
   });
+  tab6Data = data; // expose for CSV export
   const total = data.length;
+  tab6Total = total; // expose for nextPage()
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   document.getElementById('detailCount').textContent = total;
   document.getElementById('curPage').textContent = currentPage;
@@ -13519,8 +13533,28 @@ function prevPage() {
   if (currentPage > 1) { currentPage--; renderTab6(); }
 }
 function nextPage() {
-  const maxP = Math.ceil(filtered.length/PAGE_SIZE);
+  const maxP = Math.max(1, Math.ceil(tab6Total/PAGE_SIZE));
   if (currentPage < maxP) { currentPage++; renderTab6(); }
+}
+
+function exportTab6CSV() {
+  const cols = ['DSR','SSSM','AP','Account','Opportunity','Country','Stage','Amount','Forecast','Mgr Judgement','Close Date','Status','Type','Contract','Score','Delivery','Qualified','Offering'];
+  const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const rows = tab6Data.map(d => {
+    const q = d._quali;
+    const est = d.oppId ? ESTIMATE_MAP[d.oppId] : null;
+    return [
+      d.dsr, d.sssm, d.ap, d.account, d.oppName, d.country, d.stage,
+      d.amount, d.forecast, d.mgrJudgement || '', d.closeDate, d.status,
+      d.requestTypeDetail, est ? (d.contractType || est.billingType || '') : (d.contractType || ''),
+      q?.score ?? '', q?.deliveryModel ?? '', q?.qualified ?? '', q?.offering ?? ''
+    ].map(esc).join(',');
+  });
+  const csv = [cols.map(esc).join(','), ...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'}));
+  a.download = `dsr-detail-${GENERATED}.csv`;
+  a.click();
 }
 
 function showTab(id, btn) {
@@ -13528,6 +13562,7 @@ function showTab(id, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(id).classList.remove('hidden');
   btn.classList.add('active');
+  activeTabId = id;
   // re-render charts after display (needed for Chart.js resize)
   setTimeout(() => {
     if (id === 't1') renderTab1();
@@ -13709,6 +13744,14 @@ function _initOnce() {
   _filtersInited = true;
   const ld = document.getElementById('rm-lastDate');
   if (ld) ld.textContent = GENERATED;
+  // Stale data badge — warn if data is more than 3 days old
+  const genParts = GENERATED.split('-').map(Number);
+  const genMs = Date.UTC(genParts[0], genParts[1]-1, genParts[2]);
+  const diffDays = Math.floor((Date.now() - genMs) / 86400000);
+  if (diffDays >= 3) {
+    const badge = document.getElementById('staleDataBadge');
+    if (badge) { badge.textContent = `Datos de hace ${diffDays}d`; badge.style.display = 'inline'; }
+  }
   initFilters();
 }
 document.addEventListener('DOMContentLoaded', _initOnce);
