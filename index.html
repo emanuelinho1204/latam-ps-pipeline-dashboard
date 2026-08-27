@@ -298,9 +298,15 @@
     </div>
   </div>
   <p class="text-xs mb-3" style="color:#706E6B;" data-i18n="sssm_view_desc">Grouped view: SSSM → Stage → Status · matches org62 report</p>
-  <div class="card-panel mb-3" style="padding:0.65rem 1rem;">
-    <div class="text-xs font-semibold mb-2" style="color:#706E6B;letter-spacing:0.04em;text-transform:uppercase;">Carga del Equipo</div>
-    <div id="sssmLoadBars"></div>
+  <div class="flex gap-3 mb-3 items-start">
+    <div class="card-panel flex-1" style="padding:0.65rem 1rem;">
+      <div class="text-xs font-semibold mb-2" style="color:#706E6B;letter-spacing:0.04em;text-transform:uppercase;">Carga del Equipo</div>
+      <div id="sssmLoadBars"></div>
+    </div>
+    <div class="card-panel p-3" style="min-width:260px;max-width:300px;border-left:4px solid #7B5EA7;" id="sssm-insights">
+      <div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.5rem;letter-spacing:0.03em;">📊 INSIGHTS</div>
+      <span style="color:#706E6B;font-size:0.75rem;">Calculando...</span>
+    </div>
   </div>
   <div id="sssmGroupedContainer"></div>
 </div>
@@ -473,12 +479,18 @@
 
 <div id="testimates" class="tab-content hidden">
 <div class="p-4">
-  <div class="grid grid-cols-5 gap-3 mb-4">
-    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Total Estimates</div><div class="text-2xl font-bold text-blue-900" id="est-kpiTotal">—</div></div>
-    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Monto Total</div><div class="text-2xl font-bold text-blue-900" id="est-kpiAmount">—</div></div>
-    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Margen Promedio</div><div class="text-2xl font-bold text-blue-900" id="est-kpiMargin">—</div></div>
-    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Bill Rate Promedio</div><div class="text-2xl font-bold text-blue-900" id="est-kpiBillRate">—</div></div>
-    <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">T&amp;E Total</div><div class="text-2xl font-bold text-blue-900" id="est-kpiTE">—</div></div>
+  <div class="flex gap-3 mb-4 items-stretch">
+    <div class="grid grid-cols-5 gap-3 flex-1">
+      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Total Estimates</div><div class="text-2xl font-bold text-blue-900" id="est-kpiTotal">—</div></div>
+      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Monto Total</div><div class="text-2xl font-bold text-blue-900" id="est-kpiAmount">—</div></div>
+      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Margen Promedio</div><div class="text-2xl font-bold text-blue-900" id="est-kpiMargin">—</div></div>
+      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Bill Rate Promedio</div><div class="text-2xl font-bold text-blue-900" id="est-kpiBillRate">—</div></div>
+      <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">T&amp;E Total</div><div class="text-2xl font-bold text-blue-900" id="est-kpiTE">—</div></div>
+    </div>
+    <div class="card-panel p-3" style="min-width:260px;max-width:300px;border-left:4px solid #0176D3;" id="est-insights">
+      <div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.5rem;letter-spacing:0.03em;">📊 INSIGHTS</div>
+      <span style="color:#706E6B;font-size:0.75rem;">Calculando...</span>
+    </div>
   </div>
   <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-center">
     <select id="est-fStatus" onchange="renderEstimatesTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">Approval Status (Todos)</option><option>Draft</option><option>Pending</option><option>Approved</option></select>
@@ -516,8 +528,9 @@
 
 <div id="twon" class="tab-content hidden">
 <div class="p-4">
-  <div class="card-panel p-3 mb-3" style="background:#EAF5FE;">
-    <span style="font-size:0.82rem;color:#032D60;">DSRs de oportunidades ganadas (06 - Project Booked) desde Feb 2026. Solo EM/Admin/SOW Support LATAM/LACA.</span>
+  <div id="won-insights" class="card-panel p-3 mb-3" style="border-left:4px solid #04844B;">
+    <div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.5rem;letter-spacing:0.03em;">📊 INSIGHTS</div>
+    <span style="color:#706E6B;font-size:0.75rem;">Calculando...</span>
   </div>
   <div class="flex flex-wrap gap-3 mb-3 items-center">
     <select id="won-fSSM" onchange="renderWonTab()" style="border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"><option value="">SSSM (Todos)</option></select>
@@ -12044,6 +12057,23 @@ function renderSSSmLoadBars() {
   if (warned.length) parts.push(`<span style="color:#C56200;">🟡 ${warned.length} en atención 13–15</span>`);
   if (!overloaded.length && !warned.length) parts.push(`<span style="color:#04844B;">✅ Carga normal</span>`);
   el.innerHTML = `<span style="font-size:0.75rem;color:#706E6B;">${sorted.length} SSSMs &nbsp;·&nbsp; ${parts.join(' &nbsp;·&nbsp; ')}</span>`;
+  // Insights panel dinámico
+  const insEl = document.getElementById('sssm-insights');
+  if (!insEl) return;
+  const sssmNow = new Date().toISOString().slice(0,10);
+  const sssmD30 = new Date(Date.now()+30*86400000).toISOString().slice(0,10);
+  const allRROppIds = new Set(RR_DATA.map(d=>d.oppId).filter(Boolean));
+  const urgentDSRs = filtered.filter(d=>(d.closeDate||'')>=sssmNow&&(d.closeDate||'')<=sssmD30);
+  const noRRStage3 = filtered.filter(d=>(d.stage||'').match(/^0[3-9]/)&&!allRROppIds.has(d.oppId)&&(d.closeDate||'')>=sssmNow);
+  const noEstimate = filtered.filter(d=>(d.stage||'').match(/^0[3-9]/)&&!ESTIMATE_MAP[d.oppId]&&(d.closeDate||'')>=sssmNow);
+  const overloadedSSSMs = sorted.filter(([,c])=>c>15).map(([n])=>n.split(' ')[0]);
+  const items = [];
+  if (urgentDSRs.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C23934;font-weight:700">⚡ ${urgentDSRs.length} DSR${urgentDSRs.length>1?'s':''} close &lt; 30d</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(urgentDSRs.map(d=>d.account||''))].filter(Boolean).slice(0,2).join(', ')}${urgentDSRs.length>2?` +${urgentDSRs.length-2}`:''}</span></div>`);
+  if (noRRStage3.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C56200;font-weight:700">⚠ ${noRRStage3.length} opp${noRRStage3.length>1?'s':''} Stage 03+ sin RR</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(noRRStage3.map(d=>d.account||''))].filter(Boolean).slice(0,2).join(', ')}${noRRStage3.length>2?` +${noRRStage3.length-2}`:''}</span></div>`);
+  if (noEstimate.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C56200;font-weight:700">📋 ${noEstimate.length} Stage 03+ sin estimate</span></div>`);
+  if (overloadedSSSMs.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C23934;font-weight:700">🔴 Sobrecargados: ${overloadedSSSMs.slice(0,3).join(', ')}</span></div>`);
+  if (!items.length) items.push('<span style="color:#04844B;font-size:0.8rem;font-weight:600">✅ Sin alertas activas</span>');
+  insEl.innerHTML = `<div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.6rem;letter-spacing:0.03em;">📊 INSIGHTS</div>`+items.join('');
 }
 
 function resetSSSmFilters() {
@@ -12680,7 +12710,7 @@ function showTab(id, btn) {
     if (id === 't2') renderTab2();
     if (id === 't3') renderTab3();
     if (id === 't4') renderTab4();
-    if (id === 'tsssm') renderSSSmGroupedView(filtered);
+    if (id === 'tsssm') { renderSSSmLoadBars(); renderSSSmGroupedView(filtered); }
     if (id === 'testimates') renderEstimatesTab();
     if (id === 'trrlatam') renderRRTab();
     if (id === 'twon') renderWonTab();
@@ -12900,6 +12930,26 @@ function renderEstimatesTab() {
     [...new Set(ESTIMATE_DATA.map(d=>d.em).filter(Boolean))].sort().forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; emEl.appendChild(o); });
   }
   document.getElementById('est-rowCount').textContent = data.length + ' registros';
+  // Insights (siempre desde ESTIMATE_DATA completo, no filtrado)
+  const estNow = new Date().toISOString().slice(0,10);
+  const estD30 = new Date(Date.now()+30*86400000).toISOString().slice(0,10);
+  const estInsEl = document.getElementById('est-insights');
+  if (estInsEl) {
+    const activeEst = ESTIMATE_DATA.filter(e=>(e.closeDate||'')>=estNow);
+    const urgentEstClose = activeEst.filter(e=>e.closeDate<=estD30);
+    const highDisc = ESTIMATE_DATA.filter(e=>(e.discountPct||0)>=15);
+    const fpCount = ESTIMATE_DATA.filter(e=>e.billingType==='Fixed Price').length;
+    const tmCount = ESTIMATE_DATA.filter(e=>e.billingType==='Time and Materials').length;
+    const noEstDSRs = DSR_DATA.filter(d=>(d.stage||'').match(/^0[3-9]/)&&!ESTIMATE_MAP[d.oppId]&&(d.closeDate||'')>=estNow);
+    const noEstOpps = [...new Set(noEstDSRs.map(d=>d.account||''))].filter(Boolean);
+    const items = [];
+    if (urgentEstClose.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C23934;font-weight:700">⚡ ${urgentEstClose.length} estimate${urgentEstClose.length>1?'s':''} close &lt; 30d</span><br><span style="font-size:0.7rem;color:#706E6B">${urgentEstClose.slice(0,2).map(e=>e.account||e.oppName||'').filter(Boolean).join(', ')}${urgentEstClose.length>2?` +${urgentEstClose.length-2}`:''}</span></div>`);
+    if (highDisc.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C56200;font-weight:700">⚠ ${highDisc.length} con descuento ≥15%</span><br><span style="font-size:0.7rem;color:#706E6B">Máx: ${Math.max(...highDisc.map(e=>e.discountPct||0))}%</span></div>`);
+    if (noEstOpps.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#C56200;font-weight:700">📋 ${noEstOpps.length} acct Stage 03+ sin estimate</span><br><span style="font-size:0.7rem;color:#706E6B">${noEstOpps.slice(0,2).join(', ')}${noEstOpps.length>2?` +${noEstOpps.length-2}`:''}</span></div>`);
+    if (!items.length) items.push('<span style="color:#04844B;font-size:0.8rem;font-weight:600">✅ Sin alertas activas</span>');
+    items.push(`<div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid #E8E8E8;font-size:0.7rem;color:#706E6B">Fixed Price: ${fpCount} &nbsp;·&nbsp; T&amp;M: ${tmCount}</div>`);
+    estInsEl.innerHTML = `<div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.6rem;letter-spacing:0.03em;">📊 INSIGHTS</div>`+items.join('');
+  }
   // Table
   const stageColors = {'01 - Discovery':'#706E6B','02 - Scoping':'#0176D3','03 - Initial Proposal':'#C56200','04 - Active Negotiation':'#7B5EA7','05 - Negotiation/Review':'#C23934'};
   const billingBadge = b => { if(!b) return '<span style="color:#706E6B">--</span>'; const m={'Fixed Price':'#D8EDFF:#0176D3','Time and Materials':'#EEF1FF:#4C4C94','Order Form':'#FFF3CD:#C56200'}; const p=(m[b]||'#F3F2F2:#706E6B').split(':'); return `<span style="background:${p[0]};color:${p[1]};padding:1px 7px;border-radius:12px;font-size:0.68rem;font-weight:600">${b}</span>`; };
@@ -12965,6 +13015,24 @@ function renderWonTab() {
   const sfBase = 'https://org62.lightning.force.com/lightning/r';
   const countEl = document.getElementById('won-count');
   if (countEl) countEl.textContent = wonOpps.length + ' oportunidades (' + data.length + ' DSRs)';
+  // Insights panel (desde WON_DATA completo)
+  const wonInsEl = document.getElementById('won-insights');
+  if (wonInsEl && WON_DATA.length) {
+    const allOpps = Object.values((() => { const m={}; WON_DATA.forEach(d=>{ const k=d.oppId||d.oppName||'_'; if(!m[k]) m[k]={amount:d.amount||0,closeDate:d.closeDate,account:d.account,sssm:d.sssm}; }); return m; })());
+    const thisMonth = new Date().toISOString().slice(0,7);
+    const wonThisMonth = allOpps.filter(o=>(o.closeDate||'').startsWith(thisMonth));
+    const totalArr = allOpps.reduce((s,o)=>s+(o.amount||0),0);
+    const biggestDeal = allOpps.sort((a,b)=>(b.amount||0)-(a.amount||0))[0];
+    const bySssm = {}; WON_DATA.forEach(d=>{ bySssm[d.sssm||'N/A']=(bySssm[d.sssm||'N/A']||0)+1; });
+    const topSssm = Object.entries(bySssm).sort((a,b)=>b[1]-a[1])[0];
+    const fmtW = v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':'$'+v;
+    const items = [];
+    items.push(`<div style="margin-bottom:0.4rem"><span style="color:#04844B;font-weight:700">🏆 ${allOpps.length} opps · ${fmtW(totalArr)} ARR total</span></div>`);
+    if (wonThisMonth.length) items.push(`<div style="margin-bottom:0.4rem"><span style="color:#0176D3;font-weight:700">📅 ${wonThisMonth.length} ganados este mes</span><br><span style="font-size:0.7rem;color:#706E6B">${wonThisMonth.slice(0,2).map(o=>o.account||'').filter(Boolean).join(', ')}${wonThisMonth.length>2?` +${wonThisMonth.length-2}`:''}</span></div>`);
+    if (biggestDeal) items.push(`<div style="margin-bottom:0.4rem"><span style="font-weight:700;color:#032D60">💰 Mayor deal: ${fmtW(biggestDeal.amount||0)}</span><br><span style="font-size:0.7rem;color:#706E6B">${biggestDeal.account||''}</span></div>`);
+    if (topSssm) items.push(`<div><span style="font-weight:700;color:#7B5EA7">⭐ Top SSSM: ${topSssm[0].split(' ')[0]}</span><span style="font-size:0.7rem;color:#706E6B"> (${topSssm[1]} DSRs)</span></div>`);
+    wonInsEl.innerHTML = `<div style="font-weight:700;font-size:0.78rem;color:#032D60;margin-bottom:0.6rem;letter-spacing:0.03em;">📊 INSIGHTS</div>`+items.join('');
+  }
   // Summary panel
   const wonSumEl = document.getElementById('won-summary');
   if (wonSumEl && wonOpps.length) {
