@@ -13324,7 +13324,7 @@ function positionInsightsSidebar() {
   const top = wrap.getBoundingClientRect().top + window.scrollY;
   sb.style.top    = top + 'px';
   sb.style.height = 'calc(100vh - ' + top + 'px)';
-  wrap.style.paddingRight = (264 + 16) + 'px';
+  document.body.style.marginRight = '264px';
 }
 window.addEventListener('DOMContentLoaded', positionInsightsSidebar);
 window.addEventListener('resize', positionInsightsSidebar);
