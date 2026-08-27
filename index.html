@@ -84,7 +84,7 @@
     </svg>
     <div>
       <h1 class="text-xl font-bold text-white">LATAM PS Pipeline Dashboard</h1>
-      <p class="text-sm mt-0.5" style="color:#A8C8E8;">Professional Services SSSM Team &middot; <span data-i18n="generated">Generated:</span> <span id="genDate"></span><span id="liveIndicator" style="margin-left:8px;font-size:0.75rem;"></span></p>
+      <p class="text-sm mt-0.5" style="color:#A8C8E8;">Professional Services SSSM Team &middot; <span data-i18n="generated">Generated:</span> <span id="genDate"></span></p>
     </div>
   </div>
   <div class="flex items-center gap-3">
@@ -102,31 +102,21 @@
 
 <!-- Refresh Modal -->
 <div id="refreshModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;" onclick="if(event.target===this)closeRefreshModal()">
-  <div style="background:#fff;border-radius:12px;padding:1.75rem;width:520px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,0.25);">
+  <div style="background:#fff;border-radius:12px;padding:1.75rem;width:480px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,0.25);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
-      <h2 style="font-size:1.1rem;font-weight:700;color:#032D60;">🔄 Actualizar datos del dashboard</h2>
+      <h2 style="font-size:1.1rem;font-weight:700;color:#032D60;">Estado de los datos</h2>
       <button onclick="closeRefreshModal()" style="color:#706E6B;font-size:1.25rem;background:none;border:none;cursor:pointer;">✕</button>
     </div>
-    <div style="font-size:0.82rem;color:#706E6B;margin-bottom:1rem;">Última actualización: <strong style="color:#032D60;" id="rm-lastDate"></strong></div>
-
-    <!-- Offline state -->
-    <div id="rm-offline" style="background:#FFF3CD;border-radius:8px;padding:1rem;margin-bottom:1rem;">
-      <div style="font-weight:600;color:#C56200;margin-bottom:0.5rem;">⚠️ Servidor local no detectado</div>
-      <div style="font-size:0.8rem;color:#706E6B;margin-bottom:0.75rem;">Para activar el refresh automático, ejecuta en una terminal:</div>
-      <code style="display:block;background:#032D60;color:#4FC3F7;padding:0.6rem 0.9rem;border-radius:6px;font-size:0.82rem;margin-bottom:0.75rem;">python3 /Users/a.moreno/ps-pipeline-dashboard/refresh-server.py</code>
-      <div style="font-size:0.78rem;color:#706E6B;">O para refrescar ahora, ejecuta <code style="background:#F3F2F2;padding:1px 5px;border-radius:3px;">@Claude ps-dashboard</code> en Claude Code.</div>
-      <button onclick="checkRefreshServer()" style="margin-top:0.75rem;padding:0.4rem 1rem;background:#0176D3;color:white;border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;">↺ Reintentar conexión</button>
+    <div style="background:#EAF5FE;border-radius:8px;padding:1rem;margin-bottom:1rem;">
+      <div style="font-weight:600;color:#032D60;margin-bottom:0.4rem;">Datos embebidos directamente desde org62</div>
+      <div style="font-size:0.82rem;color:#444;">Última actualización: <strong id="rm-lastDate"></strong></div>
     </div>
-
-    <!-- Online state -->
-    <div id="rm-online" class="hidden">
-      <div style="background:#D4EDDA;border-radius:8px;padding:0.6rem 0.9rem;margin-bottom:1rem;font-size:0.8rem;color:#04844B;font-weight:600;">✅ Servidor activo — listo para refrescar</div>
-      <button id="rm-btnRefresh" onclick="startRefresh()" style="width:100%;padding:0.65rem;background:#032D60;color:white;border:none;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;margin-bottom:0.75rem;">🔄 Actualizar datos</button>
-      <pre id="rm-log" style="background:#1A1A2E;color:#A8E6CF;padding:0.75rem;border-radius:6px;font-size:0.72rem;min-height:60px;max-height:180px;overflow-y:auto;margin:0;white-space:pre-wrap;"></pre>
-      <div id="rm-done" class="hidden" style="margin-top:0.75rem;text-align:center;">
-        <div style="color:#04844B;font-weight:600;margin-bottom:0.5rem;">✅ Datos actualizados</div>
-        <button onclick="location.reload()" style="padding:0.5rem 1.5rem;background:#04844B;color:white;border:none;border-radius:6px;font-size:0.85rem;cursor:pointer;">↺ Recargar dashboard</button>
-      </div>
+    <div style="font-size:0.8rem;color:#706E6B;line-height:1.5;">
+      Los datos se refrescan automáticamente cada 2 horas via Claude Code.<br>
+      Para forzar un refresh ahora, dile a Claude: <code style="background:#F3F2F2;padding:1px 5px;border-radius:3px;">actualiza el dashboard</code>
+    </div>
+    <div style="margin-top:1.25rem;text-align:right;">
+      <button onclick="closeRefreshModal()" style="padding:0.4rem 1.2rem;background:#032D60;color:white;border:none;border-radius:6px;font-size:0.85rem;cursor:pointer;">Cerrar</button>
     </div>
   </div>
 </div>
@@ -566,7 +556,6 @@
 
 <script>
 // Live data proxy URL — set to Heroku app URL after deploy, empty = use embedded data
-const LIVE_DATA_URL = '';
 
 let DSR_DATA = [
   {
@@ -5974,7 +5963,7 @@ function territoryBadge(country) {
   return `<span class="${cls}">${t}</span>`;
 }
 
-// ── Refresh → clipboard copy + toast ──────────────────
+// ── Refresh modal ──────────────────────────────────────
 function refreshCopy() {
   const modal = document.getElementById('refreshModal');
   modal.classList.remove('hidden');
@@ -5984,54 +5973,9 @@ function refreshCopy() {
     const days = Math.floor((Date.now() - d)/86400000);
     ld.textContent = GENERATED + (days > 0 ? ` (hace ${days} día${days>1?'s':''})` : ' (hoy)');
   }
-  document.getElementById('rm-done').classList.add('hidden');
-  checkRefreshServer();
 }
 function closeRefreshModal() {
   document.getElementById('refreshModal').classList.add('hidden');
-}
-let _refreshPoll = null;
-function checkRefreshServer() {
-  fetch('http://localhost:3001/health', {signal: AbortSignal.timeout(1500)})
-    .then(r => r.json())
-    .then(() => {
-      document.getElementById('rm-offline').classList.add('hidden');
-      document.getElementById('rm-online').classList.remove('hidden');
-      pollStatus();
-    })
-    .catch(() => {
-      document.getElementById('rm-offline').classList.remove('hidden');
-      document.getElementById('rm-online').classList.add('hidden');
-    });
-}
-function startRefresh() {
-  document.getElementById('rm-btnRefresh').disabled = true;
-  document.getElementById('rm-btnRefresh').textContent = 'Actualizando...';
-  document.getElementById('rm-log').textContent = '';
-  fetch('http://localhost:3001/refresh', {method:'POST'})
-    .then(r=>r.json())
-    .then(d => { if(d.ok) pollStatus(); })
-    .catch(e => { document.getElementById('rm-log').textContent = 'Error: '+e; });
-}
-function pollStatus() {
-  clearInterval(_refreshPoll);
-  _refreshPoll = setInterval(() => {
-    fetch('http://localhost:3001/status', {signal: AbortSignal.timeout(2000)})
-      .then(r=>r.json())
-      .then(d => {
-        const log = document.getElementById('rm-log');
-        if (log) log.textContent = (d.log||[]).slice(-12).join('\n');
-        const btn = document.getElementById('rm-btnRefresh');
-        if (!d.running) {
-          clearInterval(_refreshPoll);
-          if (btn) { btn.disabled = false; btn.textContent = '🔄 Actualizar datos'; }
-          if (d.last) {
-            const done = document.getElementById('rm-done');
-            if(done) { done.classList.remove('hidden'); }
-          }
-        }
-      }).catch(()=>clearInterval(_refreshPoll));
-  }, 1500);
 }
 
 // ── SSSM View local filters ────────────────────────────
@@ -6831,29 +6775,7 @@ function selectSSSmSidebar(name) {
   applySSSmFilters();
 }
 
-window.addEventListener('load', async function() {
-  // Try live data: 1) Heroku proxy, 2) local dev server
-  const urls = [LIVE_DATA_URL, 'http://localhost:3001/data'].filter(Boolean);
-  for (const url of urls) {
-    try {
-      const resp = await fetch(url, {signal: AbortSignal.timeout(4000)});
-      if (!resp.ok) continue;
-      const d = await resp.json();
-      if (d.ok && d.dsrData && d.dsrData.length) {
-        DSR_DATA = d.dsrData;
-        if (d.estimateMap) ESTIMATE_MAP = d.estimateMap;
-        if (d.generated)   GENERATED   = d.generated;
-        const li = document.getElementById('liveIndicator');
-        if (li) {
-          const badge = document.createElement('span');
-          badge.textContent = '🟢 Live';
-          badge.style.cssText = 'background:#027E46;color:#fff;padding:1px 7px;border-radius:10px;font-size:0.7rem;font-weight:600;';
-          li.appendChild(badge);
-        }
-        break;
-      }
-    } catch(e) { /* try next */ }
-  }
+window.addEventListener('load', function() {
   initFilters();
 });
 
