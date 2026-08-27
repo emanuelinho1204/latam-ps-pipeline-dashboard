@@ -157,7 +157,8 @@ def fetch(instance_url, token):
             batch   = opp_list[i:i + 90]
             ids_str = "','".join(batch)
             est_records = soql(
-                f"SELECT Id, Name, ffscpq__Billing_Type__c, ffscpq__Opportunity__c "
+                f"SELECT Id, Name, ffscpq__Billing_Type__c, ffscpq__Opportunity__c, "
+                f"Sub_Region__c, Estimated_ExpenseTotal_Price__c, ffscpq__Percent_Discount__c "
                 f"FROM ffscpq__Estimate__c "
                 f"WHERE ffscpq__Is_Primary__c = true "
                 f"AND ffscpq__Opportunity__c IN ('{ids_str}') "
@@ -168,9 +169,12 @@ def fetch(instance_url, token):
                 oid = e.get("ffscpq__Opportunity__c")
                 if oid:
                     estimate_map[oid] = {
-                        "id":          e["Id"],
-                        "name":        e.get("Name", ""),
-                        "billingType": e.get("ffscpq__Billing_Type__c", ""),
+                        "id":             e["Id"],
+                        "name":           e.get("Name", ""),
+                        "billingType":    e.get("ffscpq__Billing_Type__c", ""),
+                        "rateCardRegion": e.get("Sub_Region__c", "LATAM"),
+                        "tAndE":          e.get("Estimated_ExpenseTotal_Price__c"),
+                        "discountPct":    e.get("ffscpq__Percent_Discount__c") or 0,
                     }
         log(f"{len(estimate_map)} estimates obtenidos.")
 
