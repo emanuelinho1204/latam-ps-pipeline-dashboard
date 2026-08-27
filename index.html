@@ -11968,7 +11968,8 @@ function applySSSmFilters() {
   if (sssmF) data = data.filter(d => d.sssm === sssmF);
   if (terrF) data = data.filter(d => getTerritory(d.country) === terrF);
   renderSSSmLoadBars();
-  renderSSSmGroupedView(data);
+  // Defer grouped view so DOM/layout is ready (mirrors showTab's 50ms pattern)
+  setTimeout(function() { renderSSSmGroupedView(data); }, 0);
 }
 
 function renderSSSmLoadBars() {
@@ -12211,12 +12212,12 @@ function applyFilters() {
 
   currentPage = 1;
   updateAlerts();
-  renderTab1();
-  renderTab2();
-  renderTab3();
-  renderTab4();
-  renderTab5();
-  renderTab6();
+  try { renderTab1(); } catch(e) { console.warn('renderTab1', e); }
+  try { renderTab2(); } catch(e) { console.warn('renderTab2', e); }
+  try { renderTab3(); } catch(e) { console.warn('renderTab3', e); }
+  try { renderTab4(); } catch(e) { console.warn('renderTab4', e); }
+  try { renderTab5(); } catch(e) { console.warn('renderTab5', e); }
+  try { renderTab6(); } catch(e) { console.warn('renderTab6', e); }
   applySSSmFilters();
 }
 
@@ -12899,11 +12900,16 @@ function selectSSSmSidebar(name) {
   applySSSmFilters();
 }
 
-window.addEventListener('load', function() {
+let _filtersInited = false;
+function _initOnce() {
+  if (_filtersInited) return;
+  _filtersInited = true;
   const ld = document.getElementById('rm-lastDate');
   if (ld) ld.textContent = GENERATED;
   initFilters();
-});
+}
+document.addEventListener('DOMContentLoaded', _initOnce);
+window.addEventListener('load', _initOnce);
 
 // ── Estimates Tab ──────────────────────────────────────────────────
 let estSortCol = 'amount', estSortDir = -1;
