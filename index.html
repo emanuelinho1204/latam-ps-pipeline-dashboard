@@ -12365,6 +12365,24 @@ function renderTab1() {
   const stageCnts = stages.map(s => filtered.filter(d => d.stage===s).length);
   makeChart('chartStage','bar',stageLbls,[{label:'DSRs',data:stageCnts,backgroundColor:'#0176D3',borderRadius:4}]);
 
+  // Insights
+  const t1Items = [];
+  if (total === 0) { t1Items.push('<div style="color:#C23934;">⚠️ Sin DSRs en el filtro actual</div>'); }
+  else {
+    const commitPct = totalArr ? Math.round(commitArr/totalArr*100) : 0;
+    if (commitPct < 30) t1Items.push(`<div>⚠️ Solo <b>${commitPct}%</b> del ARR en Commit (${fmt$(commitArr)} de ${fmt$(totalArr)})</div>`);
+    else t1Items.push(`<div>✅ <b>${commitPct}%</b> del ARR en Commit (${fmt$(commitArr)})</div>`);
+    const closeSoon = filtered.filter(d => { const days=(new Date(d.closeDate)-new Date())/86400000; return days>=0&&days<30; }).length;
+    if (closeSoon) t1Items.push(`<div>📅 <b>${closeSoon}</b> opp${closeSoon>1?'s':''} cierran en &lt;30 días</div>`);
+    const noPending = filtered.filter(d => !QUALI_MAP[d.dsr]).length;
+    if (noPending > 0) t1Items.push(`<div>🔲 <b>${noPending}</b> sin calificar (Skill 2)</div>`);
+    if (avgScore !== '--') {
+      const sc = parseFloat(avgScore);
+      if (sc < 15) t1Items.push(`<div style="color:#C56200;">📉 Avg score bajo: <b>${avgScore}/27</b></div>`);
+    }
+  }
+  setInsights('Executive Summary', t1Items);
+
   // Top 5
   const sorted = [...filtered].sort((a,b) => b.amount - a.amount).slice(0,5);
   document.getElementById('top5Body').innerHTML = sorted.map(d => {
@@ -12421,6 +12439,17 @@ function renderTab2() {
     </tr>`;
   }).join('');
 
+  // Insights
+  const t2Items = [];
+  const overloadedSSSMs = entries.filter(([,m])=>m.total>15);
+  overloadedSSSMs.forEach(([n,m]) => t2Items.push(`<div style="color:${m.total>18?'#C23934':'#C56200'};">${m.total>18?'🔴':'🟡'} <b>${n.split(' ')[0]}</b> — ${m.total} DSRs (${m.total>18?'sobrecargado':'atención'})</div>`));
+  const topARR = entries[0];
+  if (topARR) t2Items.push(`<div>💰 Mayor ARR: <b>${topARR[0].split(' ')[0]}</b> — ${fmt$(topARR[1].arr)}</div>`);
+  const onHoldTotal = entries.reduce((s,[,m])=>s+m.onhold,0);
+  if (onHoldTotal > 0) t2Items.push(`<div style="color:#C56200;">⏸ <b>${onHoldTotal}</b> DSRs en On Hold</div>`);
+  if (!t2Items.length) t2Items.push('<div style="color:#04844B;">✅ Carga distribuida normalmente</div>');
+  setInsights('SSSM Coverage', t2Items);
+
   sssmChartEntries = entries;
   const labels = entries.map(([n]) => n.split(' ')[0]);
   const counts = entries.map(([,m]) => m.total);
@@ -12445,6 +12474,23 @@ function renderTab3() {
       y1:{type:'linear',position:'right',ticks:{color:'#04844B'},grid:{drawOnChartArea:false}}
     }
   });
+
+  // Insights
+  const t3Items = [];
+  const heaviestStage = stages.reduce((best,s) => {
+    const cnt = filtered.filter(d=>d.stage===s).length;
+    return cnt > (best.cnt||0) ? {s,cnt} : best;
+  }, {});
+  if (heaviestStage.s) t3Items.push(`<div>📊 Etapa más cargada: <b>${(heaviestStage.s.split(' - ')[1]||heaviestStage.s)}</b> (${heaviestStage.cnt} DSRs)</div>`);
+  const nowMo = new Date().toISOString().substring(0,7);
+  const thisMo = monthMap[nowMo];
+  if (thisMo) t3Items.push(`<div>📅 Este mes: <b>${thisMo.count}</b> ops — ${fmt$(thisMo.arr)} (${fmt$(thisMo.commit)} Commit)</div>`);
+  const nextMoDate = new Date(); nextMoDate.setMonth(nextMoDate.getMonth()+1);
+  const nextMo = nextMoDate.toISOString().substring(0,7);
+  const nMo = monthMap[nextMo];
+  if (nMo) t3Items.push(`<div>📆 Próximo mes: <b>${nMo.count}</b> ops — ${fmt$(nMo.arr)}</div>`);
+  if (!t3Items.length) t3Items.push('<div style="color:#706E6B;">Sin cierres registrados en el filtro actual</div>');
+  setInsights('Funnel', t3Items);
 
   // Stage × Forecast
   const forecasts = ['Commit','Best Case','Pipeline'];
@@ -12515,6 +12561,20 @@ function renderTab4() {
     </tr>`;
   }).join('');
   document.getElementById('aiNote').textContent = `Solo muestra ${qualified.length} oportunidades calificadas de ${filtered.length} totales filtradas.`;
+  // Insights
+  const t4Items = [];
+  const qualTotal = qualified.length;
+  if (qualTotal > 0) {
+    const nativePct = Math.round(native.length/qualTotal*100);
+    t4Items.push(`<div>🤖 <b>${nativePct}%</b> AI-Native Agentic (${native.length} de ${qualTotal})</div>`);
+    if (notq.length > 0) t4Items.push(`<div style="color:#C23934;">❌ <b>${notq.length}</b> ops Not Qualified</div>`);
+    if (totalHours > 0) t4Items.push(`<div>⏱ <b>${totalHours}h</b> ahorradas con AI tools</div>`);
+    if (totalDollars > 0) t4Items.push(`<div>💰 <b>${fmt$(totalDollars)}</b> ahorrados</div>`);
+  }
+  const unqual = filtered.filter(d => !QUALI_MAP[d.dsr]).length;
+  if (unqual > 0) t4Items.push(`<div style="color:#C56200;">🔲 <b>${unqual}</b> sin calificar aún</div>`);
+  if (!t4Items.length) t4Items.push('<div style="color:#706E6B;">Sin datos de AI Readiness</div>');
+  setInsights('AI Readiness', t4Items);
 
   // AI Tool Impact
   const aiDeals = filtered.filter(d => {
@@ -12600,6 +12660,20 @@ function renderTab5() {
       <td class="py-1.5 text-right" style="color:${pct>50?'#C23934':'#C56200'};">${pct}%</td>
     </tr>`;
   }).join('');
+
+  // Insights
+  const t5Items = [];
+  if (imminent.length > 0) t5Items.push(`<div style="color:#C23934;">🚨 <b>${imminent.length}</b> cierre${imminent.length>1?'s':''} inminente${imminent.length>1?'s':''} (&lt;14 días)</div>`);
+  else t5Items.push('<div style="color:#04844B;">✅ Sin cierres críticos &lt;14 días</div>');
+  if (highVal.length > 0) t5Items.push(`<div style="color:#C56200;">💰 <b>${highVal.length}</b> ops &gt;$500k sin calificar</div>`);
+  if (overloaded.length > 0) overloaded.forEach(([n,c]) => t5Items.push(`<div style="color:${c>18?'#C23934':'#C56200'};">${c>18?'🔴':'🟡'} <b>${n.split(' ')[0]}</b> — ${c} DSRs</div>`));
+  const worstFlag = flags.map(([label,key]) => {
+    const yes=qualified.filter(d=>QUALI_MAP[d.dsr][key]==='YES').length;
+    const no=qualified.filter(d=>QUALI_MAP[d.dsr][key]==='NO').length;
+    const t=yes+no; return {label,pct:t?Math.round(no/t*100):0};
+  }).sort((a,b)=>b.pct-a.pct)[0];
+  if (worstFlag && worstFlag.pct > 50) t5Items.push(`<div style="color:#C23934;">⛔ <b>${worstFlag.label}</b>: ${worstFlag.pct}% sin cumplir</div>`);
+  setInsights('Risk Radar', t5Items);
 }
 
 function renderTab6() {
@@ -12659,6 +12733,17 @@ function renderTab6() {
       <td class="px-2"><button onclick="navigator.clipboard.writeText('${copyText.replace(/'/g,"\\'").replace(/`/g,'\\`')}')" style="color:#706E6B;font-size:0.72rem;padding:2px 6px;border:1px solid #DDDBDA;border-radius:4px;" onmouseover="this.style.color='#032D60'" onmouseout="this.style.color='#706E6B'">📋</button></td>
     </tr>`;
   }).join('');
+
+  // Insights
+  const t6Items = [];
+  t6Items.push(`<div>📋 <b>${total}</b> DSR${total!==1?'s':''} en vista actual</div>`);
+  const highHeat = data.filter(d => d._heat >= 3).length;
+  if (highHeat > 0) t6Items.push(`<div style="color:#C23934;">🔥 <b>${highHeat}</b> con heat score alto (≥3)</div>`);
+  const noQuali = data.filter(d => !d._quali).length;
+  if (noQuali > 0) t6Items.push(`<div style="color:#C56200;">🔲 <b>${noQuali}</b> sin calificar</div>`);
+  const highPri = data.filter(d => priorityScore(d) >= 8).length;
+  if (highPri > 0) t6Items.push(`<div style="color:#C56200;">⚡ <b>${highPri}</b> con prioridad alta (≥8)</div>`);
+  setInsights('DSR Detail', t6Items);
 }
 
 let detailSortDir = {};
@@ -12687,6 +12772,8 @@ function showTab(id, btn) {
     if (id === 't2') renderTab2();
     if (id === 't3') renderTab3();
     if (id === 't4') renderTab4();
+    if (id === 't5') renderTab5();
+    if (id === 't6') renderTab6();
     if (id === 'tsssm') { renderSSSmLoadBars(); renderSSSmGroupedView(filtered); }
     if (id === 'testimates') renderEstimatesTab();
     if (id === 'trrlatam') renderRRTab();
