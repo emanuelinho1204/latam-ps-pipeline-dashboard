@@ -8745,9 +8745,9 @@ function renderRRTab() {
     !allRROpps.has(d.oppId)
   );
   const tooClose = RR_DATA.filter(d => {
-    if (!d.startDate || !d.oppCloseDate) return false;
-    const diff = (new Date(d.oppCloseDate) - new Date(d.startDate)) / 86400000;
-    return diff < 30 && diff >= 0;
+    if (!d.startDate || !d.closeDate) return false;
+    const diff = (new Date(d.closeDate) - new Date(d.startDate)) / 86400000;
+    return diff >= 0 && diff < 30;
   });
   const violEl = document.getElementById('rr-violations');
   if (violEl) {
@@ -8823,15 +8823,14 @@ function renderRRTab() {
       ? opp.rrs.map(rr => rr.name||rr.id).join(' · ')
       : '<span style="color:#706E6B;">—</span>';
     const closeStyle = opp.closeDate <= today ? 'color:#C23934;font-weight:600' : opp.closeDate <= d30 ? 'color:#C56200;font-weight:600' : 'color:#706E6B';
-    // Flag column: based on days between earliest RR start and opp close date
-    const rrStartDates = opp.rrs.map(rr => rr.startDate).filter(Boolean);
+    // Flag column: remaining days from TODAY to opp close date
     let flagHtml = '<span style="color:#706E6B;">—</span>';
-    if (rrStartDates.length && opp.closeDate) {
-      const earliest = rrStartDates.sort()[0];
-      const days = Math.round((new Date(opp.closeDate) - new Date(earliest)) / 86400000);
-      if (days < 31) flagHtml = `<span style="background:#FDDCDB;color:#C23934;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🚩 ${days}d</span>`;
-      else if (days <= 45) flagHtml = `<span style="background:#FEF0C7;color:#7A4504;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${days}d</span>`;
-      else flagHtml = `<span style="background:#D4EDDA;color:#027E46;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${days}d</span>`;
+    if (opp.closeDate) {
+      const daysLeft = Math.round((new Date(opp.closeDate) - new Date(today)) / 86400000);
+      if (daysLeft < 0) flagHtml = `<span style="background:#F3F2F2;color:#706E6B;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">✔ cerrado</span>`;
+      else if (daysLeft < 31) flagHtml = `<span style="background:#FDDCDB;color:#C23934;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🚩 ${daysLeft}d</span>`;
+      else if (daysLeft <= 45) flagHtml = `<span style="background:#FEF0C7;color:#7A4504;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${daysLeft}d</span>`;
+      else flagHtml = `<span style="background:#D4EDDA;color:#027E46;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${daysLeft}d</span>`;
     }
     return `<tr class="table-row">
       <td class="px-3 py-2 text-center">${flagHtml}</td>
