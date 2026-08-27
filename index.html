@@ -21,6 +21,8 @@
   .heat-low { background: #FEEFEE; color: #C23934; border: 1px solid rgba(194,57,52,0.2); }
   .sort-btn { cursor: pointer; user-select: none; color: #0176D3; }
   .sort-btn:hover { color: #014486; }
+  .rr-table { table-layout: fixed; width: 100%; }
+  .rr-table th { resize: horizontal; overflow: hidden; position: relative; min-width: 50px; }
   .chart-container { position: relative; height: 260px; }
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: #F3F3F3; }
@@ -570,18 +572,18 @@
     </div>
   </details>
   <div class="card-panel overflow-auto">
-    <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
+    <table class="rr-table border-collapse" style="font-size:0.78rem;color:#3E3E3C;">
       <thead><tr>
-        <th class="px-3 py-2 text-center" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Bandera</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('oppName')">Oportunidad <span class="sort-icon" id="rr-si-oppName">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('account')">Cuenta <span class="sort-icon" id="rr-si-account">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Stage</th>
-        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="rr-si-closeDate">▲</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="rrSortBy('ap')">AP <span class="sort-icon" id="rr-si-ap">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">RRs</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Estado</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Estimate</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">SSSM</th>
+        <th class="px-3 py-2 text-center" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:80px;">Bandera</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;width:190px;" onclick="rrSortBy('oppName')">Oportunidad <span class="sort-icon" id="rr-si-oppName">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;width:140px;" onclick="rrSortBy('account')">Cuenta <span class="sort-icon" id="rr-si-account">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:80px;">Stage</th>
+        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;width:90px;" onclick="rrSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="rr-si-closeDate">▲</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;width:120px;" onclick="rrSortBy('ap')">AP <span class="sort-icon" id="rr-si-ap">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:170px;">RRs</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:90px;">Estado</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:160px;">Estimate</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;width:120px;">SSSM</th>
       </tr></thead>
       <tbody id="rr-tableBody"></tbody>
     </table>
@@ -8821,9 +8823,14 @@ function renderRRTab() {
     let violBadge = '';
     if (hasViol) violBadge += '<span style="background:#FBE8E8;color:#C23934;padding:1px 6px;border-radius:12px;font-size:0.68rem;font-weight:600;display:inline-block;margin-bottom:2px;">🔴 inicio &lt;30d</span><br>';
     if (!opp.rrs.length && isStage3Plus) violBadge += '<span style="background:#FFF3E0;color:#C56200;padding:1px 6px;border-radius:12px;font-size:0.68rem;font-weight:600;display:inline-block;">⚠ Sin RR</span>';
-    const rrText = opp.rrs.length
-      ? opp.rrs.map(rr => rr.name||rr.id).join(' · ')
+    const rrNames = opp.rrs.map(rr => rr.name||rr.id||'').filter(Boolean);
+    const rrFirst = rrNames[0] || '';
+    const rrTrunc = rrFirst.length > 35 ? rrFirst.substring(0,35)+'…' : rrFirst;
+    const rrExtra = rrNames.length - 1;
+    const rrText = rrNames.length
+      ? (rrExtra > 0 ? `${rrTrunc} <span style="color:#706E6B;font-size:0.7rem;">+${rrExtra} más</span>` : rrTrunc)
       : '<span style="color:#706E6B;">—</span>';
+    const rrTitle = rrNames.join(' · ');
     const closeStyle = opp.closeDate <= today ? 'color:#C23934;font-weight:600' : opp.closeDate <= d30 ? 'color:#C56200;font-weight:600' : 'color:#706E6B';
     // Flag column: remaining days from TODAY to opp close date
     let flagHtml = '<span style="color:#706E6B;">—</span>';
@@ -8841,7 +8848,7 @@ function renderRRTab() {
       <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;white-space:nowrap;">${opp.stage||'--'}</td>
       <td class="px-3 py-2 text-right" style="${closeStyle};white-space:nowrap;">${opp.closeDate||'--'}</td>
       <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${opp.ap||'--'}</td>
-      <td class="px-3 py-2" style="font-size:0.73rem;color:#3E3E3C;max-width:280px;white-space:normal;">${rrText}</td>
+      <td class="px-3 py-2" style="font-size:0.73rem;color:#3E3E3C;overflow:hidden;text-overflow:ellipsis;" title="${rrTitle}">${rrText}</td>
       <td class="px-3 py-2">${violBadge||'<span style="color:#04844B;font-size:0.75rem;">✅</span>'}</td>
       <td class="px-3 py-2" style="font-size:0.73rem;">${(()=>{ const est=ESTIMATE_MAP[opp.oppId]; return est ? `<a href="${sfBase}/ffscpq__Estimate__c/${est.id}/view" target="_blank" style="color:#0176D3;">${est.name}</a>` : '<span style="color:#706E6B;">—</span>'; })()}</td>
       <td class="px-3 py-2" style="font-size:0.73rem;">${(()=>{ const dsr=DSR_DATA.find(d=>d.oppId===opp.oppId); return dsr ? `<a href="${sfBase}/Deal_Support_Request__c/${dsr.dsrId}/view" target="_blank" style="color:#0176D3;">${dsr.sssm}</a>` : '<span style="color:#706E6B;">—</span>'; })()}</td>
