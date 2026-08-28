@@ -272,6 +272,15 @@
         <option value="Brazil">Brazil</option>
       </select>
     </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">DSR Status</label>
+      <select id="sssmStatusF" onchange="applySSSmFilters()">
+        <option value="">All Statuses</option>
+        <option value="Working">Working</option>
+        <option value="On Hold">On Hold</option>
+        <option value="In Queue">In Queue</option>
+      </select>
+    </div>
     <div class="flex items-end">
       <button onclick="resetSSSmFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]" data-i18n="btn_reset">↺ Reset</button>
     </div>
@@ -12773,9 +12782,11 @@ function territoryBadge(country) {
 function applySSSmFilters() {
   const sssmF = (document.getElementById('sssmF') || {}).value || '';
   const terrF = (document.getElementById('terrF') || {}).value || '';
+  const statusF = (document.getElementById('sssmStatusF') || {}).value || '';
   let data = [...filtered];
   if (sssmF) data = data.filter(d => d.sssm === sssmF);
   if (terrF) data = data.filter(d => getTerritory(d.country) === terrF);
+  if (statusF) data = data.filter(d => d.status === statusF);
   renderSSSmLoadBars();
   // Defer grouped view so DOM/layout is ready (mirrors showTab's 50ms pattern)
   setTimeout(function() { renderSSSmGroupedView(data); }, 0);
@@ -12822,8 +12833,11 @@ function renderSSSmLoadBars() {
 function resetSSSmFilters() {
   const s = document.getElementById('sssmF');
   const t = document.getElementById('terrF');
+  const st = document.getElementById('sssmStatusF');
   if (s) s.value = '';
   if (t) t.value = '';
+  if (st) st.value = '';
+  renderSSSmLoadBars();
   renderSSSmGroupedView(filtered);
 }
 
@@ -13226,11 +13240,15 @@ function renderTab2() {
 
   sssmChartEntries = entries;
   const labels = entries.map(([n]) => n.split(' ')[0]);
-  const counts = entries.map(([,m]) => m.total);
   const arrs = entries.map(([,m]) => +(m.arr/1e6).toFixed(2));
   const sssmChartClick = (e, els) => { if (els.length > 0) selectSSSM(sssmChartEntries[els[0].index][0]); };
   const sssmChartHover = (e, els) => { e.native.target.style.cursor = els.length > 0 ? 'pointer' : 'default'; };
-  makeChart('chartSSSM','bar',labels,[{label:'DSRs',data:counts,backgroundColor:'#0176D3',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover});
+  const stackedScales = { x: { stacked:true, ticks:{color:'#706E6B',font:{size:10}}, grid:{color:'#F3F3F3'} }, y: { stacked:true, ticks:{color:'#706E6B',font:{size:10}}, grid:{color:'#F3F3F3'} } };
+  makeChart('chartSSSM','bar',labels,[
+    {label:'Working', data:entries.map(([,m])=>m.working), backgroundColor:'#04844B', borderRadius:0},
+    {label:'On Hold', data:entries.map(([,m])=>m.onhold),  backgroundColor:'#C56200', borderRadius:0},
+    {label:'In Queue',data:entries.map(([,m])=>m.inqueue), backgroundColor:'#9EA1A3', borderRadius:0},
+  ],{onClick:sssmChartClick,onHover:sssmChartHover,scales:stackedScales});
   makeChart('chartSSSMArr','bar',labels,[{label:'ARR ($M)',data:arrs,backgroundColor:'#04844B',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover});
 }
 
