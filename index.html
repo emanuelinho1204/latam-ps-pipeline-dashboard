@@ -565,10 +565,10 @@
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:80px;">Stage</th>
         <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:90px;" onclick="rrSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="rr-si-closeDate">▲</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:110px;" onclick="rrSortBy('ap')">AP <span class="sort-icon" id="rr-si-ap">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:150px;">RRs</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:90px;">Estado</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:150px;">Estimate</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:110px;">SSSM</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:150px;" onclick="rrSortBy('rrCount')">RRs <span class="sort-icon" id="rr-si-rrCount">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:90px;" onclick="rrSortBy('estado')">Estado <span class="sort-icon" id="rr-si-estado">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:150px;" onclick="rrSortBy('estimateName')">Estimate <span class="sort-icon" id="rr-si-estimateName">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:110px;" onclick="rrSortBy('sssm')">SSSM <span class="sort-icon" id="rr-si-sssm">▼</span></th>
       </tr></thead>
       <tbody id="rr-tableBody"></tbody>
     </table>
@@ -13948,6 +13948,9 @@ function renderWonTab() {
 let rrSortCol = 'closeDate', rrSortDir = 1;
 function rrSortBy(col) {
   if (rrSortCol === col) rrSortDir *= -1; else { rrSortCol = col; rrSortDir = 1; }
+  document.querySelectorAll('[id^="rr-si-"]').forEach(el => { el.className='sort-icon'; el.textContent='▼'; });
+  const si = document.getElementById('rr-si-'+col);
+  if (si) { si.className='sort-icon sort-active'; si.textContent = rrSortDir===1 ? '▲' : '▼'; }
   renderRRTab();
 }
 function renderRRTab() {
@@ -14040,6 +14043,10 @@ function renderRRTab() {
     if (rrSortCol === 'oppName') return (a.oppName||'') < (b.oppName||'') ? -rrSortDir : (a.oppName||'') > (b.oppName||'') ? rrSortDir : 0;
     if (rrSortCol === 'ap') return (a.ap||'') < (b.ap||'') ? -rrSortDir : (a.ap||'') > (b.ap||'') ? rrSortDir : 0;
     if (rrSortCol === 'account') return (a.account||'') < (b.account||'') ? -rrSortDir : (a.account||'') > (b.account||'') ? rrSortDir : 0;
+    if (rrSortCol === 'rrCount') return rrSortDir * (a.rrs.length - b.rrs.length);
+    if (rrSortCol === 'estado') { const rank = o => { const nowS=new Date().toISOString().slice(0,10); const venc=o.rrs.some(r=>r.startDate&&r.startDate<nowS&&(r.status==='Draft'||r.status==='Ready to Staff')); const hasViol=o.rrs.some(r=>{if(!r.startDate||!o.closeDate)return false;const d=(new Date(o.closeDate)-new Date(r.startDate))/86400000;return d<30&&d>=0;}); const sinRR=!o.rrs.length; return venc?0:hasViol?1:sinRR?2:3; }; return rrSortDir*(rank(a)-rank(b)); }
+    if (rrSortCol === 'estimateName') { const ea=(ESTIMATE_MAP[a.oppId]||{}).name||''; const eb=(ESTIMATE_MAP[b.oppId]||{}).name||''; return ea<eb?-rrSortDir:ea>eb?rrSortDir:0; }
+    if (rrSortCol === 'sssm') { const sa=(DSR_DATA.find(d=>d.oppId===a.oppId)||{}).sssm||''; const sb=(DSR_DATA.find(d=>d.oppId===b.oppId)||{}).sssm||''; return sa<sb?-rrSortDir:sa>sb?rrSortDir:0; }
     return (a.closeDate||'') < (b.closeDate||'') ? -1 : (a.closeDate||'') > (b.closeDate||'') ? 1 : 0;
   });
   let rows = sortedGroups.map(opp => {
