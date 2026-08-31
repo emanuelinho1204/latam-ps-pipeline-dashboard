@@ -12690,7 +12690,6 @@ function renderSSSmLoadBars() {
   if (totalStale) parts.push(`<span style="color:#C23934;">🚩 ${totalStale} Working opp vencida</span>`);
   el.innerHTML = `<span style="font-size:0.75rem;color:#706E6B;">${sorted.length} SSSMs &nbsp;·&nbsp; ${parts.join(' &nbsp;·&nbsp; ')}</span>`;
   // Insights sidebar
-  const sssmNow = new Date().toISOString().slice(0,10);
   const sssmD30 = new Date(Date.now()+30*86400000).toISOString().slice(0,10);
   const allRROppIds = new Set(RR_DATA.map(d=>d.oppId).filter(Boolean));
   const urgentDSRs = filtered.filter(d=>(d.closeDate||'')>=sssmNow&&(d.closeDate||'')<=sssmD30);
@@ -12711,7 +12710,7 @@ function renderSSSmLoadBars() {
     }).join('<br>');
     sssmItems.unshift(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 Working con opp vencida</span><br><span style="font-size:0.7rem;color:#706E6B">${detail}</span></div>`);
   }
-  setInsights('SSSM View', sssmItems);
+  setInsights('SSSM View', sssmItems.length ? sssmItems : ['<span style="color:#706E6B;font-size:0.75rem">Sin alertas activas.</span>']);
 }
 
 function resetSSSmFilters() {
