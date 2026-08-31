@@ -1,0 +1,53 @@
+name: Refresh Dashboard Data
+
+on:
+  # Manual trigger (for testing and on-demand refresh)
+  workflow_dispatch:
+  # Scheduled: Monday–Friday at 8:00 AM Mexico City time (UTC-6 = 14:00 UTC)
+  schedule:
+    - cron: '0 14 * * 1-5'
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Salesforce CLI
+        run: |
+          npm install -g @salesforce/cli --silent
+          sf --version
+
+      - name: Authenticate to org62
+        env:
+          ORG62_SFDX_URL: ${{ secrets.ORG62_SFDX_URL }}
+        run: |
+          echo "$ORG62_SFDX_URL" > /tmp/sfdx_auth.txt
+          sf org login sfdx-url --sfdx-url-file /tmp/sfdx_auth.txt --alias org62 --no-prompt
+          rm /tmp/sfdx_auth.txt
+
+      - name: Run data refresh
+        env:
+          ORG62_SFDX_URL: ${{ secrets.ORG62_SFDX_URL }}
+        run: python3 refresh-data.py
+
+      - name: Commit and push updated index.html
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Auto-refresh: $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
