@@ -551,6 +551,10 @@
     <input id="rr-fSearch" type="text" placeholder="Buscar RR / opp / cuenta / recurso..." oninput="renderRRTab()" style="width:280px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem">
     <span class="text-xs text-gray-500 ml-auto" id="rr-rowCount"></span>
   </div>
+  <div class="grid grid-cols-2 gap-3 mb-3">
+    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">RRs por SSSM</h3><div class="chart-container"><canvas id="chartRRSssm"></canvas></div></div>
+    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">RRs por AP</h3><div class="chart-container"><canvas id="chartRRAp"></canvas></div></div>
+  </div>
   <details class="card-panel p-3 mb-3">
     <summary style="cursor:pointer;font-weight:600;font-size:0.875rem;color:#3E3E3C">Resumen por Oportunidad</summary>
     <div class="overflow-auto mt-2">
@@ -13161,17 +13165,18 @@ function renderTab2() {
   if (!t2Items.length) t2Items.push('<div style="color:#04844B;">✅ Carga distribuida normalmente</div>');
   setInsights('SSSM Coverage', t2Items);
 
-  sssmChartEntries = entries;
-  const labels = entries.map(([n]) => sssmLabel(n));
-  const arrs = entries.map(([,m]) => +(m.arr/1e6).toFixed(2));
+  const chartEntries = [...entries].sort((a,b) => a[0].localeCompare(b[0]));
+  sssmChartEntries = chartEntries;
+  const labels = chartEntries.map(([n]) => sssmLabel(n));
+  const arrs = chartEntries.map(([,m]) => +(m.arr/1e6).toFixed(2));
   const sssmChartClick = (e, els) => { if (els.length > 0) selectSSSM(sssmChartEntries[els[0].index][0]); };
   const sssmChartHover = (e, els) => { e.native.target.style.cursor = els.length > 0 ? 'pointer' : 'default'; };
   const stackedScales = { x: { stacked:true, ticks:{color:'#706E6B',font:{size:10}}, grid:{color:'#F3F3F3'} }, y: { stacked:true, ticks:{color:'#706E6B',font:{size:10}}, grid:{color:'#F3F3F3'} } };
   makeChart('chartSSSM','bar',labels,[
-    {label:'Working', data:entries.map(([,m])=>m.working), backgroundColor:'#04844B', borderRadius:0},
-    {label:'On Hold', data:entries.map(([,m])=>m.onhold),  backgroundColor:'#C56200', borderRadius:0},
-    {label:'In Queue',data:entries.map(([,m])=>m.inqueue), backgroundColor:'#9EA1A3', borderRadius:0},
-    {label:'Waiting', data:entries.map(([,m])=>m.waiting), backgroundColor:'#E4D5F9', borderRadius:0},
+    {label:'Working', data:chartEntries.map(([,m])=>m.working), backgroundColor:'#04844B', borderRadius:0},
+    {label:'On Hold', data:chartEntries.map(([,m])=>m.onhold),  backgroundColor:'#C56200', borderRadius:0},
+    {label:'In Queue',data:chartEntries.map(([,m])=>m.inqueue), backgroundColor:'#9EA1A3', borderRadius:0},
+    {label:'Waiting', data:chartEntries.map(([,m])=>m.waiting), backgroundColor:'#E4D5F9', borderRadius:0},
   ],{onClick:sssmChartClick,onHover:sssmChartHover,scales:stackedScales});
   makeChart('chartSSSMArr','bar',labels,[{label:'Pipeline ($M)',data:arrs,backgroundColor:'#04844B',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover});
 }
@@ -14066,6 +14071,32 @@ function renderRRTab() {
     rows += estRows;
   }
   document.getElementById('rr-tableBody').innerHTML = rows;
+  // Charts: RRs por SSSM y por AP
+  const oppSSSMMap = {};
+  DSR_DATA.forEach(d => { if (d.oppId && d.sssm) oppSSSMMap[d.oppId] = d.sssm; });
+  const sssmRRMap = {};
+  data.forEach(d => {
+    const sssm = oppSSSMMap[d.oppId] || 'Sin SSSM';
+    if (!sssmRRMap[sssm]) sssmRRMap[sssm] = {draft:0,ready:0};
+    if (d.status === 'Ready to Staff') sssmRRMap[sssm].ready++; else sssmRRMap[sssm].draft++;
+  });
+  const sssmRREntries = Object.entries(sssmRRMap).sort((a,b) => a[0].localeCompare(b[0]));
+  const rrStackedScales = { x:{stacked:true,ticks:{color:'#706E6B',font:{size:10}},grid:{color:'#F3F3F3'}}, y:{stacked:true,ticks:{color:'#706E6B',font:{size:10}},grid:{color:'#F3F3F3'}} };
+  makeChart('chartRRSssm','bar',sssmRREntries.map(([n])=>sssmLabel(n)),[
+    {label:'Ready to Staff',data:sssmRREntries.map(([,m])=>m.ready),backgroundColor:'#04844B',borderRadius:0},
+    {label:'Draft',data:sssmRREntries.map(([,m])=>m.draft),backgroundColor:'#9EA1A3',borderRadius:0},
+  ],{scales:rrStackedScales});
+  const apRRMap = {};
+  data.forEach(d => {
+    const ap = d.ap || 'Sin AP';
+    if (!apRRMap[ap]) apRRMap[ap] = {draft:0,ready:0};
+    if (d.status === 'Ready to Staff') apRRMap[ap].ready++; else apRRMap[ap].draft++;
+  });
+  const apRREntries = Object.entries(apRRMap).sort((a,b) => a[0].localeCompare(b[0]));
+  makeChart('chartRRAp','bar',apRREntries.map(([n])=>sssmLabel(n)),[
+    {label:'Ready to Staff',data:apRREntries.map(([,m])=>m.ready),backgroundColor:'#0176D3',borderRadius:0},
+    {label:'Draft',data:apRREntries.map(([,m])=>m.draft),backgroundColor:'#9EA1A3',borderRadius:0},
+  ],{scales:rrStackedScales});
 }
 
 // ── Global Insights Sidebar ────────────────────────────
