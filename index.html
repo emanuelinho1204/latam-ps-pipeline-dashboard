@@ -162,7 +162,7 @@
       <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_amt_max">Max Amount ($M)</label>
       <input type="number" id="fAmtMax" onchange="applyFilters()" placeholder="30" style="width:80px">
     </div>
-    <div>
+    <div style="display:none">
       <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_qual">Qualification</label>
       <select id="fQual" onchange="applyFilters()">
         <option value="" data-i18n="opt_all">All</option>
@@ -171,7 +171,7 @@
         <option value="pending" data-i18n="opt_pending">Pending</option>
       </select>
     </div>
-    <div>
+    <div style="display:none">
       <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_delivery">Delivery Model</label>
       <select id="fDelivery" onchange="applyFilters()" class="min-w-36">
         <option value="" data-i18n="opt_all">All</option>
@@ -207,10 +207,10 @@
     <div class="flex items-center gap-1.5"><span class="text-xs" style="color:#706E6B;">Commit</span><span id="sk3" class="text-sm font-bold" style="color:#04844B;"></span></div>
     <div class="w-px h-4" style="background:#DDDBDA;"></div>
     <div class="flex items-center gap-1.5"><span class="text-xs" style="color:#706E6B;">Best Case</span><span id="sk6" class="text-sm font-bold" style="color:#C56200;"></span></div>
-    <div class="w-px h-4" style="background:#DDDBDA;"></div>
-    <div class="flex items-center gap-1.5"><span class="text-xs" style="color:#706E6B;">Qualified</span><span id="sk4" class="text-sm font-bold" style="color:#C56200;"></span></div>
-    <div class="w-px h-4" style="background:#DDDBDA;"></div>
-    <div class="flex items-center gap-1.5"><span class="text-xs" style="color:#706E6B;">Avg Score</span><span id="sk5" class="text-sm font-bold" style="color:#7B5EA7;"></span></div>
+    <div class="w-px h-4" style="background:#DDDBDA;display:none"></div>
+    <div class="flex items-center gap-1.5" style="display:none"><span class="text-xs" style="color:#706E6B;">Qualified</span><span id="sk4" class="text-sm font-bold" style="color:#C56200;"></span></div>
+    <div class="w-px h-4" style="background:#DDDBDA;display:none"></div>
+    <div class="flex items-center gap-1.5" style="display:none"><span class="text-xs" style="color:#706E6B;">Avg Score</span><span id="sk5" class="text-sm font-bold" style="color:#7B5EA7;"></span></div>
   </div>
 </div>
 
@@ -224,8 +224,8 @@
     <button class="tab-btn active px-5 py-3 text-sm font-medium" onclick="showTab('tsssm',this)"><span data-i18n="tab_sssm_view">👤 SSSM View</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t2',this)"><span data-i18n="tab_sssm_coverage">👥 SSSM Coverage</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t3',this)"><span data-i18n="tab_funnel">🔻 Funnel</span></button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t4',this)"><span data-i18n="tab_ai">🤖 AI Readiness</span></button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t5',this)"><span data-i18n="tab_risk">🚨 Risk Radar</span></button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t4',this)" style="display:none"><span data-i18n="tab_ai">🤖 AI Readiness</span></button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t5',this)" style="display:none"><span data-i18n="tab_risk">🚨 Risk Radar</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t6',this)"><span data-i18n="tab_detail">📄 DSR Detail</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('testimates',this)">📋 Estimates</button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('twon',this)">🏆 Won Deals</button>
@@ -459,7 +459,7 @@
       <th title="Opp Contract Type | Estimate Billing Type">Contract</th>
       <th class="text-right sort-btn" onclick="sortTable('score')">Score ▲▼</th>
       <th>Delivery</th>
-      <th data-i18n="th_qualified">Qualified</th>
+      <th data-i18n="th_qualified" style="display:none">Qualified</th>
       <th>Offering</th>
       <th data-i18n="th_copy">Copy</th>
     </tr></thead>
