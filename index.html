@@ -26,7 +26,7 @@
   .rr-table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
   .chart-container { position: relative; height: 260px; }
   @media (max-width: 640px) {
-    .chart-container { height: 200px; }
+    .chart-container { height: 240px; }
     #main-content-area { overflow-x: hidden; }
   }
   ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -12705,11 +12705,16 @@ function applySSSmFilters() {
 function renderSSSmLoadBars() {
   const el = document.getElementById('sssmLoadBars');
   if (!el) return;
-  const wCounts = {}, totalCounts = {};
+  const wCounts = {}, totalCounts = {}, staleCounts = {};
   let totalWorking = 0, totalHold = 0;
+  const sssmNow = new Date().toISOString().slice(0,10);
   filtered.forEach(d => {
     totalCounts[d.sssm] = (totalCounts[d.sssm]||0)+1;
-    if (d.status === 'Working') { wCounts[d.sssm] = (wCounts[d.sssm]||0)+1; totalWorking++; }
+    if (d.status === 'Working') {
+      wCounts[d.sssm] = (wCounts[d.sssm]||0)+1;
+      totalWorking++;
+      if (d.closeDate && d.closeDate < sssmNow) staleCounts[d.sssm] = (staleCounts[d.sssm]||0)+1;
+    }
     else if (d.status === 'On Hold') totalHold++;
   });
   const sorted = Object.entries(totalCounts).sort((a,b)=>(wCounts[b[0]]||0)-(wCounts[a[0]]||0));
@@ -12723,6 +12728,8 @@ function renderSSSmLoadBars() {
   if (overloaded.length) parts.push(`<span style="color:#C23934;">🔴 ${overloaded.length} sobrecargado${overloaded.length>1?'s':''} &gt;10W</span>`);
   if (warned.length) parts.push(`<span style="color:#C56200;">🟡 ${warned.length} en atención 8–10W</span>`);
   if (!overloaded.length && !warned.length) parts.push(`<span style="color:#04844B;">✅ Carga Working normal</span>`);
+  const totalStale = Object.values(staleCounts).reduce((s,v)=>s+v,0);
+  if (totalStale) parts.push(`<span style="color:#C23934;">🚩 ${totalStale} Working opp vencida</span>`);
   el.innerHTML = `<span style="font-size:0.75rem;color:#706E6B;">${sorted.length} SSSMs &nbsp;·&nbsp; ${parts.join(' &nbsp;·&nbsp; ')}</span>`;
   // Insights sidebar
   const sssmNow = new Date().toISOString().slice(0,10);
@@ -12737,6 +12744,15 @@ function renderSSSmLoadBars() {
   if (noRRStage3.length) sssmItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠ ${noRRStage3.length} opp${noRRStage3.length>1?'s':''} Stage 03+ sin RR</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(noRRStage3.map(d=>d.account||''))].filter(Boolean).slice(0,2).join(', ')}${noRRStage3.length>2?` +${noRRStage3.length-2}`:''}</span></div>`);
   if (noEstimate.length) sssmItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">📋 ${noEstimate.length} Stage 03+ sin estimate</span></div>`);
   if (overloadedSSSMs.length) sssmItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🔴 Sobrecargados:</span><br><span style="font-size:0.7rem;color:#706E6B">${overloadedSSSMs.slice(0,4).join(', ')}</span></div>`);
+  const staleEntries = Object.entries(staleCounts).sort((a,b)=>b[1]-a[1]);
+  if (staleEntries.length) {
+    const detail = staleEntries.map(([n]) => {
+      const staleOpps = filtered.filter(d => d.sssm===n && d.status==='Working' && d.closeDate && d.closeDate < sssmNow);
+      const uniqueOpps = [...new Set(staleOpps.map(d=>d.oppName||d.dsr))].filter(Boolean);
+      return `<b>${sssmLabel(n)}</b>: ${uniqueOpps.slice(0,2).join(', ')}${uniqueOpps.length>2?` +${uniqueOpps.length-2}`:''}`;
+    }).join('<br>');
+    sssmItems.unshift(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 Working con opp vencida</span><br><span style="font-size:0.7rem;color:#706E6B">${detail}</span></div>`);
+  }
   setInsights('SSSM View', sssmItems);
 }
 
@@ -13006,7 +13022,7 @@ function makeChart(id, type, labels, datasets, opts={}) {
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { labels: { color: '#3E3E3C', font: { size: 11 } } } },
-      scales: type === 'bar' ? { x: { ticks: { color: '#706E6B', font: { size: 10 } }, grid: { color: '#F3F3F3' } }, y: { ticks: { color: '#706E6B', font: { size: 10 } }, grid: { color: '#F3F3F3' } } } : {},
+      scales: type === 'bar' ? { x: { ticks: { color: '#706E6B', font: { size: window.innerWidth < 640 ? 8 : 10 }, maxRotation: 90, minRotation: 45 }, grid: { color: '#F3F3F3' } }, y: { ticks: { color: '#706E6B', font: { size: 10 } }, grid: { color: '#F3F3F3' } } } : {},
       ...opts
     }
   });
@@ -13119,12 +13135,13 @@ function cloudTier(amount) {
 }
 
 function renderTab2() {
+  const nowStr = new Date().toISOString().slice(0,10);
   const sssmMap = {};
   filtered.forEach(d => {
-    if (!sssmMap[d.sssm]) sssmMap[d.sssm] = {total:0,arr:0,working:0,onhold:0,inqueue:0,waiting:0,qualified:0,scores:[],aiNative:0,aiAug:0,cloudSum:0,complexitySum:0};
+    if (!sssmMap[d.sssm]) sssmMap[d.sssm] = {total:0,arr:0,working:0,staleWorking:0,onhold:0,inqueue:0,waiting:0,qualified:0,scores:[],aiNative:0,aiAug:0,cloudSum:0,complexitySum:0};
     const m = sssmMap[d.sssm];
     m.total++; m.arr += d.amount;
-    if (d.status==='Working') m.working++;
+    if (d.status==='Working') { m.working++; if (d.closeDate && d.closeDate < nowStr) m.staleWorking++; }
     if (d.status==='On Hold') m.onhold++;
     if (d.status==='In Queue') m.inqueue++;
     if (d.status==='Waiting on Requestor') m.waiting++;
@@ -13166,12 +13183,15 @@ function renderTab2() {
   if (topARR) t2Items.push(`<div>💰 Mayor ARR: <b>${topARR[0].split(' ')[0]}</b> — ${fmt$(topARR[1].arr)}</div>`);
   const onHoldTotal = entries.reduce((s,[,m])=>s+m.onhold,0);
   if (onHoldTotal > 0) t2Items.push(`<div style="color:#C56200;">⏸ <b>${onHoldTotal}</b> DSRs en On Hold</div>`);
-  const nowStrT2 = new Date().toISOString().slice(0,10);
-  const pastCloseActive = filtered.filter(d => d.closeDate && d.closeDate < nowStrT2);
+  const pastCloseActive = filtered.filter(d => d.closeDate && d.closeDate < nowStr);
   if (pastCloseActive.length) {
-    const oppNames = [...new Set(pastCloseActive.map(d => d.oppName))].filter(Boolean);
-    const preview = oppNames.slice(0,2).join(', ') + (oppNames.length > 2 ? ` +${oppNames.length-2}` : '');
-    t2Items.unshift(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 ${pastCloseActive.length} DSR${pastCloseActive.length>1?'s':''} con opp vencida</span><br><span style="font-size:0.7rem;color:#706E6B">${preview}</span></div>`);
+    const bySssm = {};
+    pastCloseActive.forEach(d => { if (!bySssm[d.sssm]) bySssm[d.sssm]=[]; bySssm[d.sssm].push(d.oppName||d.dsr); });
+    const sssmDetail = Object.entries(bySssm).map(([sssm,opps]) => {
+      const uniqueOpps = [...new Set(opps)].filter(Boolean);
+      return `<b>${sssmLabel(sssm)}</b>: ${uniqueOpps.slice(0,2).join(', ')}${uniqueOpps.length>2?` +${uniqueOpps.length-2}`:''}`;
+    }).join('<br>');
+    t2Items.unshift(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 ${pastCloseActive.length} DSR${pastCloseActive.length>1?'s':''} con opp vencida</span><br><span style="font-size:0.7rem;color:#706E6B">${sssmDetail}</span></div>`);
   }
   if (!t2Items.length) t2Items.push('<div style="color:#04844B;">✅ Carga distribuida normalmente</div>');
   setInsights('SSSM Coverage', t2Items);
@@ -13182,9 +13202,10 @@ function renderTab2() {
   const arrs = chartEntries.map(([,m]) => +(m.arr/1e6).toFixed(2));
   const sssmChartClick = (e, els) => { if (els.length > 0) selectSSSM(sssmChartEntries[els[0].index][0]); };
   const sssmChartHover = (e, els) => { e.native.target.style.cursor = els.length > 0 ? 'pointer' : 'default'; };
-  const stackedScales = { x: { stacked:true, ticks:{color:'#706E6B',font:{size:10}}, grid:{color:'#F3F3F3'} }, y: { stacked:true, ticks:{color:'#706E6B',font:{size:10}}, grid:{color:'#F3F3F3'} } };
+  const stackedScales = { x: { stacked:true, ticks:{color:'#706E6B',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45}, grid:{color:'#F3F3F3'} }, y: { stacked:true, ticks:{color:'#706E6B',font:{size:10}}, grid:{color:'#F3F3F3'} } };
   makeChart('chartSSSM','bar',labels,[
-    {label:'Working', data:chartEntries.map(([,m])=>m.working), backgroundColor:'#04844B', borderRadius:0},
+    {label:'Working', data:chartEntries.map(([,m])=>m.working-m.staleWorking), backgroundColor:'#04844B', borderRadius:0},
+    {label:'Working - Opp vencida', data:chartEntries.map(([,m])=>m.staleWorking), backgroundColor:'#C23934', borderRadius:0},
     {label:'On Hold', data:chartEntries.map(([,m])=>m.onhold),  backgroundColor:'#C56200', borderRadius:0},
     {label:'In Queue',data:chartEntries.map(([,m])=>m.inqueue), backgroundColor:'#9EA1A3', borderRadius:0},
     {label:'Waiting', data:chartEntries.map(([,m])=>m.waiting), backgroundColor:'#E4D5F9', borderRadius:0},
@@ -14097,7 +14118,7 @@ function renderRRTab() {
     sssmRRMap[sssm][rrFlagOf(d)]++;
   });
   const sssmRREntries = Object.entries(sssmRRMap).sort((a,b) => a[0].localeCompare(b[0]));
-  const rrStackedScales = { x:{stacked:true,ticks:{color:'#706E6B',font:{size:10}},grid:{color:'#F3F3F3'}}, y:{stacked:true,ticks:{color:'#706E6B',font:{size:10}},grid:{color:'#F3F3F3'}} };
+  const rrStackedScales = { x:{stacked:true,ticks:{color:'#706E6B',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45},grid:{color:'#F3F3F3'}}, y:{stacked:true,ticks:{color:'#706E6B',font:{size:10}},grid:{color:'#F3F3F3'}} };
   makeChart('chartRRSssm','bar',sssmRREntries.map(([n])=>sssmLabel(n)),[
     {label:'🚩 Inicio vencido',data:sssmRREntries.map(([,m])=>m.vencido),backgroundColor:'#C23934',borderRadius:0},
     {label:'⚡ Close <30d',data:sssmRREntries.map(([,m])=>m.urgente),backgroundColor:'#C56200',borderRadius:0},
