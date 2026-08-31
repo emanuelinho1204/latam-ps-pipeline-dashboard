@@ -301,7 +301,7 @@
 <div id="t2" class="tab-content hidden">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
     <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">DSRs por SSSM</h3><div class="chart-container"><canvas id="chartSSSM"></canvas></div></div>
-    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">ARR por SSSM ($M)</h3><div class="chart-container"><canvas id="chartSSSMArr"></canvas></div></div>
+    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Pipeline por SSSM ($M)</h3><div class="chart-container"><canvas id="chartSSSMArr"></canvas></div></div>
   </div>
   <div class="card-panel">
     <div class="overflow-x-auto">
@@ -13167,7 +13167,7 @@ function renderTab2() {
     {label:'In Queue',data:entries.map(([,m])=>m.inqueue), backgroundColor:'#9EA1A3', borderRadius:0},
     {label:'Waiting', data:entries.map(([,m])=>m.waiting), backgroundColor:'#E4D5F9', borderRadius:0},
   ],{onClick:sssmChartClick,onHover:sssmChartHover,scales:stackedScales});
-  makeChart('chartSSSMArr','bar',labels,[{label:'ARR ($M)',data:arrs,backgroundColor:'#04844B',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover});
+  makeChart('chartSSSMArr','bar',labels,[{label:'Pipeline ($M)',data:arrs,backgroundColor:'#04844B',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover});
 }
 
 function renderTab3() {
@@ -13177,7 +13177,7 @@ function renderTab3() {
   const stageArr = stages.map(s => filtered.filter(d=>d.stage===s).reduce((a,d)=>a+d.amount,0)/1e6);
   makeChart('chartFunnel','bar',stageLbls,[
     {label:'DSRs',data:stageCounts,backgroundColor:'#0176D3',borderRadius:3,yAxisID:'y'},
-    {label:'ARR ($M)',data:stageArr.map(v=>+v.toFixed(1)),backgroundColor:'#04844B',borderRadius:3,yAxisID:'y1'}
+    {label:'Pipeline ($M)',data:stageArr.map(v=>+v.toFixed(1)),backgroundColor:'#04844B',borderRadius:3,yAxisID:'y1'}
   ],{
     scales:{
       y:{type:'linear',position:'left',ticks:{color:'#706E6B'},grid:{color:'#F3F3F3'}},
