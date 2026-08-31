@@ -201,7 +201,7 @@ def fetch(instance_url, token):
         "AND pse__Opportunity__r.StageName NOT IN ('06 - Project Booked', 'Dead - Lost') "
         "AND pse__Opportunity__r.CloseDate >= TODAY "
         "ORDER BY pse__Opportunity__r.CloseDate, pse__Start_Date__c "
-        "LIMIT 300",
+        "LIMIT 2000",
         instance_url, token
     )
     log(f"{len(rr_records)} RRs obtenidos.")
