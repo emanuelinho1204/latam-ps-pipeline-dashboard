@@ -13093,6 +13093,12 @@ function renderTab1() {
   }).join('');
 }
 
+function sssmLabel(fullName) {
+  const parts = (fullName||'').split(' ');
+  // "Nombre Apellido1 Apellido2" → "Nombre Apellido1"
+  return parts.length >= 2 ? parts[0] + ' ' + parts[1] : parts[0] || fullName;
+}
+
 function countClouds(name) {
   const C = ['Sales Cloud','Service Cloud','Marketing Cloud','Data Cloud','Experience Cloud',
     'Commerce Cloud','MuleSoft','Mule ','Tableau','Agentforce','Einstein','CPQ','FSC',
@@ -13156,7 +13162,7 @@ function renderTab2() {
   setInsights('SSSM Coverage', t2Items);
 
   sssmChartEntries = entries;
-  const labels = entries.map(([n]) => n.split(' ')[0]);
+  const labels = entries.map(([n]) => sssmLabel(n));
   const arrs = entries.map(([,m]) => +(m.arr/1e6).toFixed(2));
   const sssmChartClick = (e, els) => { if (els.length > 0) selectSSSM(sssmChartEntries[els[0].index][0]); };
   const sssmChartHover = (e, els) => { e.native.target.style.cursor = els.length > 0 ? 'pointer' : 'default'; };
