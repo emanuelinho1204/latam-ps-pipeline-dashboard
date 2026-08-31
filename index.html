@@ -13162,6 +13162,13 @@ function renderTab2() {
   if (topARR) t2Items.push(`<div>💰 Mayor ARR: <b>${topARR[0].split(' ')[0]}</b> — ${fmt$(topARR[1].arr)}</div>`);
   const onHoldTotal = entries.reduce((s,[,m])=>s+m.onhold,0);
   if (onHoldTotal > 0) t2Items.push(`<div style="color:#C56200;">⏸ <b>${onHoldTotal}</b> DSRs en On Hold</div>`);
+  const nowStrT2 = new Date().toISOString().slice(0,10);
+  const pastCloseActive = filtered.filter(d => d.closeDate && d.closeDate < nowStrT2);
+  if (pastCloseActive.length) {
+    const oppNames = [...new Set(pastCloseActive.map(d => d.oppName))].filter(Boolean);
+    const preview = oppNames.slice(0,2).join(', ') + (oppNames.length > 2 ? ` +${oppNames.length-2}` : '');
+    t2Items.unshift(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 ${pastCloseActive.length} DSR${pastCloseActive.length>1?'s':''} con opp vencida</span><br><span style="font-size:0.7rem;color:#706E6B">${preview}</span></div>`);
+  }
   if (!t2Items.length) t2Items.push('<div style="color:#04844B;">✅ Carga distribuida normalmente</div>');
   setInsights('SSSM Coverage', t2Items);
 
@@ -14071,31 +14078,38 @@ function renderRRTab() {
     rows += estRows;
   }
   document.getElementById('rr-tableBody').innerHTML = rows;
-  // Charts: RRs por SSSM y por AP
+  // Charts: RRs por SSSM y por AP — colored by flag status
   const oppSSSMMap = {};
   DSR_DATA.forEach(d => { if (d.oppId && d.sssm) oppSSSMMap[d.oppId] = d.sssm; });
+  const rrFlagOf = d => {
+    if (d.startDate && d.startDate < nowStr) return 'vencido';
+    if (d.closeDate && d.closeDate <= d30Str) return 'urgente';
+    return 'normal';
+  };
   const sssmRRMap = {};
   data.forEach(d => {
     const sssm = oppSSSMMap[d.oppId] || 'Sin SSSM';
-    if (!sssmRRMap[sssm]) sssmRRMap[sssm] = {draft:0,ready:0};
-    if (d.status === 'Ready to Staff') sssmRRMap[sssm].ready++; else sssmRRMap[sssm].draft++;
+    if (!sssmRRMap[sssm]) sssmRRMap[sssm] = {vencido:0,urgente:0,normal:0};
+    sssmRRMap[sssm][rrFlagOf(d)]++;
   });
   const sssmRREntries = Object.entries(sssmRRMap).sort((a,b) => a[0].localeCompare(b[0]));
   const rrStackedScales = { x:{stacked:true,ticks:{color:'#706E6B',font:{size:10}},grid:{color:'#F3F3F3'}}, y:{stacked:true,ticks:{color:'#706E6B',font:{size:10}},grid:{color:'#F3F3F3'}} };
   makeChart('chartRRSssm','bar',sssmRREntries.map(([n])=>sssmLabel(n)),[
-    {label:'Ready to Staff',data:sssmRREntries.map(([,m])=>m.ready),backgroundColor:'#04844B',borderRadius:0},
-    {label:'Draft',data:sssmRREntries.map(([,m])=>m.draft),backgroundColor:'#9EA1A3',borderRadius:0},
+    {label:'🚩 Inicio vencido',data:sssmRREntries.map(([,m])=>m.vencido),backgroundColor:'#C23934',borderRadius:0},
+    {label:'⚡ Close <30d',data:sssmRREntries.map(([,m])=>m.urgente),backgroundColor:'#C56200',borderRadius:0},
+    {label:'✅ Normal',data:sssmRREntries.map(([,m])=>m.normal),backgroundColor:'#04844B',borderRadius:0},
   ],{scales:rrStackedScales});
   const apRRMap = {};
   data.forEach(d => {
     const ap = d.ap || 'Sin AP';
-    if (!apRRMap[ap]) apRRMap[ap] = {draft:0,ready:0};
-    if (d.status === 'Ready to Staff') apRRMap[ap].ready++; else apRRMap[ap].draft++;
+    if (!apRRMap[ap]) apRRMap[ap] = {vencido:0,urgente:0,normal:0};
+    apRRMap[ap][rrFlagOf(d)]++;
   });
   const apRREntries = Object.entries(apRRMap).sort((a,b) => a[0].localeCompare(b[0]));
   makeChart('chartRRAp','bar',apRREntries.map(([n])=>sssmLabel(n)),[
-    {label:'Ready to Staff',data:apRREntries.map(([,m])=>m.ready),backgroundColor:'#0176D3',borderRadius:0},
-    {label:'Draft',data:apRREntries.map(([,m])=>m.draft),backgroundColor:'#9EA1A3',borderRadius:0},
+    {label:'🚩 Inicio vencido',data:apRREntries.map(([,m])=>m.vencido),backgroundColor:'#C23934',borderRadius:0},
+    {label:'⚡ Close <30d',data:apRREntries.map(([,m])=>m.urgente),backgroundColor:'#C56200',borderRadius:0},
+    {label:'✅ Normal',data:apRREntries.map(([,m])=>m.normal),backgroundColor:'#04844B',borderRadius:0},
   ],{scales:rrStackedScales});
 }
 
