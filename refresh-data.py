@@ -67,12 +67,17 @@ def _sf_bin():
             return p
 
 def _soql_cli(query):
+    env = os.environ.copy()
+    env["SF_AUTOUPDATE_DISABLE"] = "true"
     result = subprocess.run(
         [_sf_bin(), "data", "query", "--target-org", "org62", "--query", query, "--json"],
-        capture_output=True, text=True, timeout=90
+        capture_output=True, text=True, timeout=90, env=env
     )
-    if result.returncode != 0:
-        raise RuntimeError(f"SF CLI error: {result.stderr[:400]}")
+    # Tolerate non-zero exit when stderr only contains update warnings
+    stderr_clean = result.stderr.strip()
+    only_warning = all('Warning:' in line or not line.strip() for line in stderr_clean.splitlines())
+    if result.returncode != 0 and not only_warning:
+        raise RuntimeError(f"SF CLI error: {stderr_clean[:400]}")
     return json.loads(result.stdout).get("result", {}).get("records", [])
 
 def _soql_rest(instance_url, token, query):
