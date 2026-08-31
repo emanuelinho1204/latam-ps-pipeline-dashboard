@@ -312,6 +312,7 @@
       <th class="text-right">Working</th>
       <th class="text-right">On Hold</th>
       <th class="text-right">In Queue</th>
+      <th class="text-right">Waiting</th>
       <th class="text-right">Calificados</th>
       <th class="text-right">Avg Score</th>
       <th class="text-right">AI-Native</th>
@@ -13106,12 +13107,13 @@ function cloudTier(amount) {
 function renderTab2() {
   const sssmMap = {};
   filtered.forEach(d => {
-    if (!sssmMap[d.sssm]) sssmMap[d.sssm] = {total:0,arr:0,working:0,onhold:0,inqueue:0,qualified:0,scores:[],aiNative:0,aiAug:0,cloudSum:0,complexitySum:0};
+    if (!sssmMap[d.sssm]) sssmMap[d.sssm] = {total:0,arr:0,working:0,onhold:0,inqueue:0,waiting:0,qualified:0,scores:[],aiNative:0,aiAug:0,cloudSum:0,complexitySum:0};
     const m = sssmMap[d.sssm];
     m.total++; m.arr += d.amount;
     if (d.status==='Working') m.working++;
     if (d.status==='On Hold') m.onhold++;
     if (d.status==='In Queue') m.inqueue++;
+    if (d.status==='Waiting on Requestor') m.waiting++;
     const cl = countClouds(d.oppName); m.cloudSum += cl; m.complexitySum += (cl||1) + cloudTier(d.amount);
     const q = QUALI_MAP[d.dsr];
     if (q?.qualified==='YES') m.qualified++;
@@ -13133,6 +13135,7 @@ function renderTab2() {
       <td class="text-right font-bold" style="color:#04844B;">${m.working}</td>
       <td class="text-right" style="color:#C56200;">${m.onhold}</td>
       <td class="text-right" style="color:#9EA1A3;">${m.inqueue}</td>
+      <td class="text-right" style="color:#706E6B;">${m.waiting}</td>
       <td class="text-right">${m.qualified}</td>
       <td class="text-right" style="color:#032D60;font-weight:600;">${avgSc}</td>
       <td class="text-right" style="color:#04844B;">${m.aiNative}</td>
@@ -13162,7 +13165,7 @@ function renderTab2() {
     {label:'Working', data:entries.map(([,m])=>m.working), backgroundColor:'#04844B', borderRadius:0},
     {label:'On Hold', data:entries.map(([,m])=>m.onhold),  backgroundColor:'#C56200', borderRadius:0},
     {label:'In Queue',data:entries.map(([,m])=>m.inqueue), backgroundColor:'#9EA1A3', borderRadius:0},
-    {label:'Otros',   data:entries.map(([,m])=>Math.max(0,m.total-m.working-m.onhold-m.inqueue)), backgroundColor:'#D8EDFF', borderRadius:0},
+    {label:'Waiting', data:entries.map(([,m])=>m.waiting), backgroundColor:'#E4D5F9', borderRadius:0},
   ],{onClick:sssmChartClick,onHover:sssmChartHover,scales:stackedScales});
   makeChart('chartSSSMArr','bar',labels,[{label:'ARR ($M)',data:arrs,backgroundColor:'#04844B',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover});
 }
