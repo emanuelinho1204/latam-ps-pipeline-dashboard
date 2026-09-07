@@ -519,10 +519,10 @@
 <div id="twon" class="tab-content hidden">
 <div class="p-4">
   <div id="won-summary" class="mb-3"></div>
-  <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-center">
+  <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-end">
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_wonSSM"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_wonAP"></div></div>
-    <input id="won-fSearch" type="text" placeholder="Buscar cuenta / oportunidad..." oninput="renderWonTab()" style="width:260px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem">
+    <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="won-fSearch" type="text" placeholder="Cuenta / oportunidad..." oninput="renderWonTab()" style="width:240px;border:1px solid #DDDBDA;border-radius:4px;padding:4px 10px;font-size:0.8rem"></div>
     <span class="text-xs ml-auto" style="color:#706E6B;" id="won-count"></span>
   </div>
   <div class="card-panel overflow-auto">
@@ -551,11 +551,12 @@
     <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">% Asignados</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiPct">—</div></div>
     <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Oportunidades</div><div class="text-2xl font-bold text-blue-900" id="rr-kpiOpps">—</div></div>
   </div>
-  <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-center">
+  <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-end">
+    <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_rrSSM"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Status</div><div class="ms-container" id="ms_rrStatus"></div></div>
-    <div><div class="text-xs mb-1" style="color:#706E6B;">País</div><div class="ms-container" id="ms_rrCountry"></div></div>
+    <div><div class="text-xs mb-1" style="color:#706E6B;">Región</div><div class="ms-container" id="ms_rrCountry"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_rrAP"></div></div>
-    <input id="rr-fSearch" type="text" placeholder="Buscar RR / opp / cuenta / recurso..." oninput="renderRRTab()" style="flex:1;min-width:140px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem">
+    <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="rr-fSearch" type="text" placeholder="Buscar oportunidad..." oninput="renderRRTab()" style="width:220px;border:1px solid #DDDBDA;border-radius:4px;padding:4px 10px;font-size:0.8rem"></div>
     <span class="text-xs text-gray-500 ml-auto" id="rr-rowCount"></span>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
@@ -26386,14 +26387,20 @@ function renderRRTab() {
     if (_msOpts[id]) return;
     msInit(id, [...new Set(RR_DATA.map(d=>d[key]).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderRRTab);
   });
+  // Build oppId→sssm map from DSR_DATA for cross-reference
+  const _rrOppSSM = {};
+  (typeof DSR_DATA !== 'undefined' ? DSR_DATA : []).forEach(d => { if (d.oppId && d.sssm) _rrOppSSM[d.oppId] = d.sssm; });
+  if (!_msOpts['ms_rrSSM']) msInit('ms_rrSSM', [...new Set(RR_DATA.map(d=>_rrOppSSM[d.oppId]).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderRRTab);
+  const fSSMSel     = msGet('ms_rrSSM');
   const fStatusSel  = msGet('ms_rrStatus');
   const fCountrySel = msGet('ms_rrCountry');
   const fAPSel      = msGet('ms_rrAP');
   let data = RR_DATA.filter(d => {
-    if (fStatusSel.length  && !fStatusSel.includes(d.status))   return false;
-    if (fCountrySel.length && !fCountrySel.includes(d.country)) return false;
-    if (fAPSel.length      && !fAPSel.includes(d.ap))           return false;
-    if (fSearch && !(d.name||'').toLowerCase().includes(fSearch) && !(d.oppName||'').toLowerCase().includes(fSearch) && !(d.account||'').toLowerCase().includes(fSearch) && !(d.resource||'').toLowerCase().includes(fSearch)) return false;
+    if (fSSMSel.length     && !fSSMSel.includes(_rrOppSSM[d.oppId]||''))  return false;
+    if (fStatusSel.length  && !fStatusSel.includes(d.status))             return false;
+    if (fCountrySel.length && !fCountrySel.includes(d.country))           return false;
+    if (fAPSel.length      && !fAPSel.includes(d.ap))                     return false;
+    if (fSearch && !(d.oppName||'').toLowerCase().includes(fSearch))       return false;
     return true;
   });
   data.sort((a,b) => {
