@@ -91,6 +91,12 @@
   .ms-item { padding:5px 10px; font-size:0.78rem; cursor:pointer; display:flex; align-items:center; gap:7px; }
   .ms-item:hover { background:#F3F2F2; }
   .ms-item input[type=checkbox] { cursor:pointer; accent-color:#0176D3; flex-shrink:0; }
+  .share-btn { background:none; border:none; cursor:pointer; color:#706E6B; font-size:1rem; padding:2px 5px; border-radius:4px; line-height:1; }
+  .share-btn:hover { background:#F3F2F2; color:#032D60; }
+  #shareMenu { position:fixed; z-index:99999; background:#fff; border:1px solid #DDDBDA; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.15); min-width:200px; padding:4px 0; font-size:0.8rem; }
+  .share-item { padding:8px 14px; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:8px; color:#3E3E3C; }
+  .share-item:hover { background:#F3F2F2; }
+  .share-sep { border:none; border-top:1px solid #F3F3F3; margin:3px 0; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -25021,6 +25027,46 @@ function territoryBadge(country) {
 // ── Refresh modal ──────────────────────────────────────
 
 
+// ── Share menu ────────────────────────────────────────────────────────────────
+const _shareData = {};
+
+function showShareMenu(btn, dsrId) {
+  const existing = document.getElementById('shareMenu');
+  if (existing) { existing.remove(); if (existing._btnRef === btn) return; }
+  const d = _shareData[dsrId];
+  if (!d) return;
+  const dsrLink = d.dsrId ? `https://org62.lightning.force.com/lightning/r/Deal_Support_Request__c/${d.dsrId}/view` : '';
+  const oppLink = d.oppId ? `https://org62.lightning.force.com/lightning/r/Opportunity/${d.oppId}/view` : '';
+  const stageLbl = (d.stage||'').split(' - ').slice(1).join(' - ') || d.stage || '';
+  const textFull = [d.dsr, d.account, d.oppName, d.country, fmt$(d.amount), d.stage, d.status, `AP: ${d.ap||''}`, `SSSM: ${d.sssm||''}`].filter(Boolean).join(' | ');
+  const slackMsg = `*${oppLink ? `<${oppLink}|${d.oppName}>` : d.oppName}* — ${stageLbl}\nDSR: ${dsrLink ? `<${dsrLink}|${d.dsr}>` : d.dsr} | Status: ${d.status}\n${d.account} | ${d.country||''} | ${fmt$(d.amount)}\nSSSM: ${d.sssm||''} | AP: ${d.ap||''}`;
+  const items = [
+    ['🔗', 'Link DSR', dsrLink],
+    ['🔗', 'Link Oportunidad', oppLink],
+    ['<hr class="share-sep">'],
+    ['📄', 'Texto completo', textFull],
+    ['💬', 'Copiar para Slack', slackMsg],
+  ];
+  const menu = document.createElement('div');
+  menu.id = 'shareMenu';
+  menu._btnRef = btn;
+  menu.innerHTML = items.map(it => it.length === 1 ? it[0] : `<div class="share-item" onclick="copyShare(${JSON.stringify(it[2])});event.stopPropagation();"><span>${it[0]}</span><span>${it[1]}</span></div>`).join('');
+  document.body.appendChild(menu);
+  const rect = btn.getBoundingClientRect();
+  menu.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+  menu.style.left = Math.min(rect.right - menu.offsetWidth, window.innerWidth - 210) + 'px';
+  if (parseInt(menu.style.left) < 4) menu.style.left = '4px';
+}
+
+function copyShare(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const m = document.getElementById('shareMenu');
+    if (m) { m.innerHTML = '<div class="share-item" style="color:#04844B;">✅ Copiado al portapapeles</div>'; setTimeout(() => m.remove(), 900); }
+  });
+}
+
+document.addEventListener('click', () => { const m = document.getElementById('shareMenu'); if (m) m.remove(); });
+
 // ── SSSM View local filters ────────────────────────────
 // ── MultiSelect helpers ────────────────────────────────────────────────────────
 const _msOpts = {}, _msSel = {}, _msCb = {};
@@ -25895,13 +25941,13 @@ function renderTab6() {
   document.getElementById('curPage').textContent = currentPage;
   document.getElementById('totalPages').textContent = pages;
   const pageData = data.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+  pageData.forEach(d => { _shareData[d.dsrId] = d; });
   document.getElementById('detailBody').innerHTML = pageData.map(d => {
     const q = d._quali;
     const hs = d._heat;
     const link = d.oppId ? `https://org62.lightning.force.com/lightning/r/Opportunity/${d.oppId}/view` : '#';
     const dsrLink = d.dsrId ? `https://org62.lightning.force.com/lightning/r/Deal_Support_Request__c/${d.dsrId}/view` : '#';
     const qualBadge = !q ? '<span style="color:#706E6B;">Pendiente</span>' : q.qualified==='YES' ? '<span style="color:#04844B;">✅ Sí</span>' : '<span style="color:#C23934;">❌ No</span>';
-    const copyText = `DSR: ${d.dsr} | ${d.account} | ${d.oppName} | ${d.country} | ${fmt$(d.amount)} | ${d.stage} | ${d.status} | AP: ${d.ap||''} | Tipo: ${d.requestTypeDetail||''} | Score: ${q?.score||'N/A'} | ${q?.deliveryModel||'Pendiente'}`;
     const oppNameShort = d.oppName && d.oppName.length > 40 ? d.oppName.substring(0,40)+'…' : (d.oppName||'--');
     const est = d.oppId ? ESTIMATE_MAP[d.oppId] : null;
     const estCell = est ? `<a href="https://org62.lightning.force.com/lightning/r/ffscpq__Estimate__c/${est.id}/view" target="_blank" title="${est.name}" class="opp-link" style="font-size:0.72rem;">📋</a>` : '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
@@ -25928,7 +25974,7 @@ function renderTab6() {
       <td class="px-2 whitespace-nowrap">${deliveryBadge(q?.deliveryModel)}</td>
       <td class="px-2">${qualBadge}</td>
       <td class="px-2 max-w-xs truncate" style="color:#706E6B;font-size:0.72rem;" title="${q?.offering||''}">${q?.offering||'--'}</td>
-      <td class="px-2"><button onclick="navigator.clipboard.writeText('${copyText.replace(/'/g,"\\'").replace(/`/g,'\\`')}')" style="color:#706E6B;font-size:0.72rem;padding:2px 6px;border:1px solid #DDDBDA;border-radius:4px;" onmouseover="this.style.color='#032D60'" onmouseout="this.style.color='#706E6B'">📋</button></td>
+      <td class="px-2 text-center"><button class="share-btn" onclick="showShareMenu(this,'${d.dsrId}');event.stopPropagation();" title="Compartir">⋮</button></td>
     </tr>`;
   }).join('');
 
