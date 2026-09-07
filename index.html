@@ -433,6 +433,7 @@
   <div class="overflow-x-auto bg-white border border-[#DDDBDA] rounded-xl shadow-sm">
   <table class="w-full" style="font-size:0.78rem;">
     <thead><tr>
+      <th style="width:28px;background:#F3F2F2;"></th>
       <th class="text-center sort-btn" onclick="sortTable('heat')">Heat ▲▼</th>
       <th class="text-center sort-btn" onclick="sortTable('priority')">Prioridad ▲▼</th>
       <th class="sort-btn" onclick="sortTable('dsr')">DSR ▲▼</th>
@@ -455,7 +456,6 @@
       <th>Delivery</th>
       <th data-i18n="th_qualified" style="display:none">Qualified</th>
       <th>Offering</th>
-      <th data-i18n="th_copy">Copy</th>
     </tr></thead>
     <tbody id="detailBody"></tbody>
   </table>
@@ -484,6 +484,7 @@
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
+        <th style="width:28px;background:#F3F2F2;"></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('name')">Estimate <span class="sort-icon" id="est-si-name">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('oppName')">Oportunidad <span class="sort-icon" id="est-si-oppName">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('account')">Cuenta <span class="sort-icon" id="est-si-account">▼</span></th>
@@ -519,6 +520,7 @@
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
+        <th style="width:28px;background:#F3F2F2;"></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Oportunidad</th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Cuenta</th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">SSSM</th>
@@ -573,6 +575,7 @@
   <div class="card-panel overflow-auto">
     <table class="rr-table border-collapse" style="font-size:0.78rem;color:#3E3E3C;">
       <thead><tr>
+        <th style="width:28px;background:#F3F2F2;"></th>
         <th class="px-3 py-2 text-center" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:80px;">Bandera</th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:170px;" onclick="rrSortBy('oppName')">Oportunidad <span class="sort-icon" id="rr-si-oppName">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:120px;" onclick="rrSortBy('account')">Cuenta <span class="sort-icon" id="rr-si-account">▼</span></th>
@@ -25015,27 +25018,30 @@ function territoryBadge(country) {
 // ── Share menu ────────────────────────────────────────────────────────────────
 const _shareData = {};
 
-function showShareMenu(btn, dsrId) {
+function showShareMenu(btn, key) {
   const existing = document.getElementById('shareMenu');
   if (existing) { existing.remove(); if (existing._btnRef === btn) return; }
-  const d = _shareData[dsrId];
+  const d = _shareData[key];
   if (!d) return;
-  const dsrLink = d.dsrId ? `https://org62.lightning.force.com/lightning/r/Deal_Support_Request__c/${d.dsrId}/view` : '';
-  const oppLink = d.oppId ? `https://org62.lightning.force.com/lightning/r/Opportunity/${d.oppId}/view` : '';
-  const stageLbl = (d.stage||'').split(' - ').slice(1).join(' - ') || d.stage || '';
-  const textFull = [d.dsr, d.account, d.oppName, d.country, fmt$(d.amount), d.stage, d.status, `AP: ${d.ap||''}`, `SSSM: ${d.sssm||''}`].filter(Boolean).join(' | ');
-  const slackMsg = `*${oppLink ? `<${oppLink}|${d.oppName}>` : d.oppName}* — ${stageLbl}\nDSR: ${dsrLink ? `<${dsrLink}|${d.dsr}>` : d.dsr} | Status: ${d.status}\n${d.account} | ${d.country||''} | ${fmt$(d.amount)}\nSSSM: ${d.sssm||''} | AP: ${d.ap||''}`;
-  const items = [
-    ['🔗', 'Link DSR', dsrLink],
-    ['🔗', 'Link Oportunidad', oppLink],
-    ['<hr class="share-sep">'],
-    ['📄', 'Texto completo', textFull],
-    ['💬', 'Copiar para Slack', slackMsg],
-  ];
+  const sfBase = 'https://org62.lightning.force.com/lightning/r';
+  const dsrLink = d.dsrId ? `${sfBase}/Deal_Support_Request__c/${d.dsrId}/view` : null;
+  const oppLink = d.oppId ? `${sfBase}/Opportunity/${d.oppId}/view` : null;
+  const estLink = d.estId ? `${sfBase}/ffscpq__Estimate__c/${d.estId}/view` : null;
+  const mainName = d.oppName || d.name || d.dsr || '';
+  const mainLink = oppLink || dsrLink || estLink || '';
+  const stageLbl = (d.stage||'').replace(/^\d+ - /,'');
+  const parts = [d.dsr||(d.name&&!d.oppName?d.name:null), d.account, d.oppName, d.country, d.amount!=null?fmt$(d.amount):null, d.stage, d.status, d.ap?`AP: ${d.ap}`:null, d.sssm?`SSSM: ${d.sssm}`:null].filter(Boolean);
+  const textFull = parts.join(' | ');
+  const slackMsg = `*${mainLink?`<${mainLink}|${mainName}>`:mainName}*${stageLbl?' — '+stageLbl:''}\n${dsrLink&&d.dsr?`DSR: <${dsrLink}|${d.dsr}> | `:''}Status: ${d.status||'—'}\n${[d.account,d.country,d.amount!=null?fmt$(d.amount):null].filter(Boolean).join(' | ')}\nSSSM: ${d.sssm||'—'} | AP: ${d.ap||'—'}`;
+  const linkItems = [];
+  if (dsrLink) linkItems.push(['🔗', 'Link DSR', dsrLink]);
+  if (oppLink) linkItems.push(['🔗', 'Link Oportunidad', oppLink]);
+  if (estLink) linkItems.push(['📋', 'Link Estimate', estLink]);
+  const allItems = [...linkItems, ['<hr class="share-sep">'], ['📄', 'Texto completo', textFull], ['💬', 'Copiar para Slack', slackMsg]];
   const menu = document.createElement('div');
   menu.id = 'shareMenu';
   menu._btnRef = btn;
-  menu.innerHTML = items.map(it => it.length === 1 ? it[0] : `<div class="share-item" onclick="copyShare(${JSON.stringify(it[2])});event.stopPropagation();"><span>${it[0]}</span><span>${it[1]}</span></div>`).join('');
+  menu.innerHTML = allItems.map(it => it.length===1 ? it[0] : `<div class="share-item" onclick="copyShare(${JSON.stringify(it[2]).replace(/"/g,'&quot;')});event.stopPropagation();"><span>${it[0]}</span><span>${it[1]}</span></div>`).join('');
   document.body.appendChild(menu);
   const rect = btn.getBoundingClientRect();
   menu.style.top = (rect.bottom + window.scrollY + 4) + 'px';
@@ -25937,6 +25943,7 @@ function renderTab6() {
     const est = d.oppId ? ESTIMATE_MAP[d.oppId] : null;
     const estCell = est ? `<a href="https://org62.lightning.force.com/lightning/r/ffscpq__Estimate__c/${est.id}/view" target="_blank" title="${est.name}" class="opp-link" style="font-size:0.72rem;">📋</a>` : '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
     return `<tr class="table-row">
+      <td class="px-1 text-center" style="width:28px;"><button class="share-btn" onclick="showShareMenu(this,'${d.dsrId}');event.stopPropagation();" title="Compartir">⋮</button></td>
       <td class="px-2 text-center">${heatBadge(hs)}</td>
       <td class="px-2 text-center">${priorityBadge(priorityScore(d))}</td>
       <td class="px-2"><a href="${dsrLink}" target="_blank" class="opp-link font-mono text-xs">${d.dsr}</a></td>
@@ -25959,7 +25966,6 @@ function renderTab6() {
       <td class="px-2 whitespace-nowrap">${deliveryBadge(q?.deliveryModel)}</td>
       <td class="px-2">${qualBadge}</td>
       <td class="px-2 max-w-xs truncate" style="color:#706E6B;font-size:0.72rem;" title="${q?.offering||''}">${q?.offering||'--'}</td>
-      <td class="px-2 text-center"><button class="share-btn" onclick="showShareMenu(this,'${d.dsrId}');event.stopPropagation();" title="Compartir">⋮</button></td>
     </tr>`;
   }).join('');
 
@@ -26293,7 +26299,9 @@ function renderEstimatesTab() {
   let rows = '';
   data.forEach(d => {
     const stCol = stageColors[d.stage]||'#706E6B';
+    _shareData[d.id] = {estId:d.id, oppId:d.oppId, name:d.name, oppName:d.oppName, account:d.account, ap:d.ap, em:d.em, stage:d.stage, closeDate:d.closeDate, amount:d.amount, status:d.approvalStatus, billingType:d.billingType, sssm:null};
     rows += `<tr>
+      <td class="px-1 text-center" style="width:28px;"><button class="share-btn" onclick="showShareMenu(this,'${d.id}');event.stopPropagation();" title="Compartir">⋮</button></td>
       <td class="px-3 py-2"><a href="${sfBase}/ffscpq__Estimate__c/${d.id}/view" target="_blank" style="color:#0176D3">${d.name||'--'}</a></td>
       <td class="px-3 py-2"><a href="${sfBase}/Opportunity/${d.oppId}/view" target="_blank" style="color:#0176D3">${(d.oppName||'').substring(0,40)}${(d.oppName||'').length>40?'…':''}</a></td>
       <td class="px-3 py-2">${d.account||'--'}</td>
@@ -26386,8 +26394,10 @@ function renderWonTab() {
   // Table \u2014 one row per opportunity, DSRs as links
   const tbody = document.getElementById('won-tableBody');
   if (!tbody) return;
-  tbody.innerHTML = wonOpps.map(opp =>
-    `<tr class="table-row">
+  tbody.innerHTML = wonOpps.map(opp => {
+    _shareData[opp.oppId] = {oppId:opp.oppId, oppName:opp.oppName, account:opp.account, ap:opp.ap, amount:opp.amount, closeDate:opp.closeDate, country:opp.country, stage:'06 - Project Booked', status:'Won', sssm:(opp.dsrs[0]||{}).sssm||null};
+    return `<tr class="table-row">
+      <td class="px-1 text-center" style="width:28px;"><button class="share-btn" onclick="showShareMenu(this,'${opp.oppId}');event.stopPropagation();" title="Compartir">\u22ee</button></td>
       <td class="px-3 py-2"><a href="${sfBase}/Opportunity/${opp.oppId}/view" target="_blank" style="color:#0176D3;">${(opp.oppName||'').substring(0,45)}${(opp.oppName||'').length>45?'\u2026':''}</a></td>
       <td class="px-3 py-2" style="color:#706E6B;">${opp.account||'--'}</td>
       <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${[...new Set(opp.dsrs.map(d=>d.sssm).filter(Boolean))].join(', ')||'--'}</td>
@@ -26397,8 +26407,8 @@ function renderWonTab() {
       <td class="px-3 py-2" style="white-space:normal;min-width:160px;">${opp.dsrs.map(d=>`<a href="${sfBase}/Deal_Support_Request__c/${d.dsrId}/view" target="_blank" style="color:#0176D3;font-family:monospace;font-size:0.7rem;">${d.dsr}</a>`).join('<br>')}</td>
       <td class="px-3 py-2" style="color:#706E6B;font-size:0.72rem;">${opp.requestTypeDetail||'--'}</td>
       <td class="px-3 py-2" style="color:#706E6B;">${opp.country||'--'}</td>
-    </tr>`
-  ).join('');
+    </tr>`;
+  }).join('');
 }
 
 // ── RR LATAM Tab ───────────────────────────────────────────────────
@@ -26512,6 +26522,8 @@ function renderRRTab() {
     return (a.closeDate||'') < (b.closeDate||'') ? -1 : (a.closeDate||'') > (b.closeDate||'') ? 1 : 0;
   });
   let rows = sortedGroups.map(opp => {
+    const _rrSssm = (DSR_DATA.find(d=>d.oppId===opp.oppId)||{}).sssm||null;
+    _shareData[opp.oppId] = {oppId:opp.oppId, oppName:opp.oppName, account:opp.account, ap:opp.ap, stage:opp.stage, closeDate:opp.closeDate, status:null, sssm:_rrSssm, country:null};
     const hasViol = opp.rrs.some(rr => {
       if (!rr.startDate || !opp.closeDate || opp.closeDate < nowStr) return false;
       const diff = (new Date(opp.closeDate) - new Date(rr.startDate)) / 86400000;
@@ -26543,6 +26555,7 @@ function renderRRTab() {
       else flagHtml = `<span style="background:#D4EDDA;color:#027E46;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${daysLeft}d</span>`;
     }
     return `<tr class="table-row">
+      <td class="px-1 text-center" style="width:28px;"><button class="share-btn" onclick="showShareMenu(this,'${opp.oppId}');event.stopPropagation();" title="Compartir">⋮</button></td>
       <td class="px-3 py-2 text-center">${flagHtml}</td>
       <td class="px-3 py-2"><a href="${sfBase}/Opportunity/${opp.oppId}/view" target="_blank" style="color:#0176D3;">${(opp.oppName||'').substring(0,42)}${(opp.oppName||'').length>42?'…':''}</a></td>
       <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${opp.account||'--'}</td>
@@ -26570,7 +26583,9 @@ function renderRRTab() {
       const closeStyle = e.closeDate <= d30Str ? 'color:#C56200;font-weight:600' : 'color:#706E6B';
       const est = ESTIMATE_MAP[e.oppId];
       const dsr = DSR_DATA.find(d=>d.oppId===e.oppId);
+      _shareData['noRR_'+e.oppId] = {oppId:e.oppId, oppName:e.oppName, account:e.account, ap:e.ap, stage:e.stage, closeDate:e.closeDate, status:'Sin RR', sssm:(dsr||{}).sssm||null};
       return `<tr class="table-row" style="background:#FFFBF0;">
+        <td class="px-1 text-center" style="width:28px;"><button class="share-btn" onclick="showShareMenu(this,'noRR_${e.oppId}');event.stopPropagation();" title="Compartir">⋮</button></td>
         <td class="px-3 py-2 text-center">${flagHtml}</td>
         <td class="px-3 py-2"><a href="${sfBase}/Opportunity/${e.oppId}/view" target="_blank" style="color:#0176D3;">${(e.oppName||'').substring(0,42)}${(e.oppName||'').length>42?'…':''}</a></td>
         <td class="px-3 py-2" style="color:#706E6B;font-size:0.75rem;">${e.account||'--'}</td>
