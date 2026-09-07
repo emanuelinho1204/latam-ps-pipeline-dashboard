@@ -25022,12 +25022,17 @@ function territoryBadge(country) {
 
 // ── SSSM View local filters ────────────────────────────
 // ── MultiSelect helpers ────────────────────────────────────────────────────────
-const _msOpts = {}, _msSel = {};
+const _msOpts = {}, _msSel = {}, _msCb = {};
 
-function msInit(id, opts) {
+function msInit(id, opts, onChange) {
   _msOpts[id] = opts;
   if (!_msSel[id]) _msSel[id] = new Set();
+  if (onChange) _msCb[id] = onChange;
   _msRender(id);
+}
+
+function _msFireCb(id) {
+  (_msCb[id] || applySSSmFilters)();
 }
 
 function _msRender(id) {
@@ -25062,23 +25067,26 @@ function msChange(id, val, checked) {
   if (!_msSel[id]) _msSel[id] = new Set();
   if (checked) _msSel[id].add(val); else _msSel[id].delete(val);
   _msRender(id);
-  document.getElementById(id+'_drop') && (document.getElementById(id+'_drop').classList.add('open'));
-  applySSSmFilters();
+  const drop = document.getElementById(id+'_drop');
+  if (drop) drop.classList.add('open');
+  _msFireCb(id);
 }
 
 function msAll(id) {
   if (!_msOpts[id]) return;
   _msSel[id] = new Set(_msOpts[id].map(o => o.value));
   _msRender(id);
-  document.getElementById(id+'_drop') && document.getElementById(id+'_drop').classList.add('open');
-  applySSSmFilters();
+  const drop = document.getElementById(id+'_drop');
+  if (drop) drop.classList.add('open');
+  _msFireCb(id);
 }
 
 function msClear(id) {
   _msSel[id] = new Set();
   _msRender(id);
-  document.getElementById(id+'_drop') && document.getElementById(id+'_drop').classList.add('open');
-  applySSSmFilters();
+  const drop = document.getElementById(id+'_drop');
+  if (drop) drop.classList.add('open');
+  _msFireCb(id);
 }
 
 function msGet(id) { return _msSel[id] ? [..._msSel[id]] : []; }
@@ -25344,8 +25352,8 @@ function initFilters() {
   msInit('ms_sssm', sssms.map(s => ({value:s, label:s})));
   // DSR Detail multi-selects
   const aps = [...new Set(DSR_DATA.map(d => d.ap).filter(Boolean))].sort();
-  msInit('ms_dSSSM', sssms.map(s => ({value:s, label:s})));
-  msInit('ms_dAP',   aps.map(a => ({value:a, label:a})));
+  msInit('ms_dSSSM', sssms.map(s => ({value:s, label:s})), renderTab6);
+  msInit('ms_dAP',   aps.map(a => ({value:a, label:a})),   renderTab6);
   // Country filter
   const ctrySel = document.getElementById('fCountry');
   const countries = [...new Set(DSR_DATA.map(d => d.country).filter(Boolean))].sort();
@@ -26195,7 +26203,7 @@ function renderEstimatesTab() {
   const _estMap = {ms_estStatus:'approvalStatus', ms_estBilling:'billingType', ms_estStage:'stage', ms_estEM:'em'};
   Object.entries(_estMap).forEach(([id, key]) => {
     if (_msOpts[id]) return;
-    msInit(id, [...new Set(ESTIMATE_DATA.map(d=>d[key]).filter(Boolean))].sort().map(v=>({value:v,label:v})));
+    msInit(id, [...new Set(ESTIMATE_DATA.map(d=>d[key]).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderEstimatesTab);
   });
   const fStatusSel  = msGet('ms_estStatus');
   const fBillingSel = msGet('ms_estBilling');
@@ -26279,8 +26287,8 @@ function renderEstimatesTab() {
 function renderWonTab() {
   const fSearch = ((document.getElementById('won-fSearch')||{}).value||'').toLowerCase();
   // Lazy-init won multi-selects
-  if (!_msOpts['ms_wonSSM']) msInit('ms_wonSSM', [...new Set(WON_DATA.map(d=>d.sssm).filter(Boolean))].sort().map(v=>({value:v,label:v})));
-  if (!_msOpts['ms_wonAP'])  msInit('ms_wonAP',  [...new Set(WON_DATA.map(d=>d.ap).filter(Boolean))].sort().map(v=>({value:v,label:v})));
+  if (!_msOpts['ms_wonSSM']) msInit('ms_wonSSM', [...new Set(WON_DATA.map(d=>d.sssm).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderWonTab);
+  if (!_msOpts['ms_wonAP'])  msInit('ms_wonAP',  [...new Set(WON_DATA.map(d=>d.ap).filter(Boolean))].sort().map(v=>({value:v,label:v})),  renderWonTab);
   const fSSMSel = msGet('ms_wonSSM');
   const fAPSel  = msGet('ms_wonAP');
   let data = WON_DATA.filter(d => {
@@ -26376,7 +26384,7 @@ function renderRRTab() {
   const _rrMap = {ms_rrStatus:'status', ms_rrCountry:'country', ms_rrAP:'ap'};
   Object.entries(_rrMap).forEach(([id, key]) => {
     if (_msOpts[id]) return;
-    msInit(id, [...new Set(RR_DATA.map(d=>d[key]).filter(Boolean))].sort().map(v=>({value:v,label:v})));
+    msInit(id, [...new Set(RR_DATA.map(d=>d[key]).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderRRTab);
   });
   const fStatusSel  = msGet('ms_rrStatus');
   const fCountrySel = msGet('ms_rrCountry');
