@@ -79,6 +79,18 @@
   .sssm-nav-item { padding: 0.45rem 0.75rem; cursor: pointer; border-bottom: 1px solid #F3F3F3; transition: background 0.12s; }
   .sssm-nav-item:hover { background: #EAF5FE; }
   .sssm-nav-item.active { background: #D8EDFF; }
+  /* Multi-select dropdown */
+  .ms-container { position:relative; display:inline-block; }
+  .ms-btn { border:1px solid #DDDBDA; border-radius:4px; padding:4px 8px; font-size:0.78rem; background:#fff; cursor:pointer; min-width:110px; text-align:left; color:#3E3E3C; white-space:nowrap; display:flex; align-items:center; justify-content:space-between; gap:4px; }
+  .ms-btn.has-sel { border-color:#0176D3; color:#0176D3; background:#EAF5FE; }
+  .ms-drop { position:absolute; top:calc(100% + 2px); left:0; z-index:9999; background:#fff; border:1px solid #DDDBDA; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.12); min-width:180px; max-height:220px; overflow-y:auto; display:none; }
+  .ms-drop.open { display:block; }
+  .ms-actions { padding:5px 10px 4px; border-bottom:1px solid #F3F3F3; display:flex; gap:10px; }
+  .ms-actions a { color:#0176D3; cursor:pointer; font-size:0.7rem; }
+  .ms-actions a:hover { text-decoration:underline; }
+  .ms-item { padding:5px 10px; font-size:0.78rem; cursor:pointer; display:flex; align-items:center; gap:7px; }
+  .ms-item:hover { background:#F3F2F2; }
+  .ms-item input[type=checkbox] { cursor:pointer; accent-color:#0176D3; flex-shrink:0; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -261,58 +273,31 @@
 <div id="tsssm" class="tab-content">
   <div class="local-filter-bar flex flex-wrap gap-3 items-end">
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_sssm">SSSM</label>
-      <select id="sssmF" onchange="applySSSmFilters()" class="min-w-40">
-        <option value="" data-i18n="opt_all_sssms">All SSSMs</option>
-      </select>
+      <label class="block text-xs mb-1" style="color:#706E6B;">SSSM</label>
+      <div class="ms-container" id="ms_sssm"></div>
     </div>
     <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_territory">Territory</label>
-      <select id="terrF" onchange="applySSSmFilters()">
-        <option value="" data-i18n="opt_all_territories">All Territories</option>
-        <option value="Mexico">Mexico</option>
-        <option value="Growth Norte">Growth Norte</option>
-        <option value="Growth Sur">Growth Sur</option>
-        <option value="Brazil">Brazil</option>
-      </select>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Territory</label>
+      <div class="ms-container" id="ms_terr"></div>
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">DSR Status</label>
-      <select id="sssmStatusF" onchange="applySSSmFilters()">
-        <option value="">All Statuses</option>
-        <option value="Working">Working</option>
-        <option value="On Hold">On Hold</option>
-        <option value="In Queue">In Queue</option>
-      </select>
+      <div class="ms-container" id="ms_status"></div>
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Stage Oportunidad</label>
-      <select id="sssmStageF" onchange="applySSSmFilters()">
-        <option value="">All Stages</option>
-        <option value="01 - Discovery">01 - Discovery</option>
-        <option value="02 - Scoping">02 - Scoping</option>
-        <option value="03 - Initial Proposal">03 - Initial Proposal</option>
-        <option value="04 - Active Negotiation">04 - Active Negotiation</option>
-        <option value="05 - Proposal Presented">05 - Proposal Presented</option>
-      </select>
+      <div class="ms-container" id="ms_stage"></div>
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Mgr Judgement</label>
-      <select id="sssmMgrF" onchange="applySSSmFilters()">
-        <option value="">All</option>
-        <option value="IN">IN</option>
-        <option value="UP+">UP+</option>
-        <option value="UP-">UP-</option>
-        <option value="OUT">OUT</option>
-        <option value="__none__">🚩 Sin Judgement</option>
-      </select>
+      <div class="ms-container" id="ms_mgr"></div>
     </div>
     <div class="flex items-end">
-      <button onclick="resetSSSmFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]" data-i18n="btn_reset">↺ Reset</button>
+      <button onclick="resetSSSmFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]">↺ Reset</button>
     </div>
     <div class="flex items-end ml-auto gap-2">
-      <button onclick="toggleAllGroups(true)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#0176D3] hover:bg-[#EAF5FE]"><span data-i18n="btn_expand_all">⊞ Expand all</span></button>
-      <button onclick="toggleAllGroups(false)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#706E6B] hover:bg-[#F3F3F3]"><span data-i18n="btn_collapse_all">⊟ Collapse all</span></button>
+      <button onclick="toggleAllGroups(true)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#0176D3] hover:bg-[#EAF5FE]">⊞ Expand all</button>
+      <button onclick="toggleAllGroups(false)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#706E6B] hover:bg-[#F3F3F3]">⊟ Collapse all</button>
     </div>
   </div>
   <p class="text-xs mb-3" style="color:#706E6B;" data-i18n="sssm_view_desc">Grouped view: SSSM → Status DSR → Stage Oportunidad</p>
@@ -25040,21 +25025,126 @@ function territoryBadge(country) {
 
 
 // ── SSSM View local filters ────────────────────────────
+// ── MultiSelect helpers ────────────────────────────────────────────────────────
+const _msOpts = {}, _msSel = {};
+
+function msInit(id, opts) {
+  _msOpts[id] = opts;
+  if (!_msSel[id]) _msSel[id] = new Set();
+  _msRender(id);
+}
+
+function _msRender(id) {
+  const cont = document.getElementById(id);
+  if (!cont) return;
+  const sel = _msSel[id] || new Set();
+  const opts = _msOpts[id] || [];
+  const count = sel.size;
+  const label = count ? `${count} sel.` : 'Todos';
+  cont.innerHTML = `
+    <button class="ms-btn${count?' has-sel':''}" onclick="msToggle('${id}');event.stopPropagation();" type="button">
+      <span>${label}</span><span style="font-size:0.65rem;">▾</span>
+    </button>
+    <div id="${id}_drop" class="ms-drop">
+      <div class="ms-actions">
+        <a onclick="msAll('${id}')">Todos</a>
+        <a onclick="msClear('${id}')">Limpiar</a>
+      </div>
+      ${opts.map(o => `<label class="ms-item"><input type="checkbox" value="${String(o.value).replace(/"/g,'&quot;')}"${sel.has(o.value)?' checked':''} onchange="msChange('${id}',this.value,this.checked)"><span>${o.label}</span></label>`).join('')}
+    </div>`;
+}
+
+function msToggle(id) {
+  const drop = document.getElementById(id+'_drop');
+  if (!drop) return;
+  const was = drop.classList.contains('open');
+  document.querySelectorAll('.ms-drop.open').forEach(d => d.classList.remove('open'));
+  if (!was) drop.classList.add('open');
+}
+
+function msChange(id, val, checked) {
+  if (!_msSel[id]) _msSel[id] = new Set();
+  if (checked) _msSel[id].add(val); else _msSel[id].delete(val);
+  _msRender(id);
+  document.getElementById(id+'_drop') && (document.getElementById(id+'_drop').classList.add('open'));
+  applySSSmFilters();
+}
+
+function msAll(id) {
+  if (!_msOpts[id]) return;
+  _msSel[id] = new Set(_msOpts[id].map(o => o.value));
+  _msRender(id);
+  document.getElementById(id+'_drop') && document.getElementById(id+'_drop').classList.add('open');
+  applySSSmFilters();
+}
+
+function msClear(id) {
+  _msSel[id] = new Set();
+  _msRender(id);
+  document.getElementById(id+'_drop') && document.getElementById(id+'_drop').classList.add('open');
+  applySSSmFilters();
+}
+
+function msGet(id) { return _msSel[id] ? [..._msSel[id]] : []; }
+
+function msSetExclusive(id, val) {
+  _msSel[id] = val ? new Set([val]) : new Set();
+  _msRender(id);
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.ms-drop.open').forEach(d => d.classList.remove('open'));
+});
+
+function initSSSmMultiSelects() {
+  msInit('ms_terr', [
+    {value:'Mexico', label:'Mexico'},
+    {value:'Growth Norte', label:'Growth Norte'},
+    {value:'Growth Sur', label:'Growth Sur'},
+    {value:'Brazil', label:'Brazil'},
+  ]);
+  msInit('ms_status', [
+    {value:'Working',  label:'Working'},
+    {value:'On Hold',  label:'On Hold'},
+    {value:'In Queue', label:'In Queue'},
+    {value:'Waiting',  label:'Waiting'},
+  ]);
+  msInit('ms_stage', [
+    {value:'01 - Discovery',        label:'01 - Discovery'},
+    {value:'02 - Scoping',          label:'02 - Scoping'},
+    {value:'03 - Initial Proposal', label:'03 - Initial Proposal'},
+    {value:'04 - Active Negotiation',label:'04 - Active Negotiation'},
+    {value:'05 - Proposal Presented',label:'05 - Proposal Presented'},
+  ]);
+  msInit('ms_mgr', [
+    {value:'IN',       label:'IN'},
+    {value:'UP+',      label:'UP+'},
+    {value:'UP-',      label:'UP-'},
+    {value:'OUT',      label:'OUT'},
+    {value:'__none__', label:'🚩 Sin Judgement'},
+  ]);
+}
+// ── End MultiSelect ────────────────────────────────────────────────────────────
+
 function applySSSmFilters() {
-  const sssmF = (document.getElementById('sssmF') || {}).value || '';
-  const terrF = (document.getElementById('terrF') || {}).value || '';
-  const statusF = (document.getElementById('sssmStatusF') || {}).value || '';
-  const stageF = (document.getElementById('sssmStageF') || {}).value || '';
-  const mgrF   = (document.getElementById('sssmMgrF')   || {}).value || '';
+  const sssmSel   = msGet('ms_sssm');
+  const terrSel   = msGet('ms_terr');
+  const statusSel = msGet('ms_status');
+  const stageSel  = msGet('ms_stage');
+  const mgrSel    = msGet('ms_mgr');
   let data = [...filtered];
-  if (sssmF)  data = data.filter(d => d.sssm === sssmF);
-  if (terrF)  data = data.filter(d => getTerritory(d.country) === terrF);
-  if (statusF) data = data.filter(d => d.status === statusF);
-  if (stageF) data = data.filter(d => d.stage === stageF);
-  if (mgrF === '__none__') data = data.filter(d => !d.mgrJudgement);
-  else if (mgrF) data = data.filter(d => d.mgrJudgement && d.mgrJudgement.replace(/\s/g,'') === mgrF);
+  if (sssmSel.length)   data = data.filter(d => sssmSel.includes(d.sssm));
+  if (terrSel.length)   data = data.filter(d => terrSel.includes(getTerritory(d.country)));
+  if (statusSel.length) data = data.filter(d => statusSel.includes(d.status));
+  if (stageSel.length)  data = data.filter(d => stageSel.includes(d.stage));
+  if (mgrSel.length) {
+    data = data.filter(d => {
+      if (!d.mgrJudgement) return mgrSel.includes('__none__');
+      const v = d.mgrJudgement.replace(/\s/g,'');
+      return mgrSel.some(m => m !== '__none__' && m === v);
+    });
+  }
   renderSSSmLoadBars();
-  // Defer grouped view so DOM/layout is ready (mirrors showTab's 50ms pattern)
   setTimeout(function() { renderSSSmGroupedView(data); }, 0);
 }
 
@@ -25112,28 +25202,20 @@ function renderSSSmLoadBars() {
 }
 
 function resetSSSmFilters() {
-  const s = document.getElementById('sssmF');
-  const t = document.getElementById('terrF');
-  const st = document.getElementById('sssmStatusF');
-  const sg = document.getElementById('sssmStageF');
-  const mg = document.getElementById('sssmMgrF');
-  if (s) s.value = '';
-  if (t) t.value = '';
-  if (st) st.value = '';
-  if (sg) sg.value = '';
-  if (mg) mg.value = '';
+  ['ms_sssm','ms_terr','ms_status','ms_stage','ms_mgr'].forEach(id => {
+    _msSel[id] = new Set();
+    _msRender(id);
+  });
   renderSSSmLoadBars();
   renderSSSmGroupedView(filtered);
 }
 
 // ── DSR Detail local filters ───────────────────────────
 function selectSSSM(name) {
-  // Reset territory filter to avoid conflicts
-  const terrEl = document.getElementById('terrF');
-  if (terrEl) terrEl.value = '';
-  // Set Vista SSSM filter
-  const sel = document.getElementById('sssmF');
-  if (sel) sel.value = name;
+  // Reset other filters to avoid conflicts
+  ['ms_terr','ms_status','ms_stage','ms_mgr'].forEach(id => { _msSel[id] = new Set(); _msRender(id); });
+  // Set Vista SSSM filter exclusively
+  msSetExclusive('ms_sssm', name);
   // Switch to tsssm tab manually (avoids setTimeout race with showTab)
   document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -25264,9 +25346,9 @@ function initFilters() {
   // Global SSSM filter
   const sssmSel = document.getElementById('fSSSM');
   sssms.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sssmSel.appendChild(o); });
-  // SSSM View local filter
-  const sssmF = document.getElementById('sssmF');
-  if (sssmF) sssms.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sssmF.appendChild(o); });
+  // SSSM View multi-select
+  initSSSmMultiSelects();
+  msInit('ms_sssm', sssms.map(s => ({value:s, label:s})));
   // DSR Detail SSSM filter
   const dSSSM = document.getElementById('dSSSM');
   if (dSSSM) sssms.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; dSSSM.appendChild(o); });
@@ -25945,7 +26027,8 @@ function renderSSSmGroupedView(data) {
 
   const STAGE_ORDER = ['01 - Discovery','02 - Scoping','03 - Initial Proposal','04 - Active Negotiation','05 - Proposal Presented'];
   const STATUS_ORDER = ['Working','In Queue','On Hold','Waiting'];
-  const activeSSSM = (document.getElementById('sssmF') || {}).value || '';
+  const sssmSel = msGet('ms_sssm');
+  const activeSSSM = sssmSel.length === 1 ? sssmSel[0] : '';
 
   // Sidebar: built from ALL currently filtered data (not just data param)
   const sidebarMap = {};
@@ -25960,7 +26043,7 @@ function renderSSSmGroupedView(data) {
 
   const totalCount = filtered.length;
   const sidebarHtml = [
-    `<div class="sssm-nav-item ${!activeSSSM ? 'active' : ''}" onclick="selectSSSmSidebar('')">
+    `<div class="sssm-nav-item ${sssmSel.length===0 ? 'active' : ''}" onclick="selectSSSmSidebar('')">
       <div style="font-weight:700;font-size:0.78rem;color:#032D60;">Todos</div>
       <div style="color:#706E6B;font-size:0.7rem;">${totalCount} DSRs</div>
     </div>`,
@@ -25969,7 +26052,7 @@ function renderSSSmGroupedView(data) {
       const parts = sssm.split(' ');
       const first = parts[0];
       const last = parts.slice(1).join(' ');
-      const isActive = activeSSSM === sssm;
+      const isActive = sssmSel.length === 1 && sssmSel[0] === sssm;
       return `<div class="sssm-nav-item${isActive ? ' active' : ''}" onclick="selectSSSmSidebar('${sssm.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
         <div style="font-weight:700;font-size:0.78rem;color:#032D60;">${first}</div>
         ${last ? `<div style="font-size:0.72rem;color:#3E3E3C;">${last}</div>` : ''}
@@ -25992,7 +26075,7 @@ function renderSSSmGroupedView(data) {
     if (!bySSM[d.sssm][d.status][d.stage]) bySSM[d.sssm][d.status][d.stage] = [];
     bySSM[d.sssm][d.status][d.stage].push(d);
   });
-  const panelNames = activeSSSM ? [activeSSSM] : Object.keys(bySSM).sort();
+  const panelNames = sssmSel.length ? sssmSel.filter(s => bySSM[s]) : Object.keys(bySSM).sort();
 
   let tbodyHtml = '';
   panelNames.forEach(sssm => {
@@ -26088,8 +26171,7 @@ function renderSSSmGroupedView(data) {
 }
 
 function selectSSSmSidebar(name) {
-  const sel = document.getElementById('sssmF');
-  if (sel) sel.value = name;
+  msSetExclusive('ms_sssm', name);
   applySSSmFilters();
 }
 
