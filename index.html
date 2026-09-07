@@ -26009,9 +26009,9 @@ function renderSSSmGroupedView(data) {
         const stageRows = stages[st];
         const stageArr = stageRows.reduce((a, d) => a + d.amount, 0);
         tbodyHtml += `<tr><td colspan="13" style="padding:0;">
-          <div class="stage-group-header" style="margin:0;border-radius:0;padding-left:1.5rem;">
+          <div style="background:#F8F8F8;border-left:3px solid #DDDBDA;color:#3E3E3C;font-weight:500;padding:0.25rem 1rem 0.25rem 1.5rem;font-size:0.74rem;display:flex;align-items:center;gap:8px;">
             <span>${st}</span>
-            <span style="color:#706E6B;font-size:0.72rem;margin-left:8px;">${stageRows.length} DSRs · ${fmt$(stageArr)}</span>
+            <span style="color:#AEACAB;font-size:0.7rem;font-weight:400;">${stageRows.length} · ${fmt$(stageArr)}</span>
           </div>
         </td></tr>`;
         const rows = stageRows;
