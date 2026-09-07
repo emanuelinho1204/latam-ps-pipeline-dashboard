@@ -296,6 +296,17 @@
         <option value="05 - Proposal Presented">05 - Proposal Presented</option>
       </select>
     </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Mgr Judgement</label>
+      <select id="sssmMgrF" onchange="applySSSmFilters()">
+        <option value="">All</option>
+        <option value="IN">IN</option>
+        <option value="UP+">UP+</option>
+        <option value="UP-">UP-</option>
+        <option value="OUT">OUT</option>
+        <option value="__none__">🚩 Sin Judgement</option>
+      </select>
+    </div>
     <div class="flex items-end">
       <button onclick="resetSSSmFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]" data-i18n="btn_reset">↺ Reset</button>
     </div>
@@ -25034,11 +25045,14 @@ function applySSSmFilters() {
   const terrF = (document.getElementById('terrF') || {}).value || '';
   const statusF = (document.getElementById('sssmStatusF') || {}).value || '';
   const stageF = (document.getElementById('sssmStageF') || {}).value || '';
+  const mgrF   = (document.getElementById('sssmMgrF')   || {}).value || '';
   let data = [...filtered];
-  if (sssmF) data = data.filter(d => d.sssm === sssmF);
-  if (terrF) data = data.filter(d => getTerritory(d.country) === terrF);
+  if (sssmF)  data = data.filter(d => d.sssm === sssmF);
+  if (terrF)  data = data.filter(d => getTerritory(d.country) === terrF);
   if (statusF) data = data.filter(d => d.status === statusF);
   if (stageF) data = data.filter(d => d.stage === stageF);
+  if (mgrF === '__none__') data = data.filter(d => !d.mgrJudgement);
+  else if (mgrF) data = data.filter(d => d.mgrJudgement && d.mgrJudgement.replace(/\s/g,'') === mgrF);
   renderSSSmLoadBars();
   // Defer grouped view so DOM/layout is ready (mirrors showTab's 50ms pattern)
   setTimeout(function() { renderSSSmGroupedView(data); }, 0);
@@ -25102,10 +25116,12 @@ function resetSSSmFilters() {
   const t = document.getElementById('terrF');
   const st = document.getElementById('sssmStatusF');
   const sg = document.getElementById('sssmStageF');
+  const mg = document.getElementById('sssmMgrF');
   if (s) s.value = '';
   if (t) t.value = '';
   if (st) st.value = '';
   if (sg) sg.value = '';
+  if (mg) mg.value = '';
   renderSSSmLoadBars();
   renderSSSmGroupedView(filtered);
 }
