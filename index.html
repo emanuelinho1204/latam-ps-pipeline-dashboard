@@ -285,6 +285,17 @@
         <option value="In Queue">In Queue</option>
       </select>
     </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Stage Oportunidad</label>
+      <select id="sssmStageF" onchange="applySSSmFilters()">
+        <option value="">All Stages</option>
+        <option value="01 - Discovery">01 - Discovery</option>
+        <option value="02 - Scoping">02 - Scoping</option>
+        <option value="03 - Initial Proposal">03 - Initial Proposal</option>
+        <option value="04 - Active Negotiation">04 - Active Negotiation</option>
+        <option value="05 - Proposal Presented">05 - Proposal Presented</option>
+      </select>
+    </div>
     <div class="flex items-end">
       <button onclick="resetSSSmFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]" data-i18n="btn_reset">↺ Reset</button>
     </div>
@@ -293,7 +304,7 @@
       <button onclick="toggleAllGroups(false)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#706E6B] hover:bg-[#F3F3F3]"><span data-i18n="btn_collapse_all">⊟ Collapse all</span></button>
     </div>
   </div>
-  <p class="text-xs mb-3" style="color:#706E6B;" data-i18n="sssm_view_desc">Grouped view: SSSM → Stage → Status · matches org62 report</p>
+  <p class="text-xs mb-3" style="color:#706E6B;" data-i18n="sssm_view_desc">Grouped view: SSSM → Status DSR → Stage Oportunidad</p>
   <div class="card-panel mb-3" style="padding:0.65rem 1rem;">
     <div class="text-xs font-semibold mb-2" style="color:#706E6B;letter-spacing:0.04em;text-transform:uppercase;">Carga del Equipo</div>
     <div id="sssmLoadBars"></div>
@@ -25022,10 +25033,12 @@ function applySSSmFilters() {
   const sssmF = (document.getElementById('sssmF') || {}).value || '';
   const terrF = (document.getElementById('terrF') || {}).value || '';
   const statusF = (document.getElementById('sssmStatusF') || {}).value || '';
+  const stageF = (document.getElementById('sssmStageF') || {}).value || '';
   let data = [...filtered];
   if (sssmF) data = data.filter(d => d.sssm === sssmF);
   if (terrF) data = data.filter(d => getTerritory(d.country) === terrF);
   if (statusF) data = data.filter(d => d.status === statusF);
+  if (stageF) data = data.filter(d => d.stage === stageF);
   renderSSSmLoadBars();
   // Defer grouped view so DOM/layout is ready (mirrors showTab's 50ms pattern)
   setTimeout(function() { renderSSSmGroupedView(data); }, 0);
@@ -25088,9 +25101,11 @@ function resetSSSmFilters() {
   const s = document.getElementById('sssmF');
   const t = document.getElementById('terrF');
   const st = document.getElementById('sssmStatusF');
+  const sg = document.getElementById('sssmStageF');
   if (s) s.value = '';
   if (t) t.value = '';
   if (st) st.value = '';
+  if (sg) sg.value = '';
   renderSSSmLoadBars();
   renderSSSmGroupedView(filtered);
 }
@@ -25911,7 +25926,8 @@ function renderSSSmGroupedView(data) {
   const container = document.getElementById('sssmGroupedContainer');
   if (!container) return;
 
-  const STAGE_ORDER = ['01 - Discovery','02 - Scoping','03 - Initial Proposal','04 - Active Negotiation'];
+  const STAGE_ORDER = ['01 - Discovery','02 - Scoping','03 - Initial Proposal','04 - Active Negotiation','05 - Proposal Presented'];
+  const STATUS_ORDER = ['Working','In Queue','On Hold','Waiting'];
   const activeSSSM = (document.getElementById('sssmF') || {}).value || '';
 
   // Sidebar: built from ALL currently filtered data (not just data param)
@@ -25945,23 +25961,29 @@ function renderSSSmGroupedView(data) {
     })
   ].join('');
 
-  // Right panel: group data by sssm → stage → status
+  // Right panel: group data by sssm → status → stage
+  const STATUS_COLORS = {
+    'Working':    {bg:'#EDFDF4', border:'#04844B', text:'#04844B'},
+    'In Queue':   {bg:'#EAF5FE', border:'#0176D3', text:'#0176D3'},
+    'On Hold':    {bg:'#FFF3E0', border:'#C56200', text:'#C56200'},
+    'Waiting':    {bg:'#F3F2F2', border:'#706E6B', text:'#706E6B'},
+  };
   const bySSM = {};
   data.forEach(d => {
     if (!bySSM[d.sssm]) bySSM[d.sssm] = {};
-    if (!bySSM[d.sssm][d.stage]) bySSM[d.sssm][d.stage] = {};
-    if (!bySSM[d.sssm][d.stage][d.status]) bySSM[d.sssm][d.stage][d.status] = [];
-    bySSM[d.sssm][d.stage][d.status].push(d);
+    if (!bySSM[d.sssm][d.status]) bySSM[d.sssm][d.status] = {};
+    if (!bySSM[d.sssm][d.status][d.stage]) bySSM[d.sssm][d.status][d.stage] = [];
+    bySSM[d.sssm][d.status][d.stage].push(d);
   });
   const panelNames = activeSSSM ? [activeSSSM] : Object.keys(bySSM).sort();
 
   let tbodyHtml = '';
   panelNames.forEach(sssm => {
-    const stages = bySSM[sssm];
-    if (!stages) return;
+    const statuses = bySSM[sssm];
+    if (!statuses) return;
 
     if (!activeSSSM) {
-      const sssmRows = Object.values(stages).reduce((a, st) => a.concat(Object.values(st).flat()), []);
+      const sssmRows = Object.values(statuses).reduce((a, stg) => a.concat(Object.values(stg).flat()), []);
       const sssmArr = sssmRows.reduce((s, d) => s + d.amount, 0);
       tbodyHtml += `<tr style="background:#fff;"><td colspan="13" style="padding:0.5rem 0.75rem 0.15rem;border-top:2px solid #DDDBDA;">
         <span style="font-weight:700;font-size:0.77rem;color:#032D60;">${sssm}</span>
@@ -25969,23 +25991,30 @@ function renderSSSmGroupedView(data) {
       </td></tr>`;
     }
 
-    STAGE_ORDER.filter(st => stages[st]).forEach(st => {
-      const statuses = stages[st];
-      const stageRows = Object.values(statuses).flat();
-      const stageArr = stageRows.reduce((a, d) => a + d.amount, 0);
+    const orderedStatuses = STATUS_ORDER.filter(s => statuses[s]);
+    const extraStatuses = Object.keys(statuses).filter(s => !STATUS_ORDER.includes(s)).sort();
+    [...orderedStatuses, ...extraStatuses].forEach(status => {
+      const stages = statuses[status];
+      const statusRows = Object.values(stages).flat();
+      const statusArr = statusRows.reduce((a, d) => a + d.amount, 0);
+      const sc = STATUS_COLORS[status] || {bg:'#F3F2F2', border:'#706E6B', text:'#706E6B'};
       tbodyHtml += `<tr><td colspan="13" style="padding:0;">
-        <div class="stage-group-header" style="margin:0;border-radius:0;">
-          <span>${st}</span>
-          <span style="color:#706E6B;font-size:0.72rem;margin-left:8px;">${stageRows.length} DSRs · ${fmt$(stageArr)}</span>
+        <div style="background:${sc.bg};border-left:3px solid ${sc.border};color:${sc.text};font-weight:700;padding:0.375rem 1rem;font-size:0.82rem;display:flex;align-items:center;gap:8px;">
+          <span>${status}</span>
+          <span style="color:#706E6B;font-size:0.72rem;font-weight:400;">${statusRows.length} DSRs · ${fmt$(statusArr)}</span>
         </div>
       </td></tr>`;
 
-      Object.keys(statuses).sort().forEach(status => {
-        const rows = statuses[status];
-        tbodyHtml += `<tr><td colspan="13" style="padding:3px 0 0 0;">
-          <span class="status-label">${status}</span>
-          <span style="color:#706E6B;font-size:0.71rem;margin-left:8px;">(${rows.length})</span>
+      STAGE_ORDER.filter(st => stages[st]).forEach(st => {
+        const stageRows = stages[st];
+        const stageArr = stageRows.reduce((a, d) => a + d.amount, 0);
+        tbodyHtml += `<tr><td colspan="13" style="padding:0;">
+          <div class="stage-group-header" style="margin:0;border-radius:0;padding-left:1.5rem;">
+            <span>${st}</span>
+            <span style="color:#706E6B;font-size:0.72rem;margin-left:8px;">${stageRows.length} DSRs · ${fmt$(stageArr)}</span>
+          </div>
         </td></tr>`;
+        const rows = stageRows;
         rows.forEach(d => {
           const q = QUALI_MAP[d.dsr];
           const hs = heatScore(d, q);
