@@ -25185,9 +25185,10 @@ function priorityBadge(score) {
 }
 function mgrJudgeBadge(val) {
   if (!val) return '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
-  if (val==='UP+') return '<span style="background:#CDEFC4;color:#027A48;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;">↑+</span>';
-  if (val==='UP-') return '<span style="background:#FEF0C7;color:#B54708;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;">↑−</span>';
-  if (val==='IN')  return '<span style="background:#EAF5FE;color:#0176D3;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;">IN</span>';
+  const v = val.replace(/\s/g,'');
+  if (v==='UP+')  return '<span style="background:#CDEFC4;color:#027A48;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;">UP+</span>';
+  if (v==='UP-')  return '<span style="background:#E8F7E3;color:#3D8B37;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;">UP-</span>';
+  if (val==='IN') return '<span style="background:#04844B;color:#FFFFFF;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;">IN</span>';
   if (val==='OUT') return '<span style="background:#FCE9E9;color:#C23934;padding:2px 6px;border-radius:4px;font-size:0.7rem;font-weight:700;">OUT</span>';
   return `<span style="color:#706E6B;font-size:0.72rem;">${val}</span>`;
 }
