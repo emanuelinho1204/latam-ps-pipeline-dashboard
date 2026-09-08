@@ -252,7 +252,7 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
     <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">DSRs por SSSM</h3><div class="chart-container"><canvas id="chartSSSM"></canvas></div></div>
     <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Pipeline por SSSM ($M)</h3><div class="chart-container"><canvas id="chartSSSMArr"></canvas></div></div>
-    <div id="workloadDonutPanel" class="card-panel flex flex-col" style="height:310px;overflow:hidden;">
+    <div id="workloadDonutPanel" class="card-panel flex flex-col" style="min-height:310px;overflow:hidden;">
       <div class="flex items-center justify-between mb-2" style="flex-shrink:0;">
         <h3 class="text-sm font-semibold" id="workloadDonutTitle" style="color:#032D60;">Distribución por SSSM</h3>
       </div>
@@ -260,9 +260,9 @@
         <span style="font-size:1.8rem;">🍩</span>
         <span>Haz click en una barra<br>o nombre de SSSM</span>
       </div>
-      <div id="workloadDonutChart" style="display:none;flex-direction:column;align-items:center;gap:0.3rem;flex:1;overflow:hidden;">
-        <div style="width:100%;height:190px;position:relative;"><canvas id="chartSSSmDonut"></canvas></div>
-        <div id="workloadDonutStats" style="font-size:0.75rem;text-align:center;line-height:1.4;"></div>
+      <div id="workloadDonutChart" style="display:none;flex-direction:column;align-items:center;gap:0.4rem;">
+        <div style="width:100%;height:260px;position:relative;"><canvas id="chartSSSmDonut"></canvas></div>
+        <div id="workloadDonutStats" style="font-size:0.75rem;text-align:center;line-height:1.6;"></div>
       </div>
     </div>
   </div>
@@ -27022,7 +27022,7 @@ function renderTab1() {
   const fCnt = {Commit:0,'Best Case':0,Pipeline:0,Omitted:0};
   filtered.forEach(d => fCnt[d.forecast] = (fCnt[d.forecast]||0)+1);
   makeChart('chartForecast','doughnut',Object.keys(fCnt),
-    [{data:Object.values(fCnt),backgroundColor:['#0176D3','#FFB75D','#9E9E9E','#DDDBDA'],borderWidth:0}],
+    [{data:Object.values(fCnt),backgroundColor:['#0176D3','#0D9DDA','#0B3BCC','#C9E4F7'],borderWidth:0}],
     {plugins:{legend:{position:'right',labels:{color:'#3E3E3C',font:{size:10}}}}}
   );
 
@@ -27034,7 +27034,7 @@ function renderTab1() {
     else dCnt[dm] = (dCnt[dm]||0)+1;
   });
   makeChart('chartDelivery','doughnut',Object.keys(dCnt),
-    [{data:Object.values(dCnt),backgroundColor:['#04844B','#FFB75D','#9E9E9E','#C23934','#DDDBDA'],borderWidth:0}],
+    [{data:Object.values(dCnt),backgroundColor:['#0176D3','#0D9DDA','#0B3BCC','#C9E4F7','#B4C8E6'],borderWidth:0}],
     {plugins:{legend:{position:'right',labels:{color:'#3E3E3C',font:{size:10}}}}}
   );
 
@@ -27200,15 +27200,15 @@ function renderTab2() {
   const arrs = chartEntries.map(([,m]) => +(m.arr/1e6).toFixed(2));
   const sssmChartClick = (e, els) => { if (els.length > 0) renderSSSmDonut(sssmChartEntries[els[0].index][0]); };
   const sssmChartHover = (e, els) => { e.native.target.style.cursor = els.length > 0 ? 'pointer' : 'default'; };
-  const stackedScales = { x: { stacked:true, ticks:{color:'#706E6B',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45}, grid:{color:'#F3F3F3'} }, y: { stacked:true, ticks:{color:'#706E6B',font:{size:10}}, grid:{color:'#F3F3F3'} } };
+  const stackedScales = { x: { stacked:true, ticks:{color:'#706E6B',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45}, grid:{color:'#EEF8FF'} }, y: { stacked:true, ticks:{color:'#706E6B',font:{size:10}}, grid:{color:'#EEF8FF'} } };
   makeChart('chartSSSM','bar',labels,[
     {label:'Working', data:chartEntries.map(([,m])=>m.working-m.staleWorking), backgroundColor:'#04844B', borderRadius:0},
     {label:'Working - Opp vencida', data:chartEntries.map(([,m])=>m.staleWorking), backgroundColor:'#C23934', borderRadius:0},
     {label:'On Hold', data:chartEntries.map(([,m])=>m.onhold),  backgroundColor:'#C56200', borderRadius:0},
-    {label:'In Queue',data:chartEntries.map(([,m])=>m.inqueue), backgroundColor:'#9EA1A3', borderRadius:0},
-    {label:'Waiting', data:chartEntries.map(([,m])=>m.waiting), backgroundColor:'#E4D5F9', borderRadius:0},
+    {label:'In Queue',data:chartEntries.map(([,m])=>m.inqueue), backgroundColor:'#5A8FBF', borderRadius:0},
+    {label:'Waiting', data:chartEntries.map(([,m])=>m.waiting), backgroundColor:'#B4C8E6', borderRadius:0},
   ],{onClick:sssmChartClick,onHover:sssmChartHover,scales:stackedScales});
-  makeChart('chartSSSMArr','bar',labels,[{label:'Pipeline ($M)',data:arrs,backgroundColor:'#04844B',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover});
+  makeChart('chartSSSMArr','bar',labels,[{label:'Pipeline ($M)',data:arrs,backgroundColor:'#0176D3',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover});
 }
 
 function renderTab3() {
@@ -27219,10 +27219,10 @@ function renderTab3() {
   const stageArr = stages.map(s => filtered.filter(d=>d.stage===s).reduce((a,d)=>a+d.amount,0)/1e6);
   makeChart('chartFunnel','bar',stageLbls,[
     {label:'DSRs',data:stageCounts,backgroundColor:'#0176D3',borderRadius:3,yAxisID:'y'},
-    {label:'Pipeline ($M)',data:stageArr.map(v=>+v.toFixed(1)),backgroundColor:'#04844B',borderRadius:3,yAxisID:'y1'}
+    {label:'Pipeline ($M)',data:stageArr.map(v=>+v.toFixed(1)),backgroundColor:'#0176D3',borderRadius:3,yAxisID:'y1'}
   ],{
     scales:{
-      y:{type:'linear',position:'left',ticks:{color:'#706E6B'},grid:{color:'#F3F3F3'}},
+      y:{type:'linear',position:'left',ticks:{color:'#706E6B'},grid:{color:'#EEF8FF'}},
       y1:{type:'linear',position:'right',ticks:{color:'#04844B'},grid:{drawOnChartArea:false}}
     }
   });
@@ -28160,7 +28160,7 @@ function renderRRTab() {
     sssmRRMap[sssm][rrFlagOf(d)]++;
   });
   const sssmRREntries = Object.entries(sssmRRMap).sort((a,b) => a[0].localeCompare(b[0]));
-  const rrStackedScales = { x:{stacked:true,ticks:{color:'#706E6B',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45},grid:{color:'#F3F3F3'}}, y:{stacked:true,ticks:{color:'#706E6B',font:{size:10}},grid:{color:'#F3F3F3'}} };
+  const rrStackedScales = { x:{stacked:true,ticks:{color:'#706E6B',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45},grid:{color:'#EEF8FF'}}, y:{stacked:true,ticks:{color:'#706E6B',font:{size:10}},grid:{color:'#EEF8FF'}} };
   makeChart('chartRRSssm','bar',sssmRREntries.map(([n])=>sssmLabel(n)),[
     {label:'🚩 Inicio vencido',data:sssmRREntries.map(([,m])=>m.vencido),backgroundColor:'#C23934',borderRadius:0},
     {label:'⚡ Close <30d',data:sssmRREntries.map(([,m])=>m.urgente),backgroundColor:'#C56200',borderRadius:0},
