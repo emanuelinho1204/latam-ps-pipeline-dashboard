@@ -252,17 +252,17 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
     <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">DSRs por SSSM</h3><div class="chart-container"><canvas id="chartSSSM"></canvas></div></div>
     <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Pipeline por SSSM ($M)</h3><div class="chart-container"><canvas id="chartSSSMArr"></canvas></div></div>
-    <div id="workloadDonutPanel" class="card-panel flex flex-col">
-      <div class="flex items-center justify-between mb-2">
+    <div id="workloadDonutPanel" class="card-panel flex flex-col" style="height:310px;overflow:hidden;">
+      <div class="flex items-center justify-between mb-2" style="flex-shrink:0;">
         <h3 class="text-sm font-semibold" id="workloadDonutTitle" style="color:#032D60;">Distribución por SSSM</h3>
       </div>
       <div id="workloadDonutPlaceholder" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9EA1A3;font-size:0.8rem;gap:0.5rem;text-align:center;">
         <span style="font-size:1.8rem;">🍩</span>
         <span>Haz click en una barra<br>o nombre de SSSM</span>
       </div>
-      <div id="workloadDonutChart" style="display:none;flex-direction:column;align-items:center;gap:0.5rem;">
-        <div style="width:100%;max-width:260px;height:220px;position:relative;margin:0 auto;"><canvas id="chartSSSmDonut"></canvas></div>
-        <div id="workloadDonutStats" style="font-size:0.8rem;text-align:center;"></div>
+      <div id="workloadDonutChart" style="display:none;flex-direction:column;align-items:center;gap:0.3rem;flex:1;overflow:hidden;">
+        <div style="width:100%;height:190px;position:relative;"><canvas id="chartSSSmDonut"></canvas></div>
+        <div id="workloadDonutStats" style="font-size:0.75rem;text-align:center;line-height:1.4;"></div>
       </div>
     </div>
   </div>
@@ -27119,14 +27119,12 @@ function renderSSSmDonut(name) {
     }}
   );
   document.getElementById('workloadDonutStats').innerHTML =
-    '<div style="display:grid;gap:0.45rem;font-size:0.83rem;">' +
-    '<div style="color:#04844B;font-weight:800;font-size:1.4rem;line-height:1;">' + m.working + '</div>' +
-    '<div style="color:#706E6B;margin-bottom:0.2rem;">Working</div>' +
-    '<div style="color:#032D60;font-weight:600;">Pipeline: ' + fmt$(m.arr) + '</div>' +
-    '<div style="color:#706E6B;">Total: ' + m.total + ' DSRs</div>' +
-    (m.onhold  ? '<div style="color:#C56200;">On Hold: ' + m.onhold + '</div>' : '') +
-    (m.inqueue ? '<div style="color:#9EA1A3;">In Queue: ' + m.inqueue + '</div>' : '') +
-    (m.staleWorking ? '<div style="color:#C23934;">Opp vencida: ' + m.staleWorking + '</div>' : '') +
+    '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.25rem 0.75rem;font-size:0.75rem;">' +
+    '<span style="color:#04844B;font-weight:700;">Working: ' + m.working + '</span>' +
+    '<span style="color:#032D60;font-weight:600;">Pipeline: ' + fmt$(m.arr) + '</span>' +
+    '<span style="color:#706E6B;">Total: ' + m.total + '</span>' +
+    (m.onhold  ? '<span style="color:#C56200;">Hold: ' + m.onhold + '</span>' : '') +
+    (m.staleWorking ? '<span style="color:#C23934;">Vencida: ' + m.staleWorking + '</span>' : '') +
     '</div>';
 }
 
