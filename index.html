@@ -361,6 +361,29 @@
       <label class="block text-xs mb-1" style="color:#706E6B;">Account Partner</label>
       <div class="ms-container" id="ms_dAP"></div>
     </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Forecast</label>
+      <select id="d_fForecast" onchange="renderTab6()" style="font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
+        <option value="">Todos</option>
+        <option>Commit</option><option>Best Case</option><option>Pipeline</option><option>Omitted</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Close From</label>
+      <input type="date" id="d_fDateFrom" onchange="renderTab6()" style="font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Close To</label>
+      <input type="date" id="d_fDateTo" onchange="renderTab6()" style="font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Min Monto ($K)</label>
+      <input type="number" id="d_fAmtMin" onchange="renderTab6()" placeholder="0" style="width:80px;font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Max Monto ($M)</label>
+      <input type="number" id="d_fAmtMax" onchange="renderTab6()" placeholder="" style="width:80px;font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
+    </div>
     <div class="flex items-end">
       <button onclick="resetDetailFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]">↺ Reset</button>
     </div>
@@ -25207,6 +25230,8 @@ function resetSSSmFilters() {
     _msSel[id] = new Set();
     _msRender(id);
   });
+  ['sssm_fForecast'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['sssm_fDateFrom','sssm_fDateTo','sssm_fAmtMin','sssm_fAmtMax'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   renderSSSmLoadBars();
   renderSSSmGroupedView(filtered);
 }
@@ -25230,6 +25255,8 @@ function selectSSSM(name) {
 
 function resetDetailFilters() {
   ['ms_dSSSM','ms_dAP'].forEach(id => { _msSel[id] = new Set(); _msRender(id); });
+  ['d_fForecast'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['d_fDateFrom','d_fDateTo','d_fAmtMin','d_fAmtMax'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   renderTab6();
 }
 
@@ -25811,11 +25838,22 @@ function renderTab5() {
 }
 
 function renderTab6() {
-  const dSSSmSel = msGet('ms_dSSSM');
-  const dAPSel   = msGet('ms_dAP');
+  const dSSSmSel  = msGet('ms_dSSSM');
+  const dAPSel    = msGet('ms_dAP');
+  const dForecast = (document.getElementById('d_fForecast')||{}).value||'';
+  const dDateFrom = (document.getElementById('d_fDateFrom')||{}).value||'';
+  const dDateTo   = (document.getElementById('d_fDateTo')||{}).value||'';
+  const dAmtMin   = parseFloat((document.getElementById('d_fAmtMin')||{}).value||0) * 1000;
+  const dAmtMaxRaw= (document.getElementById('d_fAmtMax')||{}).value||'';
+  const dAmtMax   = dAmtMaxRaw !== '' ? parseFloat(dAmtMaxRaw) * 1e6 : Infinity;
   let data = [...filtered].map(d => ({...d, _heat: heatScore(d, QUALI_MAP[d.dsr]), _quali: QUALI_MAP[d.dsr]}));
-  if (dSSSmSel.length) data = data.filter(d => dSSSmSel.includes(d.sssm));
-  if (dAPSel.length)   data = data.filter(d => dAPSel.includes(d.ap));
+  if (dSSSmSel.length)   data = data.filter(d => dSSSmSel.includes(d.sssm));
+  if (dAPSel.length)     data = data.filter(d => dAPSel.includes(d.ap));
+  if (dForecast)         data = data.filter(d => d.forecast === dForecast);
+  if (dDateFrom)         data = data.filter(d => d.closeDate >= dDateFrom);
+  if (dDateTo)           data = data.filter(d => d.closeDate <= dDateTo);
+  if (dAmtMin > 0)       data = data.filter(d => (d.amount||0) >= dAmtMin);
+  if (dAmtMax < Infinity) data = data.filter(d => (d.amount||0) <= dAmtMax);
   data.sort((a,b) => {
     let av = a[sortField] ?? a['_'+sortField] ?? '';
     let bv = b[sortField] ?? b['_'+sortField] ?? '';
