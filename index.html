@@ -26840,8 +26840,8 @@ function exportRRCSV() {
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'})); a.download = `rr-latam-${GENERATED}.csv`; a.click();
 }
 function exportZombieSlack() {
-  const _zClosed = new Set(['Closed - Resolved','Closed - No Response','Closed - Duplicate','Closed - Not Qualified']);
-  const data = DSR_DATA.filter(d => (d.stage==='06 - Project Booked'||d.stage==='Dead - Lost') && !_zClosed.has(d.status));
+  const _zActive = new Set(['Working','On Hold','Waiting for Requestor','In Queue']);
+  const data = DSR_DATA.filter(d => (d.stage==='06 - Project Booked'||d.stage==='Dead - Lost') && _zActive.has(d.status));
   if (!data.length) return;
   const today = new Date().toISOString().slice(0,10);
   let txt = `*Disciplina Operativa LATAM PS · ${data.length} DSRs Zombie* (${today})\n\n`;
@@ -27495,8 +27495,8 @@ function renderTab2() {
   _sssmMapGlobal = sssmMap;
 
   // Zombie DSRs — opps closed/lost with still-active DSRs
-  const _zClosed = new Set(['Closed - Resolved','Closed - No Response','Closed - Duplicate','Closed - Not Qualified']);
-  const _zombieAll = DSR_DATA.filter(d => (d.stage === '06 - Project Booked' || d.stage === 'Dead - Lost') && !_zClosed.has(d.status));
+  const _zActive = new Set(['Working','On Hold','Waiting for Requestor','In Queue']);
+  const _zombieAll = DSR_DATA.filter(d => (d.stage === '06 - Project Booked' || d.stage === 'Dead - Lost') && _zActive.has(d.status));
   const zombieMap = {};
   _zombieAll.forEach(d => { zombieMap[d.sssm] = (zombieMap[d.sssm]||0) + 1; });
   const totalZombies = _zombieAll.length;
@@ -28610,8 +28610,8 @@ function zombieSortBy(col) {
   renderZombieTab();
 }
 function renderZombieTab() {
-  const _zClosed = new Set(['Closed - Resolved','Closed - No Response','Closed - Duplicate','Closed - Not Qualified']);
-  const allZ = DSR_DATA.filter(d => (d.stage === '06 - Project Booked' || d.stage === 'Dead - Lost') && !_zClosed.has(d.status));
+  const _zActive = new Set(['Working','On Hold','Waiting for Requestor','In Queue']);
+  const allZ = DSR_DATA.filter(d => (d.stage === '06 - Project Booked' || d.stage === 'Dead - Lost') && _zActive.has(d.status));
   let data = allZ.slice();
   if (!_msOpts['ms_zSSM']) msInit('ms_zSSM', [...new Set(allZ.map(d=>d.sssm).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderZombieTab);
   if (!_msOpts['ms_zStage']) msInit('ms_zStage', ['06 - Project Booked','Dead - Lost'].map(v=>({value:v,label:v})), renderZombieTab);
@@ -28666,8 +28666,8 @@ function resetZombieFilters() {
   renderZombieTab();
 }
 function exportZombieCSV() {
-  const _zClosed = new Set(['Closed - Resolved','Closed - No Response','Closed - Duplicate','Closed - Not Qualified']);
-  const data = DSR_DATA.filter(d => (d.stage === '06 - Project Booked' || d.stage === 'Dead - Lost') && !_zClosed.has(d.status));
+  const _zActive = new Set(['Working','On Hold','Waiting for Requestor','In Queue']);
+  const data = DSR_DATA.filter(d => (d.stage === '06 - Project Booked' || d.stage === 'Dead - Lost') && _zActive.has(d.status));
   const rows = [['SSSM','DSR','Oportunidad','Cuenta','Stage','Status','Pipeline','Close Date','AP']];
   data.forEach(d => rows.push([d.sssm,d.dsr,d.oppName,d.account,d.stage,d.status,d.amount,d.closeDate,d.ap]));
   const csv = rows.map(r => r.map(v => '"'+(v||'').toString().replace(/"/g,'""')+'"').join(',')).join('\n');
