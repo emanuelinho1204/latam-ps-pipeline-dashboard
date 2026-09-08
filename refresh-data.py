@@ -114,7 +114,6 @@ def fetch(instance_url, token):
         "WHERE RecordType.Name = 'CSG Professional Services Deal Support' "
         "AND Status__c NOT IN ('Closed - Resolved', 'Closed - No Response', 'Closed - Duplicate', 'Closed - Not Qualified') "
         "AND Request_Type__c IN ('EM Support', 'Admin Support', 'SOW Admin Support') "
-        "AND Opportunity__r.StageName NOT IN ('06 - Project Booked', 'Dead - Lost') "
         "AND (Region__c = 'LACA' OR Region__c = 'LATAM') "
         "AND Request_Type_Detail__c IN ('Deal Strategy', 'RFP', 'Scoping/SOW', 'SOW / SPW Generation') "
         "AND Opportunity__r.CloseDate >= 2026-02-01 "
