@@ -237,9 +237,12 @@
       <label class="block text-xs mb-1" style="color:#706E6B;">Tipo Contrato</label>
       <div class="ms-container" id="ms_sssmContract"></div>
     </div>
-    <div style="align-self:flex-end;flex-direction:row;" class="flex items-center gap-2">
-      <button onclick="resetSSSmFilters()" class="btn-sm" title="Reset filtros" style="padding:4px 9px;font-size:1rem;">↺</button>
-      <button onclick="exportSSSmSlack()" class="btn-sm" title="Descargar" style="padding:4px 9px;font-size:1rem;">⬇</button>
+    <div style="margin-left:auto;">
+      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
+        <button onclick="resetSSSmFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
+        <button onclick="exportSSSmSlack()" class="btn-sm" title="Descargar" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
+      </div>
     </div>
   </div>
   <p class="text-xs mb-3" style="color:#706E6B;" data-i18n="sssm_view_desc">Grouped view: SSSM → Status DSR → Stage Oportunidad</p>
@@ -270,10 +273,12 @@
     </div>
   </div>
   <div id="t2-zombieRow" class="mb-3" style="display:none">
-    <div class="kpi-card" style="background:linear-gradient(135deg,#7B0000,#C23934);border:none;display:inline-flex;flex-direction:column;min-width:220px;cursor:pointer;" onclick="showTab('tzombie',document.querySelector('[onclick*=tzombie]'))">
-      <div style="color:rgba(255,255,255,0.75);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">🧟 DSRs Zombies</div>
-      <div style="color:#FED7D7;font-size:1.75rem;font-weight:700;" id="t2-zombieKpi">0</div>
-      <div style="color:rgba(255,255,255,0.6);font-size:0.68rem;margin-top:2px;">Opp cerrada con DSR activo · ver Disciplina Op. →</div>
+    <div onclick="showTab('tzombie',document.querySelector('[onclick*=tzombie]'))" style="background:linear-gradient(90deg,#7B0000 0%,#C23934 60%,#9B1C1C 100%);border-radius:8px;padding:7px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;box-sizing:border-box;">
+      <span style="font-size:1rem;line-height:1;">🧟</span>
+      <span style="color:#FCA5A5;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;white-space:nowrap;">DSRs Zombies</span>
+      <span style="color:#FED7D7;font-size:1.1rem;font-weight:800;line-height:1;" id="t2-zombieKpi">0</span>
+      <span style="color:rgba(255,255,255,0.55);font-size:0.72rem;white-space:nowrap;">opp cerrada/perdida con DSR activo</span>
+      <span style="margin-left:auto;color:rgba(255,255,255,0.65);font-size:0.72rem;white-space:nowrap;">ver Disciplina Op. →</span>
     </div>
   </div>
   <div class="card-panel">
@@ -416,10 +421,13 @@
       <label class="block text-xs mb-1" style="color:#706E6B;">Tipo Contrato</label>
       <div class="ms-container" id="ms_dContract"></div>
     </div>
-    <div style="align-self:flex-end;flex-direction:row;" class="flex items-center gap-2">
-      <button onclick="resetDetailFilters()" class="btn-sm" title="Reset filtros" style="padding:4px 9px;font-size:1rem;">↺</button>
-      <button onclick="exportTab6CSV()" class="btn-sm" title="Descargar CSV" style="padding:4px 9px;font-size:1rem;">⬇</button>
-      <button onclick="exportDSRSlack()" class="btn-sm" title="Descargar" style="padding:4px 9px;font-size:1rem;">⬇</button>
+    <div>
+      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
+        <button onclick="resetDetailFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
+        <button onclick="exportTab6CSV()" class="btn-sm" title="Descargar CSV" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
+        <button onclick="exportDSRSlack()" class="btn-sm" title="Enviar a Slack" style="padding:2px 7px;font-size:0.82rem;">📤</button>
+      </div>
     </div>
   </div>
   <div class="flex items-center justify-between mb-2">
@@ -477,10 +485,13 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">Stage</div><div class="ms-container" id="ms_estStage"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_estEM"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="est-fSearch" type="text" placeholder="Buscar cuenta / opp / estimate..." oninput="renderEstimatesTab()"></div>
-    <div style="align-self:flex-end;flex-direction:row;" class="flex items-center gap-2">
-      <button onclick="resetEstimatesFilters()" class="btn-sm" title="Reset filtros" style="padding:4px 9px;font-size:1rem;">↺</button>
-      <button onclick="exportEstimatesSlack()" class="btn-sm" title="Descargar" style="padding:4px 9px;font-size:1rem;">⬇</button>
-      <span class="text-xs" style="color:#706E6B;" id="est-rowCount"></span>
+    <div>
+      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
+        <button onclick="resetEstimatesFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
+        <button onclick="exportEstimatesSlack()" class="btn-sm" title="Descargar" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
+        <span class="text-xs" style="color:#706E6B;" id="est-rowCount"></span>
+      </div>
     </div>
   </div>
   <div class="card-panel overflow-auto">
@@ -516,10 +527,13 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_wonSSM"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_wonAP"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="won-fSearch" type="text" placeholder="Cuenta / oportunidad..." oninput="renderWonTab()"></div>
-    <div style="align-self:flex-end;flex-direction:row;" class="flex items-center gap-2">
-      <button onclick="resetWonFilters()" class="btn-sm" title="Reset filtros" style="padding:4px 9px;font-size:1rem;">↺</button>
-      <button onclick="exportWonSlack()" class="btn-sm" title="Descargar" style="padding:4px 9px;font-size:1rem;">⬇</button>
-      <span class="text-xs" style="color:#706E6B;" id="won-count"></span>
+    <div>
+      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
+        <button onclick="resetWonFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
+        <button onclick="exportWonSlack()" class="btn-sm" title="Descargar" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
+        <span class="text-xs" style="color:#706E6B;" id="won-count"></span>
+      </div>
     </div>
   </div>
   <div class="card-panel overflow-auto">
@@ -553,10 +567,13 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">Región</div><div class="ms-container" id="ms_rrCountry"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_rrAP"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="rr-fSearch" type="text" placeholder="Buscar oportunidad..." oninput="renderRRTab()"></div>
-    <div style="align-self:flex-end;flex-direction:row;" class="flex items-center gap-2">
-      <button onclick="resetRRFilters()" class="btn-sm" title="Reset filtros" style="padding:4px 9px;font-size:1rem;">↺</button>
-      <button onclick="exportRRSlack()" class="btn-sm" title="Descargar" style="padding:4px 9px;font-size:1rem;">⬇</button>
-      <span class="text-xs" style="color:#706E6B;" id="rr-rowCount"></span>
+    <div>
+      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
+        <button onclick="resetRRFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
+        <button onclick="exportRRSlack()" class="btn-sm" title="Descargar" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
+        <span class="text-xs" style="color:#706E6B;" id="rr-rowCount"></span>
+      </div>
     </div>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
@@ -612,10 +629,13 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">Stage</div><div class="ms-container" id="ms_zStage"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Status DSR</div><div class="ms-container" id="ms_zStatus"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="z-fSearch" type="text" placeholder="Cuenta / opp / DSR..." oninput="renderZombieTab()"></div>
-    <div style="align-self:flex-end;flex-direction:row;" class="flex items-center gap-2">
-      <button onclick="resetZombieFilters()" class="btn-sm" title="Reset filtros" style="padding:4px 9px;font-size:1rem;">↺</button>
-      <button onclick="exportZombieCSV()" class="btn-sm" title="Descargar CSV" style="padding:4px 9px;font-size:1rem;">⬇</button>
-      <span class="text-xs" style="color:#706E6B;" id="z-rowCount"></span>
+    <div>
+      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
+        <button onclick="resetZombieFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
+        <button onclick="exportZombieCSV()" class="btn-sm" title="Descargar CSV" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
+        <span class="text-xs" style="color:#706E6B;" id="z-rowCount"></span>
+      </div>
     </div>
   </div>
   <div class="card-panel overflow-auto">
