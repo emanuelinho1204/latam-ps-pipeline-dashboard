@@ -26513,7 +26513,7 @@ const i18n = {
     lbl_sssm: 'SSSM', lbl_stage: 'Stage', lbl_forecast: 'Forecast', lbl_status: 'Status',
     lbl_date_from: 'Close From', lbl_date_to: 'Close To', lbl_amt_min: 'Min Amount ($K)', lbl_amt_max: 'Max Amount ($M)',
     lbl_qual: 'Qualification', lbl_delivery: 'Delivery Model', lbl_country: 'Country', lbl_territory: 'Territory', lbl_ap: 'Account Partner',
-    opt_all: 'All', opt_all_sssms: 'All SSSMs', opt_all_territories: 'All Territories', opt_all_aps: 'All APs',
+    opt_all: 'All', opt_clear: 'Clear', opt_all_sssms: 'All SSSMs', opt_all_territories: 'All Territories', opt_all_aps: 'All APs',
     opt_qualified: 'Qualified', opt_not_qualified: 'Not Qualified', opt_pending: 'Pending',
     btn_reset: '↺ Reset', btn_expand_all: '⊞ Expand all', btn_collapse_all: '⊟ Collapse all',
     tab_summary: '📋 Summary', tab_sssm_view: '👤 SSSM View', tab_sssm_coverage: '👥 Workload',
@@ -26549,7 +26549,7 @@ const i18n = {
     lbl_sssm: 'SSSM', lbl_stage: 'Etapa', lbl_forecast: 'Forecast', lbl_status: 'Estado',
     lbl_date_from: 'Cierre Desde', lbl_date_to: 'Cierre Hasta', lbl_amt_min: 'Monto Mín ($K)', lbl_amt_max: 'Monto Máx ($M)',
     lbl_qual: 'Calificación', lbl_delivery: 'Delivery Model', lbl_country: 'País', lbl_territory: 'Territorio', lbl_ap: 'Account Partner',
-    opt_all: 'Todos', opt_all_sssms: 'Todos los SSSM', opt_all_territories: 'Todos los Territorios', opt_all_aps: 'Todos los APs',
+    opt_all: 'Todos', opt_clear: 'Limpiar', opt_all_sssms: 'Todos los SSSM', opt_all_territories: 'Todos los Territorios', opt_all_aps: 'Todos los APs',
     opt_qualified: 'Calificado', opt_not_qualified: 'No Calificado', opt_pending: 'Pendiente',
     btn_reset: '↺ Reset', btn_expand_all: '⊞ Expandir todo', btn_collapse_all: '⊟ Colapsar todo',
     tab_summary: '📋 Resumen', tab_sssm_view: '👤 Vista SSSM', tab_sssm_coverage: '👥 Carga',
@@ -26585,7 +26585,7 @@ const i18n = {
     lbl_sssm: 'SSSM', lbl_stage: 'Etapa', lbl_forecast: 'Forecast', lbl_status: 'Status',
     lbl_date_from: 'Fechamento De', lbl_date_to: 'Fechamento Até', lbl_amt_min: 'Valor Mín ($K)', lbl_amt_max: 'Valor Máx ($M)',
     lbl_qual: 'Qualificação', lbl_delivery: 'Delivery Model', lbl_country: 'País', lbl_territory: 'Território', lbl_ap: 'Account Partner',
-    opt_all: 'Todos', opt_all_sssms: 'Todos os SSSMs', opt_all_territories: 'Todos os Territórios', opt_all_aps: 'Todos os APs',
+    opt_all: 'Todos', opt_clear: 'Limpar', opt_all_sssms: 'Todos os SSSMs', opt_all_territories: 'Todos os Territórios', opt_all_aps: 'Todos os APs',
     opt_qualified: 'Qualificado', opt_not_qualified: 'Não Qualificado', opt_pending: 'Pendente',
     btn_reset: '↺ Reset', btn_expand_all: '⊞ Expandir tudo', btn_collapse_all: '⊟ Recolher tudo',
     tab_summary: '📋 Resumo', tab_sssm_view: '👤 Visão SSSM', tab_sssm_coverage: '👥 Carga',
@@ -26628,6 +26628,8 @@ function setLang(lang) {
     if (btn) btn.classList.toggle('active', l.toLowerCase() === lang);
   });
   applyTranslations();
+  // Re-render all initialised multiselects so "All"/"Todos" button label updates
+  Object.keys(_msOpts).forEach(id => _msRender(id));
   // Re-render active tab so JS-generated labels (_t() calls) also update
   if (activeTabId) {
     const tabRenders = {
@@ -26927,15 +26929,15 @@ function _msRender(id) {
   const sel = _msSel[id] || new Set();
   const opts = _msOpts[id] || [];
   const count = sel.size;
-  const label = count ? `${count} sel.` : 'Todos';
+  const label = count ? `${count} sel.` : _t('opt_all');
   cont.innerHTML = `
     <button class="ms-btn${count?' has-sel':''}" onclick="msToggle('${id}');event.stopPropagation();" type="button">
       <span>${label}</span><span style="font-size:0.65rem;">▾</span>
     </button>
     <div id="${id}_drop" class="ms-drop">
       <div class="ms-actions">
-        <a onclick="msAll('${id}')">Todos</a>
-        <a onclick="msClear('${id}')">Limpiar</a>
+        <a onclick="msAll('${id}')">${_t('opt_all')}</a>
+        <a onclick="msClear('${id}')">${_t('opt_clear')}</a>
       </div>
       ${opts.map(o => `<label class="ms-item"><input type="checkbox" value="${String(o.value).replace(/"/g,'&quot;')}"${sel.has(o.value)?' checked':''} onchange="msChange('${id}',this.value,this.checked)"><span>${o.label}</span></label>`).join('')}
     </div>`;
