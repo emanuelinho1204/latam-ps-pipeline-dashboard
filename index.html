@@ -226,6 +226,10 @@
       <label class="block text-xs mb-1" style="color:#706E6B;">Max Monto ($M)</label>
       <input type="number" id="sssm_fAmtMax" onchange="applySSSmFilters()" placeholder="" style="width:80px;font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
     </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Tipo Contrato</label>
+      <div class="ms-container" id="ms_sssmContract"></div>
+    </div>
     <div class="flex items-end">
       <button onclick="resetSSSmFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]">↺ Reset</button>
     </div>
@@ -383,6 +387,10 @@
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Max Monto ($M)</label>
       <input type="number" id="d_fAmtMax" onchange="renderTab6()" placeholder="" style="width:80px;font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Tipo Contrato</label>
+      <div class="ms-container" id="ms_dContract"></div>
     </div>
     <div class="flex items-end">
       <button onclick="resetDetailFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]">↺ Reset</button>
@@ -26413,9 +26421,15 @@ function showShareMenu(btn, key) {
   menu.innerHTML = allItems.map(it => it.length===1 ? it[0] : `<div class="share-item" onclick="copyShare(${JSON.stringify(it[2]).replace(/"/g,'&quot;')});event.stopPropagation();"><span>${it[0]}</span><span>${it[1]}</span></div>`).join('');
   document.body.appendChild(menu);
   const rect = btn.getBoundingClientRect();
-  menu.style.top = (rect.bottom + window.scrollY + 4) + 'px';
-  menu.style.left = Math.min(rect.right - menu.offsetWidth, window.innerWidth - 210) + 'px';
-  if (parseInt(menu.style.left) < 4) menu.style.left = '4px';
+  const mw = menu.offsetWidth || 210;
+  const mh = menu.offsetHeight || 160;
+  let top = rect.bottom + 4;
+  let left = rect.right - mw;
+  if (top + mh > window.innerHeight - 8) top = rect.top - mh - 4;
+  if (left < 4) left = 4;
+  if (left + mw > window.innerWidth - 4) left = window.innerWidth - mw - 4;
+  menu.style.top = top + 'px';
+  menu.style.left = left + 'px';
 }
 
 function copyShare(text) {
@@ -26566,6 +26580,8 @@ function applySSSmFilters() {
   if (dateTo)           data = data.filter(d => d.closeDate <= dateTo);
   if (amtMin > 0)       data = data.filter(d => (d.amount||0) >= amtMin);
   if (amtMax < Infinity) data = data.filter(d => (d.amount||0) <= amtMax);
+  const contractSel = msGet('ms_sssmContract');
+  if (contractSel.length) data = data.filter(d => contractSel.includes(d.contractType));
   renderSSSmLoadBars();
   setTimeout(function() { renderSSSmGroupedView(data); }, 0);
 }
@@ -26625,7 +26641,7 @@ function renderSSSmLoadBars() {
 }
 
 function resetSSSmFilters() {
-  ['ms_sssm','ms_terr','ms_status','ms_stage','ms_mgr'].forEach(id => {
+  ['ms_sssm','ms_terr','ms_status','ms_stage','ms_mgr','ms_sssmContract'].forEach(id => {
     _msSel[id] = new Set();
     _msRender(id);
   });
@@ -26653,7 +26669,7 @@ function selectSSSM(name) {
 }
 
 function resetDetailFilters() {
-  ['ms_dSSSM','ms_dAP'].forEach(id => { _msSel[id] = new Set(); _msRender(id); });
+  ['ms_dSSSM','ms_dAP','ms_dContract'].forEach(id => { _msSel[id] = new Set(); _msRender(id); });
   ['d_fForecast'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   ['d_fDateFrom','d_fDateTo','d_fAmtMin','d_fAmtMax'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   renderTab6();
@@ -26770,9 +26786,13 @@ function initFilters() {
   // SSSM View multi-selects
   initSSSmMultiSelects();
   msInit('ms_sssm', sssms.map(s => ({value:s, label:s})));
+  // Contract Type filter (shared values)
+  const contracts = [...new Set(DSR_DATA.map(d => d.contractType).filter(Boolean))].sort();
+  msInit('ms_sssmContract', contracts.map(v => ({value:v, label:v})), applySSSmFilters);
   // DSR Detail multi-selects
   const aps = [...new Set(DSR_DATA.map(d => d.ap).filter(Boolean))].sort();
   msInit('ms_dSSSM', sssms.map(s => ({value:s, label:s})), renderTab6);
+  msInit('ms_dContract', contracts.map(v => ({value:v, label:v})), renderTab6);
   msInit('ms_dAP',   aps.map(a => ({value:a, label:a})),   renderTab6);
   applyTranslations();
   applyFilters();
@@ -27260,6 +27280,8 @@ function renderTab6() {
   if (dDateTo)           data = data.filter(d => d.closeDate <= dDateTo);
   if (dAmtMin > 0)       data = data.filter(d => (d.amount||0) >= dAmtMin);
   if (dAmtMax < Infinity) data = data.filter(d => (d.amount||0) <= dAmtMax);
+  const dContractSel = msGet('ms_dContract');
+  if (dContractSel.length) data = data.filter(d => dContractSel.includes(d.contractType));
   data.sort((a,b) => {
     let av = a[sortField] ?? a['_'+sortField] ?? '';
     let bv = b[sortField] ?? b['_'+sortField] ?? '';
