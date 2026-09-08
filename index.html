@@ -27462,11 +27462,13 @@ function renderAllStatusDonut() {
   );
   document.getElementById('workloadDonutStats').innerHTML =
     '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.25rem 0.75rem;font-size:0.75rem;">' +
-    '<span style="color:#34D399;font-weight:700;">Working: ' + totals.working + '</span>' +
-    '<span style="color:rgba(255,255,255,0.85);font-weight:600;">Pipeline: ' + fmt$(totals.arr) + '</span>' +
     '<span style="color:rgba(255,255,255,0.6);">Total: ' + totals.total + '</span>' +
-    (totals.onhold  ? '<span style="color:#FBBF24;">Hold: ' + totals.onhold + '</span>' : '') +
+    (totals.working  ? '<span style="color:#34D399;font-weight:700;">Working: ' + totals.working + '</span>' : '') +
+    (totals.onhold   ? '<span style="color:#FBBF24;">Hold: ' + totals.onhold + '</span>' : '') +
+    (totals.inqueue  ? '<span style="color:#93C5FD;">In Queue: ' + totals.inqueue + '</span>' : '') +
+    (totals.waiting  ? '<span style="color:#C4B5FD;">Waiting: ' + totals.waiting + '</span>' : '') +
     (totals.staleWorking ? '<span style="color:#F87171;">Vencida: ' + totals.staleWorking + '</span>' : '') +
+    '<span style="color:rgba(255,255,255,0.85);font-weight:600;">Pipeline: ' + fmt$(totals.arr) + '</span>' +
     '</div>';
 }
 
@@ -27491,11 +27493,13 @@ function renderSSSmDonut(name) {
   );
   document.getElementById('workloadDonutStats').innerHTML =
     '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.25rem 0.75rem;font-size:0.75rem;">' +
-    '<span style="color:#34D399;font-weight:700;">Working: ' + m.working + '</span>' +
-    '<span style="color:rgba(255,255,255,0.85);font-weight:600;">Pipeline: ' + fmt$(m.arr) + '</span>' +
     '<span style="color:rgba(255,255,255,0.6);">Total: ' + m.total + '</span>' +
-    (m.onhold  ? '<span style="color:#FBBF24;">Hold: ' + m.onhold + '</span>' : '') +
+    (m.working   ? '<span style="color:#34D399;font-weight:700;">Working: ' + m.working + '</span>' : '') +
+    (m.onhold    ? '<span style="color:#FBBF24;">Hold: ' + m.onhold + '</span>' : '') +
+    (m.inqueue   ? '<span style="color:#93C5FD;">In Queue: ' + m.inqueue + '</span>' : '') +
+    (m.waiting   ? '<span style="color:#C4B5FD;">Waiting: ' + m.waiting + '</span>' : '') +
     (m.staleWorking ? '<span style="color:#F87171;">Vencida: ' + m.staleWorking + '</span>' : '') +
+    '<span style="color:rgba(255,255,255,0.85);font-weight:600;">Pipeline: ' + fmt$(m.arr) + '</span>' +
     '</div>';
 }
 
