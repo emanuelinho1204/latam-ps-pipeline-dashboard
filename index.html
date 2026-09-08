@@ -27195,23 +27195,23 @@ function renderSSSmDonut(name) {
   const workingClean = m.working - m.staleWorking;
   const allLabels  = ['Working','Working - Opp vencida','On Hold','In Queue','Waiting'];
   const allData    = [workingClean, m.staleWorking, m.onhold, m.inqueue, m.waiting];
-  const allColors  = ['#04844B','#C23934','#C56200','#9EA1A3','#E4D5F9'];
+  const allColors  = ['#34D399','#F87171','#FBBF24','#93C5FD','#C4B5FD'];
   const slices = allLabels.map((l,i)=>({l,d:allData[i],c:allColors[i]})).filter(x=>x.d>0);
   makeChart('chartSSSmDonut','doughnut',
     slices.map(x=>x.l),
-    [{data:slices.map(x=>x.d), backgroundColor:slices.map(x=>x.c), borderWidth:2, borderColor:'#fff', hoverOffset:6}],
+    [{data:slices.map(x=>x.d), backgroundColor:slices.map(x=>x.c), borderWidth:2, borderColor:'rgba(255,255,255,0.15)', hoverOffset:6}],
     {cutout:'68%', plugins:{
-      legend:{position:'right', labels:{font:{size:11},padding:12,color:'rgba(255,255,255,0.85)'}},
+      legend:{position:'right', labels:{font:{size:11},padding:12,color:'rgba(255,255,255,0.92)'}},
       tooltip:{callbacks:{label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' (' + ((ctx.parsed/m.total)*100).toFixed(0) + '%)'}}
     }}
   );
   document.getElementById('workloadDonutStats').innerHTML =
     '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.25rem 0.75rem;font-size:0.75rem;">' +
-    '<span style="color:#04844B;font-weight:700;">Working: ' + m.working + '</span>' +
-    '<span style="color:#032D60;font-weight:600;">Pipeline: ' + fmt$(m.arr) + '</span>' +
-    '<span style="color:#706E6B;">Total: ' + m.total + '</span>' +
-    (m.onhold  ? '<span style="color:#C56200;">Hold: ' + m.onhold + '</span>' : '') +
-    (m.staleWorking ? '<span style="color:#C23934;">Vencida: ' + m.staleWorking + '</span>' : '') +
+    '<span style="color:#34D399;font-weight:700;">Working: ' + m.working + '</span>' +
+    '<span style="color:rgba(255,255,255,0.85);font-weight:600;">Pipeline: ' + fmt$(m.arr) + '</span>' +
+    '<span style="color:rgba(255,255,255,0.6);">Total: ' + m.total + '</span>' +
+    (m.onhold  ? '<span style="color:#FBBF24;">Hold: ' + m.onhold + '</span>' : '') +
+    (m.staleWorking ? '<span style="color:#F87171;">Vencida: ' + m.staleWorking + '</span>' : '') +
     '</div>';
 }
 
@@ -27287,19 +27287,19 @@ function renderTab2() {
   const arrs = chartEntries.map(([,m]) => +(m.arr/1e6).toFixed(2));
   const sssmChartClick = (e, els) => { if (els.length > 0) renderSSSmDonut(sssmChartEntries[els[0].index][0]); };
   const sssmChartHover = (e, els) => { e.native.target.style.cursor = els.length > 0 ? 'pointer' : 'default'; };
-  const wTick = {color:'rgba(255,255,255,0.7)',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45};
-  const wGrid = {color:'rgba(255,255,255,0.08)'};
-  const wLegend = {labels:{color:'rgba(255,255,255,0.85)',font:{size:11}}};
-  const stackedScales = { x:{stacked:true,ticks:wTick,grid:wGrid}, y:{stacked:true,ticks:{color:'rgba(255,255,255,0.7)',font:{size:10}},grid:wGrid} };
+  const wTick = {color:'rgba(255,255,255,0.92)',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45};
+  const wGrid = {color:'rgba(255,255,255,0.12)'};
+  const wLegend = {labels:{color:'rgba(255,255,255,0.92)',font:{size:11}}};
+  const stackedScales = { x:{stacked:true,ticks:wTick,grid:wGrid}, y:{stacked:true,ticks:{color:'rgba(255,255,255,0.92)',font:{size:10}},grid:wGrid} };
   makeChart('chartSSSM','bar',labels,[
-    {label:'Working', data:chartEntries.map(([,m])=>m.working-m.staleWorking), backgroundColor:'#04844B', borderRadius:0},
-    {label:'Working - Opp vencida', data:chartEntries.map(([,m])=>m.staleWorking), backgroundColor:'#C23934', borderRadius:0},
-    {label:'On Hold', data:chartEntries.map(([,m])=>m.onhold),  backgroundColor:'#C56200', borderRadius:0},
-    {label:'In Queue',data:chartEntries.map(([,m])=>m.inqueue), backgroundColor:'#5A8FBF', borderRadius:0},
-    {label:'Waiting', data:chartEntries.map(([,m])=>m.waiting), backgroundColor:'#B4C8E6', borderRadius:0},
+    {label:'Working', data:chartEntries.map(([,m])=>m.working-m.staleWorking), backgroundColor:'#34D399', borderRadius:0},
+    {label:'Working - Opp vencida', data:chartEntries.map(([,m])=>m.staleWorking), backgroundColor:'#F87171', borderRadius:0},
+    {label:'On Hold', data:chartEntries.map(([,m])=>m.onhold),  backgroundColor:'#FBBF24', borderRadius:0},
+    {label:'In Queue',data:chartEntries.map(([,m])=>m.inqueue), backgroundColor:'#93C5FD', borderRadius:0},
+    {label:'Waiting', data:chartEntries.map(([,m])=>m.waiting), backgroundColor:'#C4B5FD', borderRadius:0},
   ],{onClick:sssmChartClick,onHover:sssmChartHover,scales:stackedScales,plugins:{legend:wLegend}});
-  const wScalesSingle = {x:{ticks:wTick,grid:wGrid},y:{ticks:{color:'rgba(255,255,255,0.7)',font:{size:10}},grid:wGrid}};
-  makeChart('chartSSSMArr','bar',labels,[{label:'Pipeline ($M)',data:arrs,backgroundColor:'#4DA6FF',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover,scales:wScalesSingle,plugins:{legend:wLegend}});
+  const wScalesSingle = {x:{ticks:wTick,grid:wGrid},y:{ticks:{color:'rgba(255,255,255,0.92)',font:{size:10}},grid:wGrid}};
+  makeChart('chartSSSMArr','bar',labels,[{label:'Pipeline ($M)',data:arrs,backgroundColor:'#38BDF8',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover,scales:wScalesSingle,plugins:{legend:wLegend}});
 }
 
 function renderTab3() {
