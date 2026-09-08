@@ -25026,13 +25026,18 @@ function showShareMenu(btn, key) {
   const sfBase = 'https://org62.lightning.force.com/lightning/r';
   const dsrLink = d.dsrId ? `${sfBase}/Deal_Support_Request__c/${d.dsrId}/view` : null;
   const oppLink = d.oppId ? `${sfBase}/Opportunity/${d.oppId}/view` : null;
-  const estLink = d.estId ? `${sfBase}/ffscpq__Estimate__c/${d.estId}/view` : null;
+  // Estimate: use stored estId or look up dynamically from ESTIMATE_MAP
+  const _estRec = d.estId ? null : (d.oppId && typeof ESTIMATE_MAP !== 'undefined' ? (ESTIMATE_MAP[d.oppId]||null) : null);
+  const _estId  = d.estId || (_estRec ? _estRec.id : null);
+  const _estName = d.estId ? (d.name||null) : (_estRec ? _estRec.name : null);
+  const estLink = _estId ? `${sfBase}/ffscpq__Estimate__c/${_estId}/view` : null;
   const mainName = d.oppName || d.name || d.dsr || '';
   const mainLink = oppLink || dsrLink || estLink || '';
   const stageLbl = (d.stage||'').replace(/^\d+ - /,'');
-  const parts = [d.dsr||(d.name&&!d.oppName?d.name:null), d.account, d.oppName, d.country, d.amount!=null?fmt$(d.amount):null, d.stage, d.status, d.ap?`AP: ${d.ap}`:null, d.sssm?`SSSM: ${d.sssm}`:null].filter(Boolean);
+  const parts = [d.dsr||(d.name&&!d.oppName?d.name:null), d.account, d.oppName, d.country, d.amount!=null?fmt$(d.amount):null, d.stage, d.status, _estName?`Est: ${_estName}`:null, d.ap?`AP: ${d.ap}`:null, d.sssm?`SSSM: ${d.sssm}`:null].filter(Boolean);
   const textFull = parts.join(' | ');
-  const slackMsg = `*${mainLink?`<${mainLink}|${mainName}>`:mainName}*${stageLbl?' — '+stageLbl:''}\n${dsrLink&&d.dsr?`DSR: <${dsrLink}|${d.dsr}> | `:''}Status: ${d.status||'—'}\n${[d.account,d.country,d.amount!=null?fmt$(d.amount):null].filter(Boolean).join(' | ')}\nSSSM: ${d.sssm||'—'} | AP: ${d.ap||'—'}`;
+  const slackEstLine = estLink && _estName ? `\n📋 <${estLink}|${_estName}>` : '';
+  const slackMsg = `*${mainLink?`<${mainLink}|${mainName}>`:mainName}*${stageLbl?' — '+stageLbl:''}\n${dsrLink&&d.dsr?`DSR: <${dsrLink}|${d.dsr}> | `:''}Status: ${d.status||'—'}\n${[d.account,d.country,d.amount!=null?fmt$(d.amount):null].filter(Boolean).join(' | ')}\nSSSM: ${d.sssm||'—'} | AP: ${d.ap||'—'}${slackEstLine}`;
   const linkItems = [];
   if (dsrLink) linkItems.push(['🔗', 'Link DSR', dsrLink]);
   if (oppLink) linkItems.push(['🔗', 'Link Oportunidad', oppLink]);
@@ -26121,7 +26126,7 @@ function renderSSSmGroupedView(data) {
     if (!activeSSSM) {
       const sssmRows = Object.values(statuses).reduce((a, stg) => a.concat(Object.values(stg).flat()), []);
       const sssmArr = sssmRows.reduce((s, d) => s + d.amount, 0);
-      tbodyHtml += `<tr style="background:#fff;"><td colspan="13" style="padding:0.5rem 0.75rem 0.15rem;border-top:2px solid #DDDBDA;">
+      tbodyHtml += `<tr style="background:#fff;"><td colspan="14" style="padding:0.5rem 0.75rem 0.15rem;border-top:2px solid #DDDBDA;">
         <span style="font-weight:700;font-size:0.77rem;color:#032D60;">${sssm}</span>
         <span style="font-size:0.69rem;color:#AEACAB;margin-left:8px;">${sssmRows.length} DSRs · ${fmt$(sssmArr)}</span>
       </td></tr>`;
@@ -26134,7 +26139,7 @@ function renderSSSmGroupedView(data) {
       const statusRows = Object.values(stages).flat();
       const statusArr = statusRows.reduce((a, d) => a + d.amount, 0);
       const sc = STATUS_COLORS[status] || {bg:'#F3F2F2', border:'#706E6B', text:'#706E6B'};
-      tbodyHtml += `<tr><td colspan="13" style="padding:0;">
+      tbodyHtml += `<tr><td colspan="14" style="padding:0;">
         <div style="background:${sc.bg};border-left:3px solid ${sc.border};color:${sc.text};font-weight:700;padding:0.375rem 1rem;font-size:0.82rem;display:flex;align-items:center;gap:8px;">
           <span>${status}</span>
           <span style="color:#706E6B;font-size:0.72rem;font-weight:400;">${statusRows.length} DSRs · ${fmt$(statusArr)}</span>
@@ -26144,7 +26149,7 @@ function renderSSSmGroupedView(data) {
       STAGE_ORDER.filter(st => stages[st]).forEach(st => {
         const stageRows = stages[st];
         const stageArr = stageRows.reduce((a, d) => a + d.amount, 0);
-        tbodyHtml += `<tr><td colspan="13" style="padding:0;">
+        tbodyHtml += `<tr><td colspan="14" style="padding:0;">
           <div style="background:#F8F8F8;border-left:3px solid #DDDBDA;color:#3E3E3C;font-weight:500;padding:0.25rem 1rem 0.25rem 1.5rem;font-size:0.74rem;display:flex;align-items:center;gap:8px;">
             <span>${st}</span>
             <span style="color:#AEACAB;font-size:0.7rem;font-weight:400;">${stageRows.length} · ${fmt$(stageArr)}</span>
@@ -26159,7 +26164,9 @@ function renderSSSmGroupedView(data) {
           const oppShort = d.oppName && d.oppName.length > 50 ? d.oppName.substring(0,50)+'…' : (d.oppName||'--');
           const estV = d.oppId ? ESTIMATE_MAP[d.oppId] : null;
           const estCellV = estV ? `<a href="https://org62.lightning.force.com/lightning/r/ffscpq__Estimate__c/${estV.id}/view" target="_blank" title="${estV.name}" class="opp-link" style="font-size:0.72rem;">📋</a>` : '<span style="color:#706E6B;font-size:0.72rem;">--</span>';
+          _shareData[d.dsrId] = d;
           tbodyHtml += `<tr class="inner-row">
+            <td style="width:28px;padding:0 2px;text-align:center;"><button class="share-btn" onclick="showShareMenu(this,'${d.dsrId}');event.stopPropagation();" title="Compartir">⋮</button></td>
             <td>${heatBadge(hs)}</td>
             <td><a href="${dsrLink}" target="_blank" class="opp-link font-mono" style="font-size:0.72rem;">${d.dsr}</a></td>
             <td class="text-center">${estCellV}</td>
@@ -26179,17 +26186,17 @@ function renderSSSmGroupedView(data) {
     });
   });
 
-  if (!tbodyHtml) tbodyHtml = `<tr><td colspan="13" style="text-align:center;padding:2rem;color:#706E6B;">Sin DSRs para los filtros actuales</td></tr>`;
+  if (!tbodyHtml) tbodyHtml = `<tr><td colspan="14" style="text-align:center;padding:2rem;color:#706E6B;">Sin DSRs para los filtros actuales</td></tr>`;
 
   const tableHtml = `<table class="inner-table w-full" style="font-size:0.78rem;table-layout:fixed;">
     <colgroup>
-      <col style="width:38px"><col style="width:88px"><col style="width:32px">
+      <col style="width:28px"><col style="width:38px"><col style="width:88px"><col style="width:32px">
       <col style="width:22%"><col style="width:14%"><col style="width:34px">
       <col style="width:68px"><col style="width:80px"><col style="width:50px">
       <col style="width:78px"><col style="width:13%"><col style="width:90px"><col style="width:38px">
     </colgroup>
     <thead style="position:sticky;top:0;z-index:2;"><tr>
-      <th>Heat</th><th>DSR</th><th>Est.</th><th>Oportunidad</th><th>Cuenta</th>
+      <th></th><th>Heat</th><th>DSR</th><th>Est.</th><th>Oportunidad</th><th>Cuenta</th>
       <th>País</th><th class="text-right">Monto</th><th>Forecast</th><th>Mgr</th>
       <th>Cierre</th><th>Account Partner</th><th>Delivery</th><th class="text-right">Score</th>
     </tr></thead>
