@@ -27439,6 +27439,37 @@ function cloudTier(amount) {
   return amount >= 1e6 ? 2 : amount >= 500000 ? 1 : 0;
 }
 
+function renderAllStatusDonut() {
+  const all = Object.values(_sssmMapGlobal);
+  if (!all.length) return;
+  const totals = {total:0,arr:0,working:0,staleWorking:0,onhold:0,inqueue:0,waiting:0};
+  all.forEach(m => { totals.total+=m.total; totals.arr+=m.arr; totals.working+=m.working; totals.staleWorking+=m.staleWorking; totals.onhold+=m.onhold; totals.inqueue+=m.inqueue; totals.waiting+=m.waiting; });
+  document.getElementById('workloadDonutPlaceholder').style.display = 'none';
+  const chartDiv = document.getElementById('workloadDonutChart'); chartDiv.style.display = 'flex';
+  document.getElementById('workloadDonutTitle').textContent = 'All SSSMs — ' + totals.total + ' DSRs';
+  const workingClean = totals.working - totals.staleWorking;
+  const allLabels  = ['Working','Working - Opp vencida','On Hold','In Queue','Waiting'];
+  const allData    = [workingClean, totals.staleWorking, totals.onhold, totals.inqueue, totals.waiting];
+  const allColors  = ['#34D399','#F87171','#FBBF24','#93C5FD','#C4B5FD'];
+  const slices = allLabels.map((l,i)=>({l,d:allData[i],c:allColors[i]})).filter(x=>x.d>0);
+  makeChart('chartSSSmDonut','doughnut',
+    slices.map(x=>x.l),
+    [{data:slices.map(x=>x.d), backgroundColor:slices.map(x=>x.c), borderWidth:2, borderColor:'rgba(255,255,255,0.15)', hoverOffset:6}],
+    {cutout:'68%', plugins:{
+      legend:{position:'right', labels:{font:{size:11},padding:12,color:'rgba(255,255,255,0.92)'}},
+      tooltip:{callbacks:{label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' (' + ((ctx.parsed/totals.total)*100).toFixed(0) + '%)'}}
+    }}
+  );
+  document.getElementById('workloadDonutStats').innerHTML =
+    '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.25rem 0.75rem;font-size:0.75rem;">' +
+    '<span style="color:#34D399;font-weight:700;">Working: ' + totals.working + '</span>' +
+    '<span style="color:rgba(255,255,255,0.85);font-weight:600;">Pipeline: ' + fmt$(totals.arr) + '</span>' +
+    '<span style="color:rgba(255,255,255,0.6);">Total: ' + totals.total + '</span>' +
+    (totals.onhold  ? '<span style="color:#FBBF24;">Hold: ' + totals.onhold + '</span>' : '') +
+    (totals.staleWorking ? '<span style="color:#F87171;">Vencida: ' + totals.staleWorking + '</span>' : '') +
+    '</div>';
+}
+
 function renderSSSmDonut(name) {
   const m = _sssmMapGlobal[name];
   if (!m) return;
@@ -27567,6 +27598,7 @@ function renderTab2() {
   ],{onClick:sssmChartClick,onHover:sssmChartHover,scales:stackedScales,plugins:{legend:wLegend}});
   const wScalesSingle = {x:{ticks:wTick,grid:wGrid},y:{ticks:{color:'rgba(255,255,255,0.92)',font:{size:10}},grid:wGrid}};
   makeChart('chartSSSMArr','bar',labels,[{label:'Pipeline ($M)',data:arrs,backgroundColor:'#38BDF8',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover,scales:wScalesSingle,plugins:{legend:wLegend}});
+  renderAllStatusDonut();
 }
 
 function renderTab3() {
