@@ -27103,8 +27103,7 @@ function renderSSSmDonut(name) {
   const m = _sssmMapGlobal[name];
   if (!m) return;
   document.getElementById('workloadDonutPlaceholder').style.display = 'none';
-  const chartDiv = document.getElementById('workloadDonutChart');
-  chartDiv.style.display = 'flex';
+  const chartDiv = document.getElementById('workloadDonutChart'); chartDiv.style.display = 'flex';
   document.getElementById('workloadDonutTitle').textContent = name + ' — ' + m.total + ' DSRs';
   const workingClean = m.working - m.staleWorking;
   const allLabels  = ['Working','Working - Opp vencida','On Hold','In Queue','Waiting'];
