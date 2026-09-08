@@ -8,9 +8,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   body { background-color: #EDF2F8; color: #032D60; font-family: 'Salesforce Sans', 'Inter', system-ui, sans-serif; }
-  .tab-btn { transition: all 0.2s; border-bottom: 3px solid transparent; color: #706E6B; }
-  .tab-btn.active { border-bottom-color: #0176D3; color: #0176D3; font-weight: 600; }
-  .tab-btn:hover { color: #0176D3; }
+  .tab-btn { transition: all 0.15s; border-bottom: 4px solid transparent; color: #5A7A99; border-radius: 8px 8px 0 0; }
+  .tab-btn.active { border-bottom-color: #032D60; color: #032D60; font-weight: 700; background: rgba(255,255,255,0.85); }
+  .tab-btn:hover:not(.active) { color: #0176D3; background: rgba(255,255,255,0.5); }
   .kpi-card { background: #FFFFFF; border: 1px solid #C9E4F7; border-radius: 16px; padding: 1.25rem; box-shadow: 0 6px 20px rgba(3,45,96,.09); }
   .table-row:hover { background: #EAF5FE; }
   select, input[type=date], input[type=number] { background: #FFFFFF; border: 1px solid #C9E4F7; color: #032D60; border-radius: 0.375rem; padding: 0.375rem 0.625rem; font-size: 0.875rem; }
@@ -21,6 +21,9 @@
   .heat-low { background: #FEEFEE; color: #C23934; border: 1px solid rgba(194,57,52,0.2); }
   .sort-btn { cursor: pointer; user-select: none; color: #0176D3; }
   .sort-btn:hover { color: #014486; }
+  .btn-sm { font-size: 0.7rem; padding: 3px 10px; border-radius: 6px; border: 1px solid #C9E4F7; color: #032D60; background: #fff; cursor: pointer; white-space: nowrap; }
+  .btn-sm:hover { background: #EEF8FF; border-color: #0176D3; }
+  .chart-title { font-size: 0.7rem; font-weight: 800; color: #0D9DDA; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
   .rr-table { table-layout: auto; width: 100%; }
   .rr-table th { resize: horizontal; overflow: hidden; position: relative; min-width: 50px; }
   .rr-table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
@@ -142,7 +145,7 @@
 <div id="main-content-area" style="flex:1;min-width:0;overflow-x:auto;">
 
 <!-- TABS -->
-<div id="tab-bar-wrap" class="bg-white border-b border-[#DDDBDA] px-6 shadow-sm">
+<div id="tab-bar-wrap" class="px-6" style="background:linear-gradient(180deg,#fff 0%,#EEF8FF 100%);border-bottom:2px solid #C9E4F7;box-shadow:0 2px 8px rgba(3,45,96,.06);">
   <div class="flex gap-0 overflow-x-auto">
     <button class="tab-btn active px-5 py-3 text-sm font-medium" onclick="showTab('tsssm',this)"><span data-i18n="tab_sssm_view">👤 SSSM View</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t2',this)"><span data-i18n="tab_sssm_coverage">👥 SSSM Coverage</span></button>
@@ -169,12 +172,12 @@
     <div class="kpi-card" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);" data-i18n="kpi_avg_score">Avg PS Score</div><div id="k5" class="text-2xl font-bold" style="color:#FFFFFF;"></div></div>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Forecast Category</h3><div class="chart-container"><canvas id="chartForecast"></canvas></div></div>
-    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Delivery Model</h3><div class="chart-container"><canvas id="chartDelivery"></canvas></div></div>
-    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">DSRs por Stage</h3><div class="chart-container"><canvas id="chartStage"></canvas></div></div>
+    <div class="card-panel"><h3 class="chart-title">Forecast Category</h3><div class="chart-container"><canvas id="chartForecast"></canvas></div></div>
+    <div class="card-panel"><h3 class="chart-title">Delivery Model</h3><div class="chart-container"><canvas id="chartDelivery"></canvas></div></div>
+    <div class="card-panel"><h3 class="chart-title">DSRs por Stage</h3><div class="chart-container"><canvas id="chartStage"></canvas></div></div>
   </div>
   <div class="card-panel">
-    <h3 class="text-sm font-semibold mb-3" style="color:#032D60;">🏆 Top 5 Oportunidades por Monto</h3>
+    <h3 class="chart-title">🏆 Top 5 Oportunidades por Monto</h3>
     <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>DSR</th><th>Cuenta</th><th>Oportunidad</th><th>SSSM</th><th class="text-right">Monto</th><th>Stage</th><th>Forecast</th><th class="text-center">Heat</th></tr></thead><tbody id="top5Body"></tbody></table></div>
   </div>
   <div class="mt-4 text-xs italic" style="color:#706E6B;">📅 Comparativa semanal disponible en la próxima actualización.</div>
@@ -230,13 +233,11 @@
       <label class="block text-xs mb-1" style="color:#706E6B;">Tipo Contrato</label>
       <div class="ms-container" id="ms_sssmContract"></div>
     </div>
-    <div class="flex items-end">
-      <button onclick="resetSSSmFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]">↺ Reset</button>
-    </div>
-    <div class="flex items-end ml-auto gap-2">
-      <button onclick="exportSSSmSlack()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#04844B] hover:bg-[#F0FFF4]" title="Exportar para Slack">⬇ Slack</button>
-      <button onclick="toggleAllGroups(true)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#0176D3] hover:bg-[#EAF5FE]">⊞ Expand all</button>
-      <button onclick="toggleAllGroups(false)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#706E6B] hover:bg-[#F3F3F3]">⊟ Collapse all</button>
+    <div class="flex items-end gap-2 ml-auto">
+      <button onclick="resetSSSmFilters()" class="btn-sm">↺ Reset</button>
+      <button onclick="exportSSSmSlack()" class="btn-sm">⬇ Descargar</button>
+      <button onclick="toggleAllGroups(true)" class="btn-sm">⊞ Expand all</button>
+      <button onclick="toggleAllGroups(false)" class="btn-sm">⊟ Collapse all</button>
     </div>
   </div>
   <p class="text-xs mb-3" style="color:#706E6B;" data-i18n="sssm_view_desc">Grouped view: SSSM → Status DSR → Stage Oportunidad</p>
@@ -250,8 +251,8 @@
 <!-- TAB 2: SSSM COVERAGE -->
 <div id="t2" class="tab-content hidden">
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">DSRs por SSSM</h3><div class="chart-container"><canvas id="chartSSSM"></canvas></div></div>
-    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Pipeline por SSSM ($M)</h3><div class="chart-container"><canvas id="chartSSSMArr"></canvas></div></div>
+    <div class="card-panel"><h3 class="chart-title">DSRs por SSSM</h3><div class="chart-container"><canvas id="chartSSSM"></canvas></div></div>
+    <div class="card-panel"><h3 class="chart-title">Pipeline por SSSM ($M)</h3><div class="chart-container"><canvas id="chartSSSMArr"></canvas></div></div>
     <div id="workloadDonutPanel" class="card-panel flex flex-col" style="min-height:310px;overflow:hidden;">
       <div class="flex items-center justify-between mb-2" style="flex-shrink:0;">
         <h3 class="text-sm font-semibold" id="workloadDonutTitle" style="color:#032D60;">Distribución por SSSM</h3>
@@ -288,14 +289,14 @@
 <!-- TAB 3: PIPELINE FUNNEL -->
 <div id="t3" class="tab-content hidden">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">DSRs y ARR por Stage</h3><div class="chart-container"><canvas id="chartFunnel"></canvas></div></div>
+    <div class="card-panel"><h3 class="chart-title">DSRs y ARR por Stage</h3><div class="chart-container"><canvas id="chartFunnel"></canvas></div></div>
     <div class="card-panel">
-      <h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Stage × Forecast</h3>
+      <h3 class="chart-title">Stage × Forecast</h3>
       <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>Stage</th><th class="text-right">Commit</th><th class="text-right">Best Case</th><th class="text-right">Pipeline</th><th class="text-right">Total</th></tr></thead><tbody id="stageForecastBody"></tbody></table></div>
     </div>
   </div>
   <div class="card-panel">
-    <h3 class="text-sm font-semibold mb-3" style="color:#032D60;">📅 Cierre por Mes</h3>
+    <h3 class="chart-title">📅 Cierre por Mes</h3>
     <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>Mes</th><th class="text-right">DSRs</th><th class="text-right">ARR ($M)</th><th class="text-right">Commit ($M)</th></tr></thead><tbody id="closeMonthBody"></tbody></table></div>
   </div>
 </div>
@@ -309,11 +310,11 @@
     <div class="kpi-card" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Avg PS Score</div><div id="aiK4" class="text-2xl font-bold" style="color:#FFFFFF;"></div></div>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Delivery Model Distribution</h3><div class="chart-container"><canvas id="chartAIDelivery"></canvas></div></div>
-    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">Top Offerings</h3><div class="chart-container"><canvas id="chartOffering"></canvas></div></div>
+    <div class="card-panel"><h3 class="chart-title">Delivery Model Distribution</h3><div class="chart-container"><canvas id="chartAIDelivery"></canvas></div></div>
+    <div class="card-panel"><h3 class="chart-title">Top Offerings</h3><div class="chart-container"><canvas id="chartOffering"></canvas></div></div>
   </div>
   <div class="card-panel mb-4">
-    <h3 class="text-sm font-semibold mb-3" style="color:#032D60;">🏆 Top 10 — PS Score más Alto</h3>
+    <h3 class="chart-title">🏆 Top 10 — PS Score más Alto</h3>
     <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>DSR</th><th>SSSM</th><th>Cuenta</th><th class="text-right">Score</th><th>Delivery Model</th><th>Offering</th></tr></thead><tbody id="aiTop10Body"></tbody></table></div>
   </div>
   <div id="aiNote" class="text-xs italic" style="color:#706E6B;"></div>
@@ -405,17 +406,17 @@
       <label class="block text-xs mb-1" style="color:#706E6B;">Tipo Contrato</label>
       <div class="ms-container" id="ms_dContract"></div>
     </div>
-    <div class="flex items-end">
-      <button onclick="resetDetailFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]">↺ Reset</button>
+    <div class="flex items-end gap-2 ml-auto">
+      <button onclick="resetDetailFilters()" class="btn-sm">↺ Reset</button>
+      <button onclick="exportTab6CSV()" class="btn-sm">⬇ CSV</button>
+      <button onclick="exportDSRSlack()" class="btn-sm">⬇ Descargar</button>
     </div>
   </div>
   <div class="flex items-center justify-between mb-2">
     <div class="text-sm" style="color:#706E6B;"><span data-i18n="showing">Showing</span> <span id="detailCount">0</span> DSRs · <span data-i18n="page">Page</span> <span id="curPage">1</span>/<span id="totalPages">1</span></div>
     <div class="flex gap-2">
-      <button onclick="exportTab6CSV()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#706E6B] hover:bg-[#F3F3F3]" title="Exportar a CSV">⬇ CSV</button>
-      <button onclick="exportDSRSlack()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#04844B] hover:bg-[#F0FFF4]" title="Exportar para Slack">⬇ Slack</button>
-      <button onclick="prevPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]" data-i18n="btn_prev">← Prev</button>
-      <button onclick="nextPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]" data-i18n="btn_next">Next →</button>
+      <button onclick="prevPage()" class="btn-sm" data-i18n="btn_prev">← Prev</button>
+      <button onclick="nextPage()" class="btn-sm" data-i18n="btn_next">Next →</button>
     </div>
   </div>
   <div class="overflow-x-auto bg-white border border-[#DDDBDA] rounded-xl shadow-sm">
@@ -468,7 +469,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_estEM"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="est-fSearch" type="text" placeholder="Buscar cuenta / opp / estimate..." oninput="renderEstimatesTab()" style="width:250px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"></div>
     <span class="text-xs text-gray-500 ml-auto" id="est-rowCount"></span>
-    <button onclick="exportEstimatesSlack()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#04844B] hover:bg-[#F0FFF4]" title="Exportar para Slack">⬇ Slack</button>
+    <button onclick="exportEstimatesSlack()" class="btn-sm">⬇ Descargar</button>
   </div>
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
@@ -506,7 +507,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_wonAP"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="won-fSearch" type="text" placeholder="Cuenta / oportunidad..." oninput="renderWonTab()" style="width:240px;border:1px solid #DDDBDA;border-radius:4px;padding:4px 10px;font-size:0.8rem"></div>
     <span class="text-xs ml-auto" style="color:#706E6B;" id="won-count"></span>
-    <button onclick="exportWonSlack()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#04844B] hover:bg-[#F0FFF4]" title="Exportar para Slack">⬇ Slack</button>
+    <button onclick="exportWonSlack()" class="btn-sm">⬇ Descargar</button>
   </div>
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
@@ -542,11 +543,11 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_rrAP"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="rr-fSearch" type="text" placeholder="Buscar oportunidad..." oninput="renderRRTab()" style="width:220px;border:1px solid #DDDBDA;border-radius:4px;padding:4px 10px;font-size:0.8rem"></div>
     <span class="text-xs text-gray-500 ml-auto" id="rr-rowCount"></span>
-    <button onclick="exportRRSlack()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#04844B] hover:bg-[#F0FFF4]" title="Exportar para Slack">⬇ Slack</button>
+    <button onclick="exportRRSlack()" class="btn-sm">⬇ Descargar</button>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">RRs por SSSM</h3><div class="chart-container"><canvas id="chartRRSssm"></canvas></div></div>
-    <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">RRs por AP</h3><div class="chart-container"><canvas id="chartRRAp"></canvas></div></div>
+    <div class="card-panel"><h3 class="chart-title">RRs por SSSM</h3><div class="chart-container"><canvas id="chartRRSssm"></canvas></div></div>
+    <div class="card-panel"><h3 class="chart-title">RRs por AP</h3><div class="chart-container"><canvas id="chartRRAp"></canvas></div></div>
   </div>
   <details class="card-panel p-3 mb-3">
     <summary style="cursor:pointer;font-weight:600;font-size:0.875rem;color:#3E3E3C">Resumen por Oportunidad</summary>
