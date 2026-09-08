@@ -234,6 +234,7 @@
       <button onclick="resetSSSmFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]">↺ Reset</button>
     </div>
     <div class="flex items-end ml-auto gap-2">
+      <button onclick="exportSSSmSlack()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#04844B] hover:bg-[#F0FFF4]" title="Exportar para Slack">⬇ Slack</button>
       <button onclick="toggleAllGroups(true)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#0176D3] hover:bg-[#EAF5FE]">⊞ Expand all</button>
       <button onclick="toggleAllGroups(false)" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#706E6B] hover:bg-[#F3F3F3]">⊟ Collapse all</button>
     </div>
@@ -400,6 +401,7 @@
     <div class="text-sm" style="color:#706E6B;"><span data-i18n="showing">Showing</span> <span id="detailCount">0</span> DSRs · <span data-i18n="page">Page</span> <span id="curPage">1</span>/<span id="totalPages">1</span></div>
     <div class="flex gap-2">
       <button onclick="exportTab6CSV()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#706E6B] hover:bg-[#F3F3F3]" title="Exportar a CSV">⬇ CSV</button>
+      <button onclick="exportDSRSlack()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#04844B] hover:bg-[#F0FFF4]" title="Exportar para Slack">⬇ Slack</button>
       <button onclick="prevPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]" data-i18n="btn_prev">← Prev</button>
       <button onclick="nextPage()" class="text-sm px-3 py-1 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE]" data-i18n="btn_next">Next →</button>
     </div>
@@ -454,6 +456,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_estEM"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="est-fSearch" type="text" placeholder="Buscar cuenta / opp / estimate..." oninput="renderEstimatesTab()" style="width:250px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"></div>
     <span class="text-xs text-gray-500 ml-auto" id="est-rowCount"></span>
+    <button onclick="exportEstimatesSlack()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#04844B] hover:bg-[#F0FFF4]" title="Exportar para Slack">⬇ Slack</button>
   </div>
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
@@ -491,6 +494,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_wonAP"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="won-fSearch" type="text" placeholder="Cuenta / oportunidad..." oninput="renderWonTab()" style="width:240px;border:1px solid #DDDBDA;border-radius:4px;padding:4px 10px;font-size:0.8rem"></div>
     <span class="text-xs ml-auto" style="color:#706E6B;" id="won-count"></span>
+    <button onclick="exportWonSlack()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#04844B] hover:bg-[#F0FFF4]" title="Exportar para Slack">⬇ Slack</button>
   </div>
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
@@ -526,6 +530,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_rrAP"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="rr-fSearch" type="text" placeholder="Buscar oportunidad..." oninput="renderRRTab()" style="width:220px;border:1px solid #DDDBDA;border-radius:4px;padding:4px 10px;font-size:0.8rem"></div>
     <span class="text-xs text-gray-500 ml-auto" id="rr-rowCount"></span>
+    <button onclick="exportRRSlack()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#04844B] hover:bg-[#F0FFF4]" title="Exportar para Slack">⬇ Slack</button>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
     <div class="card-panel"><h3 class="text-sm font-semibold mb-3" style="color:#032D60;">RRs por SSSM</h3><div class="chart-container"><canvas id="chartRRSssm"></canvas></div></div>
@@ -26282,7 +26287,8 @@ let sortDir = -1;
 let currentPage = 1;
 const PAGE_SIZE = 25;
 let tab6Total = 0; // tracks locally-filtered row count for pagination
-let tab6Data = [];  // full sorted+filtered dataset for CSV export
+let tab6Data = [];  // full sorted+filtered dataset for CSV/Slack export
+let _sssmExportData = [], _estExportData = [], _wonExportData = [], _rrExportData = [];
 let activeTabId = 'tsssm'; // tracks visible tab to avoid re-rendering hidden tabs
 let charts = {};
 let sssmChartEntries = [];
@@ -26389,6 +26395,124 @@ function territoryBadge(country) {
 
 
 // ── Share menu ────────────────────────────────────────────────────────────────
+// ── Slack Export ────────────────────────────────────────────────────────
+const _slkSfBase = 'https://org62.lightning.force.com/lightning/r';
+function _slkOpp(id,txt) { return id ? `<${_slkSfBase}/Opportunity/${id}/view|${txt||id}>` : (txt||'—'); }
+function _slkDSR(id,txt) { return id ? `<${_slkSfBase}/Deal_Support_Request__c/${id}/view|${txt||id}>` : (txt||'—'); }
+function _slkEst(id,txt) { return id ? `<${_slkSfBase}/ffscpq__Estimate__c/${id}/view|${txt||id}>` : (txt||'—'); }
+function _dlTxt(text, filename) {
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+function _slkToast() {
+  let t = document.getElementById('_slkToast');
+  if (!t) {
+    t = document.createElement('div'); t.id='_slkToast';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#032D60;color:#fff;padding:8px 20px;border-radius:20px;font-size:0.82rem;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  t.textContent='✅ Exportado y copiado al clipboard';
+  t.style.opacity='1';
+  setTimeout(()=>{ t.style.opacity='0'; }, 2500);
+}
+function _doExport(text, filename) {
+  _dlTxt(text, filename);
+  navigator.clipboard.writeText(text).catch(()=>{});
+  _slkToast();
+}
+function _fmtSlkAmt(v) { if(!v) return '$0'; if(v>=1e6) return '$'+(v/1e6).toFixed(1)+'M'; if(v>=1e3) return '$'+(v/1e3).toFixed(0)+'K'; return '$'+Math.round(v); }
+
+function exportSSSmSlack() {
+  const data = _sssmExportData;
+  if (!data.length) { alert('No hay datos para exportar'); return; }
+  const today = new Date().toISOString().slice(0,10);
+  const total = data.reduce((s,d)=>s+(d.amount||0),0);
+  let txt = `*Pipeline LATAM PS · ${data.length} DSRs · ${_fmtSlkAmt(total)}* (${today})\n\n`;
+  const bySSSM = {};
+  data.forEach(d => { if(!bySSSM[d.sssm]) bySSSM[d.sssm]=[]; bySSSM[d.sssm].push(d); });
+  Object.entries(bySSSM).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([sssm,dsrs]) => {
+    const amt = dsrs.reduce((s,d)=>s+(d.amount||0),0);
+    const wk = dsrs.filter(d=>d.status==='Working').length;
+    const oh = dsrs.filter(d=>d.status==='On Hold').length;
+    txt += `*${sssm}* — ${dsrs.length} DSRs (${wk}W/${oh}H) · ${_fmtSlkAmt(amt)}\n`;
+    dsrs.forEach(d => {
+      const stg = (d.stage||'').replace(/^\d+ - /,'');
+      const opp = `*${_slkOpp(d.oppId, d.oppName||d.account)}*`;
+      const dsr = d.dsrId ? _slkDSR(d.dsrId, d.dsr) : (d.dsr||'—');
+      txt += `  • ${opp} · ${dsr} · ${d.status} · ${stg} · ${_fmtSlkAmt(d.amount)} · Close: ${d.closeDate||'—'}\n`;
+    });
+    txt += '\n';
+  });
+  _doExport(txt, `sssm-view-${today}.txt`);
+}
+
+function exportDSRSlack() {
+  const data = tab6Data || [];
+  if (!data.length) { alert('No hay datos para exportar'); return; }
+  const today = new Date().toISOString().slice(0,10);
+  const total = data.reduce((s,d)=>s+(d.amount||0),0);
+  let txt = `*DSR Detail LATAM PS · ${data.length} DSRs · ${_fmtSlkAmt(total)}* (${today})\n\n`;
+  data.forEach(d => {
+    const stg = (d.stage||'').replace(/^\d+ - /,'');
+    const opp = `*${_slkOpp(d.oppId, d.oppName||d.account)}*`;
+    const dsr = d.dsrId ? _slkDSR(d.dsrId, d.dsr) : (d.dsr||'—');
+    const est = d.oppId && ESTIMATE_MAP[d.oppId] ? ` · 📋 ${_slkEst(ESTIMATE_MAP[d.oppId].id, ESTIMATE_MAP[d.oppId].name||'Estimate')}` : '';
+    txt += `• ${opp} — ${stg} · ${_fmtSlkAmt(d.amount)}\n  ${dsr} · ${d.status} · SSSM: ${d.sssm} · AP: ${d.ap||'—'} · Close: ${d.closeDate||'—'}${est}\n\n`;
+  });
+  _doExport(txt, `dsr-detail-${today}.txt`);
+}
+
+function exportEstimatesSlack() {
+  const data = _estExportData;
+  if (!data.length) { alert('No hay datos para exportar'); return; }
+  const today = new Date().toISOString().slice(0,10);
+  const total = data.reduce((s,d)=>s+(d.amount||0),0);
+  let txt = `*Estimates LATAM PS · ${data.length} estimates · ${_fmtSlkAmt(total)}* (${today})\n\n`;
+  data.forEach(d => {
+    const stg = (d.stage||'').replace(/^\d+ - /,'');
+    const est = `*${_slkEst(d.id, d.name||d.id)}*`;
+    const opp = _slkOpp(d.oppId, d.oppName||d.account);
+    const disc = d.discountPct > 0 ? ` · Dto: ${d.discountPct}%` : '';
+    txt += `• ${est} · ${opp}\n  ${d.account||'—'} · ${stg} · ${_fmtSlkAmt(d.amount)}${disc} · SSSM: ${d.em||'—'} · AP: ${d.ap||'—'} · ${d.billingType||'—'} · Close: ${d.closeDate||'—'}\n\n`;
+  });
+  _doExport(txt, `estimates-${today}.txt`);
+}
+
+function exportWonSlack() {
+  const data = _wonExportData;
+  if (!data.length) { alert('No hay datos para exportar'); return; }
+  const today = new Date().toISOString().slice(0,10);
+  const total = data.reduce((s,o)=>s+(o.amount||0),0);
+  let txt = `*Won Deals LATAM PS · ${data.length} oportunidades · ${_fmtSlkAmt(total)}* (${today})\n\n`;
+  data.forEach(opp => {
+    const link = `*${_slkOpp(opp.oppId, opp.oppName||opp.account)}*`;
+    const sssm = (opp.dsrs && opp.dsrs[0] && opp.dsrs[0].sssm) ? opp.dsrs[0].sssm : '—';
+    txt += `• ${link} — ${_fmtSlkAmt(opp.amount)}\n  ${opp.account||'—'} · Closed: ${opp.closeDate||'—'} · SSSM: ${sssm} · AP: ${opp.ap||'—'}\n\n`;
+  });
+  _doExport(txt, `won-deals-${today}.txt`);
+}
+
+function exportRRSlack() {
+  const data = _rrExportData;
+  if (!data.length) { alert('No hay datos para exportar'); return; }
+  const today = new Date().toISOString().slice(0,10);
+  const byOpp = {};
+  data.forEach(r => { const k=r.oppId||r.oppName||'__no__'; if(!byOpp[k]) byOpp[k]={oppId:r.oppId,oppName:r.oppName,account:r.account,stage:r.stage,closeDate:r.closeDate,ap:r.ap,rrs:[]}; byOpp[k].rrs.push(r); });
+  const opps = Object.values(byOpp);
+  let txt = `*RR LATAM · ${opps.length} oportunidades · ${data.length} RRs* (${today})\n\n`;
+  opps.forEach(({oppId,oppName,account,stage,closeDate,ap,rrs}) => {
+    const stg = (stage||'').replace(/^\d+ - /,'');
+    const link = `*${_slkOpp(oppId, oppName||account)}*`;
+    txt += `• ${link} — ${stg} · Close: ${closeDate||'—'} · AP: ${ap||'—'}\n`;
+    rrs.forEach(r => { txt += `  RR: ${r.name||r.id} · ${r.status} · ${r.startDate||'—'} → ${r.endDate||'—'}${r.resource?' · '+r.resource:''}\n`; });
+    txt += '\n';
+  });
+  _doExport(txt, `rr-latam-${today}.txt`);
+}
+// ── End Slack Export ─────────────────────────────────────────────────────
+
 const _shareData = {};
 
 function showShareMenu(btn, key) {
@@ -27006,8 +27130,10 @@ function renderTab2() {
 
   // Insights
   const t2Items = [];
-  const overloadedSSSMs = entries.filter(([,m])=>m.total>15);
-  overloadedSSSMs.forEach(([n,m]) => t2Items.push(`<div style="color:${m.total>18?'#C23934':'#C56200'};">${m.total>18?'🔴':'🟡'} <b>${n.split(' ')[0]}</b> — ${m.total} DSRs (${m.total>18?'sobrecargado':'atención'})</div>`));
+  const overloadedSSSMs = entries.filter(([,m])=>m.working>10);
+  const warnedSSSMs = entries.filter(([,m])=>m.working>7&&m.working<=10);
+  overloadedSSSMs.forEach(([n,m]) => t2Items.push(`<div style="color:#C23934;">🔴 <b>${n.split(' ')[0]}</b> — ${m.working} Working (sobrecargado)</div>`));
+  warnedSSSMs.forEach(([n,m]) => t2Items.push(`<div style="color:#C56200;">🟡 <b>${n.split(' ')[0]}</b> — ${m.working} Working (atención)</div>`));
   const topARR = entries[0];
   if (topARR) t2Items.push(`<div>💰 Mayor ARR: <b>${topARR[0].split(' ')[0]}</b> — ${fmt$(topARR[1].arr)}</div>`);
   const onHoldTotal = entries.reduce((s,[,m])=>s+m.onhold,0);
@@ -27025,7 +27151,7 @@ function renderTab2() {
   if (!t2Items.length) t2Items.push('<div style="color:#04844B;">✅ Carga distribuida normalmente</div>');
   setInsights('SSSM Coverage', t2Items);
 
-  const chartEntries = [...entries].sort((a,b) => a[0].localeCompare(b[0]));
+  const chartEntries = [...entries].sort((a,b) => b[1].working - a[1].working);
   sssmChartEntries = chartEntries;
   const labels = chartEntries.map(([n]) => sssmLabel(n));
   const arrs = chartEntries.map(([,m]) => +(m.arr/1e6).toFixed(2));
@@ -27425,6 +27551,7 @@ function toggleGroup(el) {
 }
 
 function renderSSSmGroupedView(data) {
+  _sssmExportData = data;
   const container = document.getElementById('sssmGroupedContainer');
   if (!container) return;
 
@@ -27630,6 +27757,7 @@ function renderEstimatesTab() {
     const va = a[estSortCol]||0, vb = b[estSortCol]||0;
     return va < vb ? estSortDir : va > vb ? -estSortDir : 0;
   });
+  _estExportData = data;
   // KPIs
   const totalAmt = data.reduce((s,d)=>s+(d.amount||0),0);
   const margins = data.filter(d=>d.marginPct!==0&&d.marginPct!==null);
@@ -27720,6 +27848,7 @@ function renderWonTab() {
     wonOppMap[key].dsrs.push(d);
   });
   const wonOpps = Object.values(wonOppMap).sort((a,b) => new Date(b.closeDate) - new Date(a.closeDate));
+  _wonExportData = wonOpps;
   const sfBase = 'https://org62.lightning.force.com/lightning/r';
   const countEl = document.getElementById('won-count');
   if (countEl) countEl.textContent = wonOpps.length + ' oportunidades (' + data.length + ' DSRs)';
@@ -27819,6 +27948,7 @@ function renderRRTab() {
     const va = a[rrSortCol]||'', vb = b[rrSortCol]||'';
     return va < vb ? rrSortDir : va > vb ? -rrSortDir : 0;
   });
+  _rrExportData = data;
   // Insights (only active deals — exclude past close dates)
   const nowStr = new Date().toISOString().slice(0,10);
   const d30Str = new Date(Date.now()+30*86400000).toISOString().slice(0,10);
