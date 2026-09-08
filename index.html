@@ -238,7 +238,7 @@
       <div class="ms-container" id="ms_sssmContract"></div>
     </div>
     <div style="margin-left:auto;">
-      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="font-size:0.72rem;margin-bottom:3px;visibility:hidden;">x</div>
       <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
         <button onclick="resetSSSmFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
         <button onclick="exportSSSmSlack()" class="btn-sm" title="Descargar" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
@@ -422,7 +422,7 @@
       <div class="ms-container" id="ms_dContract"></div>
     </div>
     <div>
-      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="font-size:0.72rem;margin-bottom:3px;visibility:hidden;">x</div>
       <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
         <button onclick="resetDetailFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
         <button onclick="exportTab6CSV()" class="btn-sm" title="Descargar CSV" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
@@ -486,7 +486,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_estEM"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="est-fSearch" type="text" placeholder="Buscar cuenta / opp / estimate..." oninput="renderEstimatesTab()"></div>
     <div>
-      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="font-size:0.72rem;margin-bottom:3px;visibility:hidden;">x</div>
       <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
         <button onclick="resetEstimatesFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
         <button onclick="exportEstimatesSlack()" class="btn-sm" title="Descargar" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
@@ -528,7 +528,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_wonAP"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="won-fSearch" type="text" placeholder="Cuenta / oportunidad..." oninput="renderWonTab()"></div>
     <div>
-      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="font-size:0.72rem;margin-bottom:3px;visibility:hidden;">x</div>
       <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
         <button onclick="resetWonFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
         <button onclick="exportWonSlack()" class="btn-sm" title="Descargar" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
@@ -568,7 +568,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_rrAP"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="rr-fSearch" type="text" placeholder="Buscar oportunidad..." oninput="renderRRTab()"></div>
     <div>
-      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="font-size:0.72rem;margin-bottom:3px;visibility:hidden;">x</div>
       <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
         <button onclick="resetRRFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
         <button onclick="exportRRSlack()" class="btn-sm" title="Descargar" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
@@ -630,7 +630,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">Status DSR</div><div class="ms-container" id="ms_zStatus"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="z-fSearch" type="text" placeholder="Cuenta / opp / DSR..." oninput="renderZombieTab()"></div>
     <div>
-      <div style="height:0.72rem;margin-bottom:3px;"></div>
+      <div style="font-size:0.72rem;margin-bottom:3px;visibility:hidden;">x</div>
       <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
         <button onclick="resetZombieFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
         <button onclick="exportZombieCSV()" class="btn-sm" title="Descargar CSV" style="padding:2px 7px;font-size:0.82rem;">⬇</button>
@@ -28419,6 +28419,13 @@ function setInsights(tabLabel, items) {
     : '<span style="color:#04844B;font-size:0.8rem;font-weight:600">✅ Sin alertas activas</span>';
 }
 
+function toggleInsights() {
+  const sb = document.getElementById('insights-sidebar');
+  const btn = document.getElementById('insights-show-btn');
+  const hidden = sb.style.display === 'none';
+  sb.style.display = hidden ? '' : 'none';
+  btn.style.display = hidden ? 'none' : '';
+}
 function renderZombieTab() {
   const _zClosed = new Set(['Closed - Resolved','Closed - No Response','Closed - Duplicate','Closed - Not Qualified']);
   const allZ = DSR_DATA.filter(d => (d.stage === '06 - Project Booked' || d.stage === 'Dead - Lost') && !_zClosed.has(d.status));
@@ -28479,9 +28486,12 @@ function exportZombieCSV() {
 </script>
 
 <!-- Right insights sidebar — inside flex layout, position:sticky -->
+<!-- Insights toggle button (shown when sidebar is hidden) -->
+<div id="insights-show-btn" onclick="toggleInsights()" title="Mostrar Insights" style="display:none;position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:20;background:#0176D3;color:#fff;border-radius:8px 0 0 8px;padding:10px 5px;cursor:pointer;writing-mode:vertical-rl;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;box-shadow:-2px 0 8px rgba(0,0,0,0.15);">📊 INSIGHTS</div>
 <div id="insights-sidebar" style="flex:0 0 264px;width:264px;position:sticky;top:0;height:100vh;background:#fff;border-left:3px solid #0176D3;box-shadow:-4px 0 14px rgba(0,0,0,0.1);overflow-y:auto;z-index:10;">
-  <div style="padding:0.65rem 1rem;border-bottom:1px solid #E8E8E8;background:#F8FAFC;position:sticky;top:0;z-index:1;">
+  <div style="padding:0.65rem 1rem;border-bottom:1px solid #E8E8E8;background:#F8FAFC;position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;">
     <span style="font-weight:700;font-size:0.78rem;color:#032D60;letter-spacing:0.05em;">📊 INSIGHTS</span>
+    <button onclick="toggleInsights()" title="Ocultar" style="background:none;border:none;cursor:pointer;color:#706E6B;font-size:1rem;line-height:1;padding:0 2px;">✕</button>
   </div>
   <div id="insights-tab-label" style="font-size:0.62rem;color:#706E6B;padding:0.3rem 1rem;background:#F8FAFC;border-bottom:1px solid #F3F2F2;text-transform:uppercase;letter-spacing:0.06em;"></div>
   <div id="insights-content" style="padding:0.85rem 1rem;font-size:0.78rem;color:#3E3E3C;line-height:1.5;">
