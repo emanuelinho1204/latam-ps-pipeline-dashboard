@@ -159,6 +159,7 @@
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('testimates',this)">📋 Estimates</button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('twon',this)">🏆 Won Deals</button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('trrlatam',this)">👥 RR LATAM</button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('tzombie',this)">🧟 Disciplina Op.</button>
   </div>
 </div>
 
@@ -268,6 +269,13 @@
       </div>
     </div>
   </div>
+  <div id="t2-zombieRow" class="mb-3" style="display:none">
+    <div class="kpi-card" style="background:linear-gradient(135deg,#7B0000,#C23934);border:none;display:inline-flex;flex-direction:column;min-width:220px;cursor:pointer;" onclick="showTab('tzombie',document.querySelector('[onclick*=tzombie]'))">
+      <div style="color:rgba(255,255,255,0.75);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;">🧟 DSRs Zombies</div>
+      <div style="color:#FED7D7;font-size:1.75rem;font-weight:700;" id="t2-zombieKpi">0</div>
+      <div style="color:rgba(255,255,255,0.6);font-size:0.68rem;margin-top:2px;">Opp cerrada con DSR activo · ver Disciplina Op. →</div>
+    </div>
+  </div>
   <div class="card-panel">
     <div class="overflow-x-auto">
     <table class="w-full text-sm"><thead><tr>
@@ -282,6 +290,7 @@
       <th class="text-right">AI-Native</th>
       <th class="text-right">AI-Aug</th>
       <th class="text-right" title="Promedio de productos Salesforce detectados × nivel de monto">Complexity</th>
+      <th class="text-right" title="DSRs con opp cerrada o perdida">🧟</th>
     </tr></thead><tbody id="sssmBody"></tbody></table>
     </div>
   </div>
@@ -589,6 +598,43 @@
     </table>
   </div>
 </div><!-- end trrlatam -->
+
+<!-- TAB DISCIPLINA OPERATIVA -->
+<div id="tzombie" class="tab-content hidden">
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+    <div class="kpi-card" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">🧟 Total Zombies</div><div class="text-2xl font-bold" style="color:#F87171;" id="z-kpiTotal">—</div></div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">✅ Opp Ganada</div><div class="text-2xl font-bold" style="color:#34D399;" id="z-kpiWon">—</div></div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">❌ Opp Perdida</div><div class="text-2xl font-bold" style="color:#F87171;" id="z-kpiLost">—</div></div>
+    <div class="kpi-card" style="background:linear-gradient(135deg,#7B0000,#C23934);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">SSSMs con Zombies</div><div class="text-2xl font-bold" style="color:#FED7D7;" id="z-kpiSSSMs">—</div></div>
+  </div>
+  <div class="local-filter-bar flex flex-wrap gap-3 items-start mb-3">
+    <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_zSSM"></div></div>
+    <div><div class="text-xs mb-1" style="color:#706E6B;">Stage</div><div class="ms-container" id="ms_zStage"></div></div>
+    <div><div class="text-xs mb-1" style="color:#706E6B;">Status DSR</div><div class="ms-container" id="ms_zStatus"></div></div>
+    <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="z-fSearch" type="text" placeholder="Cuenta / opp / DSR..." oninput="renderZombieTab()"></div>
+    <div style="align-self:flex-end;" class="flex items-center gap-2">
+      <button onclick="resetZombieFilters()" class="btn-sm">↺ Reset</button>
+      <button onclick="exportZombieCSV()" class="btn-sm">⬇ CSV</button>
+      <span class="text-xs" style="color:#706E6B;" id="z-rowCount"></span>
+    </div>
+  </div>
+  <div class="card-panel overflow-auto">
+    <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
+      <thead><tr>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">SSSM</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">DSR</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Oportunidad</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Cuenta</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Stage Opp</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Status DSR</th>
+        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Pipeline</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Close Date</th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">AP</th>
+      </tr></thead>
+      <tbody id="z-tableBody"></tbody>
+    </table>
+  </div>
+</div><!-- end tzombie -->
 </div><!-- end main-content-area -->
 
 <script>
@@ -27234,6 +27280,18 @@ function renderTab2() {
   });
 
   _sssmMapGlobal = sssmMap;
+
+  // Zombie DSRs — opps closed/lost with still-active DSRs
+  const _zClosed = new Set(['Closed - Resolved','Closed - No Response','Closed - Duplicate','Closed - Not Qualified']);
+  const _zombieAll = DSR_DATA.filter(d => (d.stage === '06 - Project Booked' || d.stage === 'Dead - Lost') && !_zClosed.has(d.status));
+  const zombieMap = {};
+  _zombieAll.forEach(d => { zombieMap[d.sssm] = (zombieMap[d.sssm]||0) + 1; });
+  const totalZombies = _zombieAll.length;
+  const zombieRow = document.getElementById('t2-zombieRow');
+  const zombieKpi = document.getElementById('t2-zombieKpi');
+  if (zombieRow) zombieRow.style.display = totalZombies > 0 ? '' : 'none';
+  if (zombieKpi) zombieKpi.textContent = totalZombies;
+
   const entries = Object.entries(sssmMap).sort((a,b) => b[1].working - a[1].working);
   document.getElementById('sssmBody').innerHTML = entries.map(([name,m]) => {
     const avgSc = m.scores.length ? (m.scores.reduce((a,b)=>a+b,0)/m.scores.length).toFixed(1) : '--';
@@ -27241,6 +27299,7 @@ function renderTab2() {
     const warn = m.working > 7;
     const rowStyle = overload ? 'color:#C23934;font-weight:600;' : warn ? 'color:#C56200;font-weight:600;' : '';
     const pipePerDsr = m.total ? fmt$(Math.round(m.arr / m.total)) : '$0';
+    const zCount = zombieMap[name] || 0;
     return `<tr class="table-row">
       <td style="${rowStyle};cursor:pointer;text-decoration:underline;color:${overload?'#C23934':warn?'#C56200':'#0176D3'};" onclick="renderSSSmDonut('${name}')" title="Ver distribución · ${name}">${name}${warn?' ⚠️':''}</td>
       <td class="text-right font-bold" style="color:#04844B;">${m.working}</td>
@@ -27253,6 +27312,7 @@ function renderTab2() {
       <td class="text-right" style="color:#04844B;">${m.aiNative}</td>
       <td class="text-right" style="color:#FFB75D;">${m.aiAug}</td>
       <td class="text-right" style="color:#706E6B;font-size:0.72rem;">${m.total ? (m.complexitySum/m.total).toFixed(1) : '--'}</td>
+      <td class="text-right" style="${zCount>0?'color:#C23934;font-weight:700;':'color:#9EA1A3;'}">${zCount>0?zCount:'—'}</td>
     </tr>`;
   }).join('');
 
@@ -27659,6 +27719,7 @@ function showTab(id, btn) {
     if (id === 'testimates') renderEstimatesTab();
     if (id === 'trrlatam') renderRRTab();
     if (id === 'twon') renderWonTab();
+    if (id === 'tzombie') renderZombieTab();
   }, 50);
 }
 
@@ -28278,6 +28339,64 @@ function setInsights(tabLabel, items) {
   content.innerHTML = (items && items.length)
     ? items.join('')
     : '<span style="color:#04844B;font-size:0.8rem;font-weight:600">✅ Sin alertas activas</span>';
+}
+
+function renderZombieTab() {
+  const _zClosed = new Set(['Closed - Resolved','Closed - No Response','Closed - Duplicate','Closed - Not Qualified']);
+  const allZ = DSR_DATA.filter(d => (d.stage === '06 - Project Booked' || d.stage === 'Dead - Lost') && !_zClosed.has(d.status));
+  let data = allZ.slice();
+  if (!_msOpts['ms_zSSM']) msInit('ms_zSSM', [...new Set(allZ.map(d=>d.sssm).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderZombieTab);
+  if (!_msOpts['ms_zStage']) msInit('ms_zStage', ['06 - Project Booked','Dead - Lost'].map(v=>({value:v,label:v})), renderZombieTab);
+  if (!_msOpts['ms_zStatus']) msInit('ms_zStatus', [...new Set(allZ.map(d=>d.status).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderZombieTab);
+  const zSSM = msGet('ms_zSSM'), zStage = msGet('ms_zStage'), zStatus = msGet('ms_zStatus');
+  const search = ((document.getElementById('z-fSearch')||{}).value||'').toLowerCase();
+  if (zSSM.size) data = data.filter(d => zSSM.has(d.sssm));
+  if (zStage.size) data = data.filter(d => zStage.has(d.stage));
+  if (zStatus.size) data = data.filter(d => zStatus.has(d.status));
+  if (search) data = data.filter(d => ((d.oppName||'')+(d.account||'')+(d.sssm||'')+(d.dsr||'')).toLowerCase().includes(search));
+  const kpiTotal = document.getElementById('z-kpiTotal');
+  const kpiWon = document.getElementById('z-kpiWon');
+  const kpiLost = document.getElementById('z-kpiLost');
+  const kpiSSSMs = document.getElementById('z-kpiSSSMs');
+  const rowCount = document.getElementById('z-rowCount');
+  if (kpiTotal) kpiTotal.textContent = allZ.length;
+  if (kpiWon) kpiWon.textContent = allZ.filter(d => d.stage === '06 - Project Booked').length;
+  if (kpiLost) kpiLost.textContent = allZ.filter(d => d.stage === 'Dead - Lost').length;
+  if (kpiSSSMs) kpiSSSMs.textContent = new Set(allZ.map(d=>d.sssm)).size;
+  if (rowCount) rowCount.textContent = data.length + ' registros';
+  const tbody = document.getElementById('z-tableBody');
+  if (!tbody) return;
+  tbody.innerHTML = data.map(d => {
+    const won = d.stage === '06 - Project Booked';
+    const stageBadge = won
+      ? '<span style="background:#EFFFEE;color:#04844B;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:600;">✅ Ganada</span>'
+      : '<span style="background:#FEEFEE;color:#C23934;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:600;">❌ Perdida</span>';
+    return `<tr class="table-row">
+      <td class="px-3 py-2">${d.sssm||'—'}</td>
+      <td class="px-3 py-2" style="color:#0176D3;">${d.dsr||'—'}</td>
+      <td class="px-3 py-2">${d.oppName||'—'}</td>
+      <td class="px-3 py-2">${d.account||'—'}</td>
+      <td class="px-3 py-2">${stageBadge}</td>
+      <td class="px-3 py-2">${d.status||'—'}</td>
+      <td class="px-3 py-2 text-right">${d.amount ? fmt$(d.amount) : '—'}</td>
+      <td class="px-3 py-2">${d.closeDate||'—'}</td>
+      <td class="px-3 py-2">${d.ap||'—'}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="9" class="px-3 py-4 text-center" style="color:#04844B;">✅ Sin DSRs zombies</td></tr>';
+}
+function resetZombieFilters() {
+  ['ms_zSSM','ms_zStage','ms_zStatus'].forEach(id => { if(_msSel[id]) { _msSel[id] = new Set(); _msRender(id); } });
+  const s = document.getElementById('z-fSearch'); if (s) s.value = '';
+  renderZombieTab();
+}
+function exportZombieCSV() {
+  const _zClosed = new Set(['Closed - Resolved','Closed - No Response','Closed - Duplicate','Closed - Not Qualified']);
+  const data = DSR_DATA.filter(d => (d.stage === '06 - Project Booked' || d.stage === 'Dead - Lost') && !_zClosed.has(d.status));
+  const rows = [['SSSM','DSR','Oportunidad','Cuenta','Stage','Status','Pipeline','Close Date','AP']];
+  data.forEach(d => rows.push([d.sssm,d.dsr,d.oppName,d.account,d.stage,d.status,d.amount,d.closeDate,d.ap]));
+  const csv = rows.map(r => r.map(v => '"'+(v||'').toString().replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a = Object.assign(document.createElement('a'), {href:'data:text/csv;charset=utf-8,'+encodeURIComponent(csv),download:'disciplina_operativa.csv'});
+  a.click();
 }
 </script>
 
