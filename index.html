@@ -499,23 +499,23 @@
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
         <th style="width:28px;background:#EEF8FF;"></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('name')">Estimate <span class="sort-icon" id="est-si-name">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="est-si-oppName">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="est-si-account">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('ap')">AP <span class="sort-icon" id="est-si-ap">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('em')">SSSM <span class="sort-icon" id="est-si-em">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('stage')">Stage <span class="sort-icon" id="est-si-stage">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('closeDate')" data-i18n="th_cierre">Cierre <span class="sort-icon" id="est-si-closeDate">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('amount')" data-i18n="th_monto">Monto <span class="sort-icon sort-active" id="est-si-amount">▲</span></th>
-        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('marginPct')">Margen% <span class="sort-icon" id="est-si-marginPct">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('totalHours')">Horas <span class="sort-icon" id="est-si-totalHours">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('durationWeeks')">Semanas <span class="sort-icon" id="est-si-durationWeeks">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('avgBillRate')">Bill Rate <span class="sort-icon" id="est-si-avgBillRate">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('tAndE')">T&amp;E <span class="sort-icon" id="est-si-tAndE">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('discountPct')">Descuento <span class="sort-icon" id="est-si-discountPct">▼</span></th>
-        <th class="px-3 py-2 text-center" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('billingType')">Contrato <span class="sort-icon" id="est-si-billingType">▼</span></th>
-        <th class="px-3 py-2 text-center" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('rateCardRegion')">Rate Card <span class="sort-icon" id="est-si-rateCardRegion">▼</span></th>
-        <th class="px-3 py-2 text-center" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('approvalStatus')">Aprobación <span class="sort-icon" id="est-si-approvalStatus">▼</span></th>
+        <th class="th-std s" onclick="estSortBy('name')">Estimate <span class="sort-icon" id="est-si-name">▲▼</span></th>
+        <th class="th-std s" onclick="estSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="est-si-oppName">▲▼</span></th>
+        <th class="th-std s" onclick="estSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="est-si-account">▲▼</span></th>
+        <th class="th-std s" onclick="estSortBy('ap')">AP <span class="sort-icon" id="est-si-ap">▲▼</span></th>
+        <th class="th-std s" onclick="estSortBy('em')">SSSM <span class="sort-icon" id="est-si-em">▲▼</span></th>
+        <th class="th-std s" onclick="estSortBy('stage')">Stage <span class="sort-icon" id="est-si-stage">▲▼</span></th>
+        <th class="th-std s text-right" onclick="estSortBy('closeDate')" data-i18n="th_cierre">Cierre <span class="sort-icon" id="est-si-closeDate">▲▼</span></th>
+        <th class="th-std s text-right" onclick="estSortBy('amount')" data-i18n="th_monto">Monto <span class="sort-icon sort-active" id="est-si-amount">▲</span></th>
+        <th class="th-std s text-right" onclick="estSortBy('marginPct')">Margen% <span class="sort-icon" id="est-si-marginPct">▲▼</span></th>
+        <th class="th-std s text-right" onclick="estSortBy('totalHours')">Horas <span class="sort-icon" id="est-si-totalHours">▲▼</span></th>
+        <th class="th-std s text-right" onclick="estSortBy('durationWeeks')">Semanas <span class="sort-icon" id="est-si-durationWeeks">▲▼</span></th>
+        <th class="th-std s text-right" onclick="estSortBy('avgBillRate')">Bill Rate <span class="sort-icon" id="est-si-avgBillRate">▲▼</span></th>
+        <th class="th-std s text-right" onclick="estSortBy('tAndE')">T&amp;E <span class="sort-icon" id="est-si-tAndE">▲▼</span></th>
+        <th class="th-std s text-right" onclick="estSortBy('discountPct')">Descuento <span class="sort-icon" id="est-si-discountPct">▲▼</span></th>
+        <th class="th-std s text-center" onclick="estSortBy('billingType')">Contrato <span class="sort-icon" id="est-si-billingType">▲▼</span></th>
+        <th class="th-std s text-center" onclick="estSortBy('rateCardRegion')">Rate Card <span class="sort-icon" id="est-si-rateCardRegion">▲▼</span></th>
+        <th class="th-std s text-center" onclick="estSortBy('approvalStatus')">Aprobación <span class="sort-icon" id="est-si-approvalStatus">▲▼</span></th>
       </tr></thead>
       <tbody id="est-tableBody"></tbody>
     </table>
@@ -542,13 +542,13 @@
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
         <th style="width:28px;background:#EEF8FF;"></th>
-        <th class="th-std s" onclick="wonSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="won-si-oppName">▼</span></th>
-        <th class="th-std s" onclick="wonSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="won-si-account">▼</span></th>
-        <th class="th-std s" onclick="wonSortBy('sssm')">SSSM <span class="sort-icon" id="won-si-sssm">▼</span></th>
-        <th class="th-std s" onclick="wonSortBy('ap')">AP <span class="sort-icon" id="won-si-ap">▼</span></th>
-        <th class="th-std s text-right" onclick="wonSortBy('amount')" data-i18n="th_monto">Monto <span class="sort-icon" id="won-si-amount">▼</span></th>
+        <th class="th-std s" onclick="wonSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="won-si-oppName">▲▼</span></th>
+        <th class="th-std s" onclick="wonSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="won-si-account">▲▼</span></th>
+        <th class="th-std s" onclick="wonSortBy('sssm')">SSSM <span class="sort-icon" id="won-si-sssm">▲▼</span></th>
+        <th class="th-std s" onclick="wonSortBy('ap')">AP <span class="sort-icon" id="won-si-ap">▲▼</span></th>
+        <th class="th-std s text-right" onclick="wonSortBy('amount')" data-i18n="th_monto">Monto <span class="sort-icon" id="won-si-amount">▲▼</span></th>
         <th class="th-std s text-right" onclick="wonSortBy('closeDate')">Close <span class="sort-icon sort-active" id="won-si-closeDate">▲</span></th>
-        <th class="th-std s" onclick="wonSortBy('dsrs')">DSRs <span class="sort-icon" id="won-si-dsrs">▼</span></th>
+        <th class="th-std s" onclick="wonSortBy('dsrs')">DSRs <span class="sort-icon" id="won-si-dsrs">▲▼</span></th>
         <th class="th-std" data-i18n="th_tipo">Tipo</th>
         <th class="th-std" data-i18n="lbl_country">País</th>
       </tr></thead>
@@ -588,12 +588,12 @@
     <div class="overflow-auto mt-2">
       <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C">
         <thead><tr>
-          <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap" data-i18n="th_oportunidad">Oportunidad</th>
-          <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap" data-i18n="th_cuenta">Cuenta</th>
-          <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap">AP</th>
-          <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap"># RRs</th>
-          <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap" data-i18n="rr_unassigned_th">Sin Asignar</th>
-          <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap" data-i18n="th_horas_sow">Horas SOW</th>
+          <th class="th-std s" data-i18n="th_oportunidad">Oportunidad</th>
+          <th class="th-std s" data-i18n="th_cuenta">Cuenta</th>
+          <th class="th-std s">AP</th>
+          <th class="th-std s text-right"># RRs</th>
+          <th class="th-std s text-right" data-i18n="rr_unassigned_th">Sin Asignar</th>
+          <th class="th-std s text-right" data-i18n="th_horas_sow">Horas SOW</th>
         </tr></thead>
         <tbody id="rr-summaryBody"></tbody>
       </table>
@@ -603,16 +603,16 @@
     <table class="rr-table border-collapse" style="font-size:0.78rem;color:#3E3E3C;">
       <thead><tr>
         <th style="width:28px;background:#EEF8FF;"></th>
-        <th class="px-3 py-2 text-center" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:80px;" data-i18n="th_bandera">Bandera</th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:170px;" onclick="rrSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="rr-si-oppName">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:120px;" onclick="rrSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="rr-si-account">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:80px;">Stage</th>
-        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:90px;" onclick="rrSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="rr-si-closeDate">▲</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:110px;" onclick="rrSortBy('ap')">AP <span class="sort-icon" id="rr-si-ap">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:150px;" onclick="rrSortBy('rrCount')">RRs <span class="sort-icon" id="rr-si-rrCount">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:90px;" onclick="rrSortBy('estado')" data-i18n="th_estado">Estado <span class="sort-icon" id="rr-si-estado">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:150px;" onclick="rrSortBy('estimateName')">Estimate <span class="sort-icon" id="rr-si-estimateName">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:110px;" onclick="rrSortBy('sssm')">SSSM <span class="sort-icon" id="rr-si-sssm">▼</span></th>
+        <th class="th-std s text-center" style="min-width:80px;" data-i18n="th_bandera">Bandera</th>
+        <th class="th-std s" style="min-width:170px;" onclick="rrSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="rr-si-oppName">▲▼</span></th>
+        <th class="th-std s" style="min-width:120px;" onclick="rrSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="rr-si-account">▲▼</span></th>
+        <th class="th-std s" style="min-width:80px;">Stage</th>
+        <th class="th-std s text-right" style="min-width:90px;" onclick="rrSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="rr-si-closeDate">▲</span></th>
+        <th class="th-std s" style="min-width:110px;" onclick="rrSortBy('ap')">AP <span class="sort-icon" id="rr-si-ap">▲▼</span></th>
+        <th class="th-std s" style="min-width:150px;" onclick="rrSortBy('rrCount')">RRs <span class="sort-icon" id="rr-si-rrCount">▲▼</span></th>
+        <th class="th-std s" style="min-width:90px;" onclick="rrSortBy('estado')" data-i18n="th_estado">Estado <span class="sort-icon" id="rr-si-estado">▲▼</span></th>
+        <th class="th-std s" style="min-width:150px;" onclick="rrSortBy('estimateName')">Estimate <span class="sort-icon" id="rr-si-estimateName">▲▼</span></th>
+        <th class="th-std s" style="min-width:110px;" onclick="rrSortBy('sssm')">SSSM <span class="sort-icon" id="rr-si-sssm">▲▼</span></th>
       </tr></thead>
       <tbody id="rr-tableBody"></tbody>
     </table>
@@ -646,15 +646,15 @@
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
-        <th class="th-std s" onclick="zombieSortBy('sssm')">SSSM <span class="sort-icon" id="z-si-sssm">▼</span></th>
-        <th class="th-std s" onclick="zombieSortBy('dsr')">DSR <span class="sort-icon" id="z-si-dsr">▼</span></th>
-        <th class="th-std s" onclick="zombieSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="z-si-oppName">▼</span></th>
-        <th class="th-std s" onclick="zombieSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="z-si-account">▼</span></th>
-        <th class="th-std s" onclick="zombieSortBy('stage')" data-i18n="th_stage_opp">Stage Opp <span class="sort-icon" id="z-si-stage">▼</span></th>
-        <th class="th-std s" onclick="zombieSortBy('status')">Status DSR <span class="sort-icon" id="z-si-status">▼</span></th>
-        <th class="th-std s text-right" onclick="zombieSortBy('amount')">Pipeline <span class="sort-icon" id="z-si-amount">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('sssm')">SSSM <span class="sort-icon" id="z-si-sssm">▲▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('dsr')">DSR <span class="sort-icon" id="z-si-dsr">▲▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="z-si-oppName">▲▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="z-si-account">▲▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('stage')" data-i18n="th_stage_opp">Stage Opp <span class="sort-icon" id="z-si-stage">▲▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('status')">Status DSR <span class="sort-icon" id="z-si-status">▲▼</span></th>
+        <th class="th-std s text-right" onclick="zombieSortBy('amount')">Pipeline <span class="sort-icon" id="z-si-amount">▲▼</span></th>
         <th class="th-std s" onclick="zombieSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="z-si-closeDate">▼</span></th>
-        <th class="th-std s" onclick="zombieSortBy('ap')">AP <span class="sort-icon" id="z-si-ap">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('ap')">AP <span class="sort-icon" id="z-si-ap">▲▼</span></th>
       </tr></thead>
       <tbody id="z-tableBody"></tbody>
     </table>
@@ -28137,6 +28137,9 @@ window.addEventListener('hashchange', function() {
 let estSortCol = 'amount', estSortDir = -1;
 function estSortBy(col) {
   if (estSortCol === col) estSortDir *= -1; else { estSortCol = col; estSortDir = -1; }
+  document.querySelectorAll('[id^="est-si-"]').forEach(el => { el.textContent = '▲▼'; el.classList.remove('sort-active'); });
+  const si = document.getElementById('est-si-'+col);
+  if (si) { si.textContent = estSortDir === -1 ? '▲' : '▼'; si.classList.add('sort-active'); }
   renderEstimatesTab();
 }
 function renderEstimatesTab() {
@@ -28232,7 +28235,7 @@ function renderEstimatesTab() {
 let wonSortCol = 'closeDate', wonSortDir = -1;
 function wonSortBy(col) {
   if (wonSortCol === col) wonSortDir *= -1; else { wonSortCol = col; wonSortDir = -1; }
-  document.querySelectorAll('[id^="won-si-"]').forEach(el => { el.textContent = '▼'; el.classList.remove('sort-active'); });
+  document.querySelectorAll('[id^="won-si-"]').forEach(el => { el.textContent = '▲▼'; el.classList.remove('sort-active'); });
   const si = document.getElementById('won-si-'+col);
   if (si) { si.textContent = wonSortDir === -1 ? '▲' : '▼'; si.classList.add('sort-active'); }
   renderWonTab();
@@ -28303,13 +28306,16 @@ function renderWonTab() {
     const topTipo = Object.entries(byTipo).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} (${v})`).join(' \u00b7 ');
     const topPais = Object.entries(byPais).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} (${v})`).join(' \u00b7 ');
     const topSssm = Object.entries(bySssm).sort((a,b)=>b[1]-a[1])[0];
+    const _kpiDark = 'background:linear-gradient(135deg,#032D60,#0176D3);border:none;';
+    const _kpiTxt = 'color:rgba(255,255,255,0.75)';
+    const _kpiVal = 'color:#FFFFFF';
     wonSumEl.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
-      <div class="card-panel p-3 text-center" style="min-width:100px;flex:1;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${wonOpps.length}</div><div style="font-size:0.72rem;color:#706E6B;">${_t('won_kpi_opps')}</div></div>
-      <div class="card-panel p-3 text-center" style="min-width:100px;flex:1;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${data.length}</div><div style="font-size:0.72rem;color:#706E6B;">${_t('won_kpi_dsrs')}</div></div>
-      <div class="card-panel p-3 text-center" style="min-width:140px;flex:2;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${fmt$(totalAmt)}</div><div style="font-size:0.72rem;color:#706E6B;">${_t('won_kpi_arr')}</div></div>
-      <div class="card-panel p-3" style="min-width:200px;flex:3;"><div style="font-size:0.72rem;color:#706E6B;margin-bottom:4px;">${_t('won_kpi_tipo')}</div><div style="font-size:0.78rem;color:#3E3E3C;">${topTipo}</div></div>
-      <div class="card-panel p-3" style="min-width:180px;flex:2;"><div style="font-size:0.72rem;color:#706E6B;margin-bottom:4px;">${_t('won_kpi_pais')}</div><div style="font-size:0.78rem;color:#3E3E3C;">${topPais}</div></div>
-      ${topSssm ? `<div class="card-panel p-3 text-center" style="min-width:130px;flex:2;"><div style="font-size:1.1rem;font-weight:700;color:#032D60;">${topSssm[0].split(' ')[0]}</div><div style="font-size:0.72rem;color:#706E6B;">${_t('won_kpi_sssm')} (${topSssm[1]} DSRs)</div></div>` : ''}
+      <div class="card-panel kpi-card p-3 text-center" style="${_kpiDark}min-width:100px;flex:1;"><div style="font-size:1.5rem;font-weight:700;${_kpiVal}">${wonOpps.length}</div><div style="font-size:0.72rem;${_kpiTxt}">${_t('won_kpi_opps')}</div></div>
+      <div class="card-panel kpi-card p-3 text-center" style="${_kpiDark}min-width:100px;flex:1;"><div style="font-size:1.5rem;font-weight:700;${_kpiVal}">${data.length}</div><div style="font-size:0.72rem;${_kpiTxt}">${_t('won_kpi_dsrs')}</div></div>
+      <div class="card-panel kpi-card p-3 text-center" style="${_kpiDark}min-width:140px;flex:2;"><div style="font-size:1.5rem;font-weight:700;${_kpiVal}">${fmt$(totalAmt)}</div><div style="font-size:0.72rem;${_kpiTxt}">${_t('won_kpi_arr')}</div></div>
+      <div class="card-panel kpi-card p-3" style="${_kpiDark}min-width:200px;flex:3;"><div style="font-size:0.72rem;${_kpiTxt};margin-bottom:4px;">${_t('won_kpi_tipo')}</div><div style="font-size:0.78rem;color:#FFFFFF;">${topTipo}</div></div>
+      <div class="card-panel kpi-card p-3" style="${_kpiDark}min-width:180px;flex:2;"><div style="font-size:0.72rem;${_kpiTxt};margin-bottom:4px;">${_t('won_kpi_pais')}</div><div style="font-size:0.78rem;color:#FFFFFF;">${topPais}</div></div>
+      ${topSssm ? `<div class="card-panel kpi-card p-3 text-center" style="${_kpiDark}min-width:130px;flex:2;"><div style="font-size:1.1rem;font-weight:700;${_kpiVal}">${topSssm[0].split(' ')[0]}</div><div style="font-size:0.72rem;${_kpiTxt}">${_t('won_kpi_sssm')} (${topSssm[1]} DSRs)</div></div>` : ''}
     </div>`;
   } else if (wonSumEl) { wonSumEl.innerHTML = ''; }
   // Table \u2014 one row per opportunity, DSRs as links
@@ -28336,7 +28342,7 @@ function renderWonTab() {
 let rrSortCol = 'closeDate', rrSortDir = 1;
 function rrSortBy(col) {
   if (rrSortCol === col) rrSortDir *= -1; else { rrSortCol = col; rrSortDir = 1; }
-  document.querySelectorAll('[id^="rr-si-"]').forEach(el => { el.className='sort-icon'; el.textContent='▼'; });
+  document.querySelectorAll('[id^="rr-si-"]').forEach(el => { el.className='sort-icon'; el.textContent='▲▼'; });
   const si = document.getElementById('rr-si-'+col);
   if (si) { si.className='sort-icon sort-active'; si.textContent = rrSortDir===1 ? '▲' : '▼'; }
   renderRRTab();
@@ -28581,7 +28587,7 @@ function toggleInsights() {
 let zombieSortCol = 'closeDate', zombieSortDir = 1;
 function zombieSortBy(col) {
   if (zombieSortCol === col) zombieSortDir *= -1; else { zombieSortCol = col; zombieSortDir = -1; }
-  document.querySelectorAll('[id^="z-si-"]').forEach(el => { el.textContent = '▼'; el.classList.remove('sort-active'); });
+  document.querySelectorAll('[id^="z-si-"]').forEach(el => { el.textContent = '▲▼'; el.classList.remove('sort-active'); });
   const si = document.getElementById('z-si-'+col);
   if (si) { si.textContent = zombieSortDir === -1 ? '▲' : '▼'; si.classList.add('sort-active'); }
   renderZombieTab();
