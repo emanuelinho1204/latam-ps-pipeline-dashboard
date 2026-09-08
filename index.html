@@ -26628,6 +26628,21 @@ function setLang(lang) {
     if (btn) btn.classList.toggle('active', l.toLowerCase() === lang);
   });
   applyTranslations();
+  // Re-render active tab so JS-generated labels (_t() calls) also update
+  if (activeTabId) {
+    const tabRenders = {
+      't1': () => { renderTab1 && renderTab1(); },
+      'tsssm': () => { applySSSmFilters && applySSSmFilters(); },
+      't2': () => { renderWorkloadTab && renderWorkloadTab(); },
+      't3': () => { renderTab3 && renderTab3(); },
+      't5': () => { renderEstimatesTab && renderEstimatesTab(); },
+      'twon': () => { renderWonTab && renderWonTab(); },
+      't_rr': () => { renderRRTab && renderRRTab(); },
+      'tzombie': () => { renderZombieTab && renderZombieTab(); },
+    };
+    const fn = tabRenders[activeTabId];
+    if (fn) try { fn(); } catch(e) {}
+  }
 }
 
 function applyTranslations() {
@@ -28602,10 +28617,10 @@ function renderZombieTab() {
   if (!_msOpts['ms_zTerr']) msInit('ms_zTerr', ['Mexico','Growth Norte','Growth Sur','Brazil','Other'].map(v=>({value:v,label:v})), renderZombieTab);
   const zSSM = msGet('ms_zSSM'), zStage = msGet('ms_zStage'), zStatus = msGet('ms_zStatus'), zTerr = msGet('ms_zTerr');
   const search = ((document.getElementById('z-fSearch')||{}).value||'').toLowerCase();
-  if (zSSM.size) data = data.filter(d => zSSM.has(d.sssm));
-  if (zStage.size) data = data.filter(d => zStage.has(d.stage));
-  if (zStatus.size) data = data.filter(d => zStatus.has(d.status));
-  if (zTerr.size) data = data.filter(d => zTerr.has(getTerritory(d.country)));
+  if (zSSM.length) data = data.filter(d => zSSM.includes(d.sssm));
+  if (zStage.length) data = data.filter(d => zStage.includes(d.stage));
+  if (zStatus.length) data = data.filter(d => zStatus.includes(d.status));
+  if (zTerr.length) data = data.filter(d => zTerr.includes(getTerritory(d.country)));
   if (search) data = data.filter(d => ((d.oppName||'')+(d.account||'')+(d.sssm||'')+(d.dsr||'')).toLowerCase().includes(search));
   data = data.slice().sort((a,b) => {
     const va = a[zombieSortCol]||'', vb = b[zombieSortCol]||'';
