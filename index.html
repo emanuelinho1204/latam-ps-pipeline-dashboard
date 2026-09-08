@@ -46,7 +46,7 @@
   ::-webkit-scrollbar-track { background: #F3F3F3; }
   ::-webkit-scrollbar-thumb { background: #C9E4F7; border-radius: 3px; }
   table { border-collapse: collapse; }
-  th { background: #EEF8FF; color: #706E6B; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #C9E4F7; padding: 0.625rem 0.75rem; text-align: left; }
+  th { background: #F3F2F2; color: #706E6B; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #DDDBDA; padding: 0.625rem 0.75rem; text-align: left; }
   td { border-bottom: 1px solid #EEF8FF; padding: 0.5rem 0.75rem; font-size: 0.875rem; color: #3E3E3C; }
   a.opp-link { color: #0176D3; text-decoration: none; font-weight: 500; }
   a.opp-link:hover { text-decoration: underline; }
@@ -308,7 +308,7 @@
 <!-- TAB 3: PIPELINE FUNNEL -->
 <div id="t3" class="tab-content hidden">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-    <div class="card-panel"><h3 class="chart-title">DSRs y ARR por Stage</h3><div class="chart-container"><canvas id="chartFunnel"></canvas></div></div>
+    <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;">DSRs y ARR por Stage</h3><div class="chart-container"><canvas id="chartFunnel"></canvas></div></div>
     <div class="card-panel">
       <h3 class="chart-title">Stage × Forecast</h3>
       <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>Stage</th><th class="text-right">Commit</th><th class="text-right">Best Case</th><th class="text-right">Pipeline</th><th class="text-right">Total</th></tr></thead><tbody id="stageForecastBody"></tbody></table></div>
@@ -576,8 +576,8 @@
     </div>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-    <div class="card-panel"><h3 class="chart-title">RRs por SSSM</h3><div class="chart-container"><canvas id="chartRRSssm"></canvas></div></div>
-    <div class="card-panel"><h3 class="chart-title">RRs por AP</h3><div class="chart-container"><canvas id="chartRRAp"></canvas></div></div>
+    <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;">RRs por SSSM</h3><div class="chart-container"><canvas id="chartRRSssm"></canvas></div></div>
+    <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;">RRs por AP</h3><div class="chart-container"><canvas id="chartRRAp"></canvas></div></div>
   </div>
   <details class="card-panel p-3 mb-3">
     <summary style="cursor:pointer;font-weight:600;font-size:0.875rem;color:#3E3E3C">Resumen por Oportunidad</summary>
@@ -27453,13 +27453,14 @@ function renderTab3() {
   const stageCounts = stages.map(s => filtered.filter(d => d.stage===s).length);
   const stageArr = stages.map(s => filtered.filter(d=>d.stage===s).reduce((a,d)=>a+d.amount,0)/1e6);
   makeChart('chartFunnel','bar',stageLbls,[
-    {label:'DSRs',data:stageCounts,backgroundColor:'#0176D3',borderRadius:3,yAxisID:'y'},
-    {label:'Pipeline ($M)',data:stageArr.map(v=>+v.toFixed(1)),backgroundColor:'#0176D3',borderRadius:3,yAxisID:'y1'}
+    {label:'DSRs',data:stageCounts,backgroundColor:'#38BDF8',borderRadius:3,yAxisID:'y'},
+    {label:'Pipeline ($M)',data:stageArr.map(v=>+v.toFixed(1)),backgroundColor:'#34D399',borderRadius:3,yAxisID:'y1'}
   ],{
     scales:{
-      y:{type:'linear',position:'left',ticks:{color:'#706E6B'},grid:{color:'#EEF8FF'}},
-      y1:{type:'linear',position:'right',ticks:{color:'#04844B'},grid:{drawOnChartArea:false}}
-    }
+      y:{type:'linear',position:'left',ticks:{color:'rgba(255,255,255,0.92)',font:{size:10}},grid:{color:'rgba(255,255,255,0.12)'}},
+      y1:{type:'linear',position:'right',ticks:{color:'rgba(255,255,255,0.92)',font:{size:10}},grid:{drawOnChartArea:false}}
+    },
+    plugins:{legend:{labels:{color:'rgba(255,255,255,0.92)',font:{size:11}}}}
   });
 
   // Close by month (built first — used in insights below)
@@ -28415,12 +28416,14 @@ function renderRRTab() {
     sssmRRMap[sssm][rrFlagOf(d)]++;
   });
   const sssmRREntries = Object.entries(sssmRRMap).sort((a,b) => a[0].localeCompare(b[0]));
-  const rrStackedScales = { x:{stacked:true,ticks:{color:'#706E6B',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45},grid:{color:'#EEF8FF'}}, y:{stacked:true,ticks:{color:'#706E6B',font:{size:10}},grid:{color:'#EEF8FF'}} };
+  const wTick2 = {color:'rgba(255,255,255,0.92)',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45};
+  const rrStackedScales = { x:{stacked:true,ticks:wTick2,grid:{color:'rgba(255,255,255,0.12)'}}, y:{stacked:true,ticks:{color:'rgba(255,255,255,0.92)',font:{size:10}},grid:{color:'rgba(255,255,255,0.12)'}} };
+  const rrLegend = {plugins:{legend:{labels:{color:'rgba(255,255,255,0.92)',font:{size:11}}}}};
   makeChart('chartRRSssm','bar',sssmRREntries.map(([n])=>sssmLabel(n)),[
-    {label:'🚩 Inicio vencido',data:sssmRREntries.map(([,m])=>m.vencido),backgroundColor:'#C23934',borderRadius:0},
-    {label:'⚡ Close <30d',data:sssmRREntries.map(([,m])=>m.urgente),backgroundColor:'#C56200',borderRadius:0},
-    {label:'✅ Normal',data:sssmRREntries.map(([,m])=>m.normal),backgroundColor:'#04844B',borderRadius:0},
-  ],{scales:rrStackedScales});
+    {label:'🚩 Inicio vencido',data:sssmRREntries.map(([,m])=>m.vencido),backgroundColor:'#F87171',borderRadius:0},
+    {label:'⚡ Close <30d',data:sssmRREntries.map(([,m])=>m.urgente),backgroundColor:'#FBBF24',borderRadius:0},
+    {label:'✅ Normal',data:sssmRREntries.map(([,m])=>m.normal),backgroundColor:'#34D399',borderRadius:0},
+  ],{scales:rrStackedScales,...rrLegend});
   const apRRMap = {};
   data.forEach(d => {
     const ap = d.ap || 'Sin AP';
@@ -28429,10 +28432,10 @@ function renderRRTab() {
   });
   const apRREntries = Object.entries(apRRMap).sort((a,b) => a[0].localeCompare(b[0]));
   makeChart('chartRRAp','bar',apRREntries.map(([n])=>sssmLabel(n)),[
-    {label:'🚩 Inicio vencido',data:apRREntries.map(([,m])=>m.vencido),backgroundColor:'#C23934',borderRadius:0},
-    {label:'⚡ Close <30d',data:apRREntries.map(([,m])=>m.urgente),backgroundColor:'#C56200',borderRadius:0},
-    {label:'✅ Normal',data:apRREntries.map(([,m])=>m.normal),backgroundColor:'#04844B',borderRadius:0},
-  ],{scales:rrStackedScales});
+    {label:'🚩 Inicio vencido',data:apRREntries.map(([,m])=>m.vencido),backgroundColor:'#F87171',borderRadius:0},
+    {label:'⚡ Close <30d',data:apRREntries.map(([,m])=>m.urgente),backgroundColor:'#FBBF24',borderRadius:0},
+    {label:'✅ Normal',data:apRREntries.map(([,m])=>m.normal),backgroundColor:'#34D399',borderRadius:0},
+  ],{scales:rrStackedScales,...rrLegend});
 }
 
 // ── Global Insights Sidebar ────────────────────────────
