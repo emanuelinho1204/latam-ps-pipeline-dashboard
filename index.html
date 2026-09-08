@@ -28502,7 +28502,7 @@ function renderZombieTab() {
       : '<span style="background:#FEEFEE;color:#C23934;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:600;">❌ Perdida</span>';
     return `<tr class="table-row">
       <td class="px-3 py-2">${d.sssm||'—'}</td>
-      <td class="px-3 py-2" style="color:#0176D3;">${d.dsr||'—'}</td>
+      <td class="px-3 py-2"><a href="${d.dsrId ? `https://org62.lightning.force.com/lightning/r/Deal_Support_Request__c/${d.dsrId}/view` : '#'}" target="_blank" class="opp-link font-mono text-xs">${d.dsr||'—'}</a></td>
       <td class="px-3 py-2">${d.oppName||'—'}</td>
       <td class="px-3 py-2">${d.account||'—'}</td>
       <td class="px-3 py-2">${stageBadge}</td>
