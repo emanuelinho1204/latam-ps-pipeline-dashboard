@@ -261,15 +261,15 @@
 <!-- TAB 2: SSSM COVERAGE -->
 <div id="t2" class="tab-content hidden">
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6" style="grid-auto-rows:340px;">
-    <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;">DSRs por SSSM</h3><div class="chart-container"><canvas id="chartSSSM"></canvas></div></div>
-    <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;">Pipeline por SSSM ($M)</h3><div class="chart-container"><canvas id="chartSSSMArr"></canvas></div></div>
+    <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;" data-i18n="chart_dsrs_sssm">DSRs por SSSM</h3><div class="chart-container"><canvas id="chartSSSM"></canvas></div></div>
+    <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;" data-i18n="chart_pipeline_sssm">Pipeline por SSSM ($M)</h3><div class="chart-container"><canvas id="chartSSSMArr"></canvas></div></div>
     <div id="workloadDonutPanel" class="card-panel flex flex-col" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;">
       <div class="flex items-center justify-between mb-2" style="flex-shrink:0;">
-        <h3 class="text-sm font-semibold" id="workloadDonutTitle" style="color:#7EBFEF;">Distribución por SSSM</h3>
+        <h3 class="text-sm font-semibold" id="workloadDonutTitle" style="color:#7EBFEF;" data-i18n="chart_dist_sssm">Distribución por SSSM</h3>
       </div>
       <div id="workloadDonutPlaceholder" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);font-size:0.8rem;gap:0.5rem;text-align:center;">
         <span style="font-size:1.8rem;">🍩</span>
-        <span>Haz click en una barra<br>o nombre de SSSM</span>
+        <span data-i18n="drill_placeholder">Haz click en una barra o nombre de SSSM</span>
       </div>
       <div id="workloadDonutChart" style="display:none;flex-direction:column;align-items:center;gap:0.4rem;">
         <div style="width:100%;height:230px;position:relative;"><canvas id="chartSSSmDonut"></canvas></div>
@@ -280,10 +280,10 @@
   <div id="t2-zombieRow" class="mb-3" style="display:none">
     <div onclick="showTab('tzombie',document.querySelector('[onclick*=tzombie]'))" style="background:linear-gradient(90deg,#7B0000 0%,#C23934 60%,#9B1C1C 100%);border-radius:8px;padding:7px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;box-sizing:border-box;">
       <span style="font-size:1rem;line-height:1;">🧟</span>
-      <span style="color:#FCA5A5;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;white-space:nowrap;">DSRs Zombies</span>
+      <span style="color:#FCA5A5;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;white-space:nowrap;" data-i18n="zombie_label">DSRs Zombies</span>
       <span style="color:#FED7D7;font-size:1.1rem;font-weight:800;line-height:1;" id="t2-zombieKpi">0</span>
-      <span style="color:rgba(255,255,255,0.55);font-size:0.72rem;white-space:nowrap;">opp cerrada/perdida con DSR activo</span>
-      <span style="margin-left:auto;color:rgba(255,255,255,0.65);font-size:0.72rem;white-space:nowrap;">ver Disciplina Op. →</span>
+      <span style="color:rgba(255,255,255,0.55);font-size:0.72rem;white-space:nowrap;" data-i18n="zombie_sub">opp cerrada/perdida con DSR activo</span>
+      <span style="margin-left:auto;color:rgba(255,255,255,0.65);font-size:0.72rem;white-space:nowrap;" data-i18n="zombie_link">ver Disciplina Op. →</span>
     </div>
   </div>
   <div class="card-panel">
@@ -309,15 +309,15 @@
 <!-- TAB 3: PIPELINE FUNNEL -->
 <div id="t3" class="tab-content hidden">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-    <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;">DSRs y ARR por Stage</h3><div class="chart-container"><canvas id="chartFunnel"></canvas></div></div>
+    <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;" data-i18n="chart_dsrs_arr_stage">DSRs y ARR por Stage</h3><div class="chart-container"><canvas id="chartFunnel"></canvas></div></div>
     <div class="card-panel">
       <h3 class="chart-title">Stage × Forecast</h3>
       <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>Stage</th><th class="text-right">Commit</th><th class="text-right">Best Case</th><th class="text-right">Pipeline</th><th class="text-right">Total</th></tr></thead><tbody id="stageForecastBody"></tbody></table></div>
     </div>
   </div>
   <div class="card-panel">
-    <h3 class="chart-title">📅 Cierre por Mes</h3>
-    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>Mes</th><th class="text-right">DSRs</th><th class="text-right">ARR ($M)</th><th class="text-right">Commit ($M)</th></tr></thead><tbody id="closeMonthBody"></tbody></table></div>
+    <h3 class="chart-title" data-i18n="chart_cierre_mes">📅 Cierre por Mes</h3>
+    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th data-i18n="th_mes">Mes</th><th class="text-right">DSRs</th><th class="text-right">ARR ($M)</th><th class="text-right">Commit ($M)</th></tr></thead><tbody id="closeMonthBody"></tbody></table></div>
   </div>
 </div>
 
@@ -474,9 +474,9 @@
 <div id="testimates" class="tab-content hidden">
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-4">
     <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Total Estimates</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="est-kpiTotal">—</div></div>
-    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Monto Total</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="est-kpiAmount">—</div></div>
-    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Margen Promedio</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="est-kpiMargin">—</div></div>
-    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Bill Rate Promedio</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="est-kpiBillRate">—</div></div>
+    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);" data-i18n="kpi_monto_total">Monto Total</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="est-kpiAmount">—</div></div>
+    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);" data-i18n="kpi_margen_promedio">Margen Promedio</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="est-kpiMargin">—</div></div>
+    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);" data-i18n="kpi_bill_rate">Bill Rate Promedio</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="est-kpiBillRate">—</div></div>
     <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">T&amp;E Total</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="est-kpiTE">—</div></div>
   </div>
   <div class="local-filter-bar flex flex-wrap gap-3 items-start mb-3">
@@ -500,13 +500,13 @@
       <thead><tr>
         <th style="width:28px;background:#EEF8FF;"></th>
         <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('name')">Estimate <span class="sort-icon" id="est-si-name">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('oppName')">Oportunidad <span class="sort-icon" id="est-si-oppName">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('account')">Cuenta <span class="sort-icon" id="est-si-account">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="est-si-oppName">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="est-si-account">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('ap')">AP <span class="sort-icon" id="est-si-ap">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('em')">SSSM <span class="sort-icon" id="est-si-em">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('stage')">Stage <span class="sort-icon" id="est-si-stage">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('closeDate')">Cierre <span class="sort-icon" id="est-si-closeDate">▼</span></th>
-        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('amount')">Monto <span class="sort-icon sort-active" id="est-si-amount">▲</span></th>
+        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('closeDate')" data-i18n="th_cierre">Cierre <span class="sort-icon" id="est-si-closeDate">▼</span></th>
+        <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('amount')" data-i18n="th_monto">Monto <span class="sort-icon sort-active" id="est-si-amount">▲</span></th>
         <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('marginPct')">Margen% <span class="sort-icon" id="est-si-marginPct">▼</span></th>
         <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('totalHours')">Horas <span class="sort-icon" id="est-si-totalHours">▼</span></th>
         <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('durationWeeks')">Semanas <span class="sort-icon" id="est-si-durationWeeks">▼</span></th>
@@ -542,15 +542,15 @@
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
         <th style="width:28px;background:#EEF8FF;"></th>
-        <th class="th-std s" onclick="wonSortBy('oppName')">Oportunidad <span class="sort-icon" id="won-si-oppName">▼</span></th>
-        <th class="th-std s" onclick="wonSortBy('account')">Cuenta <span class="sort-icon" id="won-si-account">▼</span></th>
+        <th class="th-std s" onclick="wonSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="won-si-oppName">▼</span></th>
+        <th class="th-std s" onclick="wonSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="won-si-account">▼</span></th>
         <th class="th-std s" onclick="wonSortBy('sssm')">SSSM <span class="sort-icon" id="won-si-sssm">▼</span></th>
         <th class="th-std s" onclick="wonSortBy('ap')">AP <span class="sort-icon" id="won-si-ap">▼</span></th>
-        <th class="th-std s text-right" onclick="wonSortBy('amount')">Monto <span class="sort-icon" id="won-si-amount">▼</span></th>
+        <th class="th-std s text-right" onclick="wonSortBy('amount')" data-i18n="th_monto">Monto <span class="sort-icon" id="won-si-amount">▼</span></th>
         <th class="th-std s text-right" onclick="wonSortBy('closeDate')">Close <span class="sort-icon sort-active" id="won-si-closeDate">▲</span></th>
         <th class="th-std s" onclick="wonSortBy('dsrs')">DSRs <span class="sort-icon" id="won-si-dsrs">▼</span></th>
-        <th class="th-std">Tipo</th>
-        <th class="th-std">País</th>
+        <th class="th-std" data-i18n="th_tipo">Tipo</th>
+        <th class="th-std" data-i18n="lbl_country">País</th>
       </tr></thead>
       <tbody id="won-tableBody"></tbody>
     </table>
@@ -559,9 +559,9 @@
 <div id="trrlatam" class="tab-content hidden">
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
     <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Total RRs</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="rr-kpiTotal">—</div></div>
-    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Sin Asignar</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="rr-kpiUnassigned">—</div></div>
-    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">% Asignados</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="rr-kpiPct">—</div></div>
-    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Oportunidades</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="rr-kpiOpps">—</div></div>
+    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);" data-i18n="kpi_unassigned">Sin Asignar</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="rr-kpiUnassigned">—</div></div>
+    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);" data-i18n="kpi_pct_assigned">% Asignados</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="rr-kpiPct">—</div></div>
+    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);" data-i18n="kpi_opps">Oportunidades</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="rr-kpiOpps">—</div></div>
   </div>
   <div class="local-filter-bar flex flex-wrap gap-3 items-start mb-3">
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_rrSSM"></div></div>
@@ -584,16 +584,16 @@
     <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;">RRs por AP</h3><div class="chart-container"><canvas id="chartRRAp"></canvas></div></div>
   </div>
   <details class="card-panel p-3 mb-3">
-    <summary style="cursor:pointer;font-weight:600;font-size:0.875rem;color:#3E3E3C">Resumen por Oportunidad</summary>
+    <summary style="cursor:pointer;font-weight:600;font-size:0.875rem;color:#3E3E3C" data-i18n="summary_opp">Resumen por Oportunidad</summary>
     <div class="overflow-auto mt-2">
       <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C">
         <thead><tr>
-          <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap">Oportunidad</th>
-          <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap">Cuenta</th>
+          <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap" data-i18n="th_oportunidad">Oportunidad</th>
+          <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap" data-i18n="th_cuenta">Cuenta</th>
           <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap">AP</th>
           <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap"># RRs</th>
-          <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap">Sin Asignar</th>
-          <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap">Horas SOW</th>
+          <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap" data-i18n="rr_unassigned_th">Sin Asignar</th>
+          <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap" data-i18n="th_horas_sow">Horas SOW</th>
         </tr></thead>
         <tbody id="rr-summaryBody"></tbody>
       </table>
@@ -603,14 +603,14 @@
     <table class="rr-table border-collapse" style="font-size:0.78rem;color:#3E3E3C;">
       <thead><tr>
         <th style="width:28px;background:#EEF8FF;"></th>
-        <th class="px-3 py-2 text-center" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:80px;">Bandera</th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:170px;" onclick="rrSortBy('oppName')">Oportunidad <span class="sort-icon" id="rr-si-oppName">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:120px;" onclick="rrSortBy('account')">Cuenta <span class="sort-icon" id="rr-si-account">▼</span></th>
+        <th class="px-3 py-2 text-center" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:80px;" data-i18n="th_bandera">Bandera</th>
+        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:170px;" onclick="rrSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="rr-si-oppName">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:120px;" onclick="rrSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="rr-si-account">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;min-width:80px;">Stage</th>
         <th class="px-3 py-2 text-right" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:90px;" onclick="rrSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="rr-si-closeDate">▲</span></th>
         <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:110px;" onclick="rrSortBy('ap')">AP <span class="sort-icon" id="rr-si-ap">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:150px;" onclick="rrSortBy('rrCount')">RRs <span class="sort-icon" id="rr-si-rrCount">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:90px;" onclick="rrSortBy('estado')">Estado <span class="sort-icon" id="rr-si-estado">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:90px;" onclick="rrSortBy('estado')" data-i18n="th_estado">Estado <span class="sort-icon" id="rr-si-estado">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:150px;" onclick="rrSortBy('estimateName')">Estimate <span class="sort-icon" id="rr-si-estimateName">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#EEF8FF;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer;min-width:110px;" onclick="rrSortBy('sssm')">SSSM <span class="sort-icon" id="rr-si-sssm">▼</span></th>
       </tr></thead>
@@ -622,10 +622,10 @@
 <!-- TAB DISCIPLINA OPERATIVA -->
 <div id="tzombie" class="tab-content hidden">
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">🧟 Total Zombies</div><div class="text-2xl font-bold" style="color:#F87171;" id="z-kpiTotal">—</div></div>
-    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">✅ Opp Ganada</div><div class="text-2xl font-bold" style="color:#34D399;" id="z-kpiWon">—</div></div>
-    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">❌ Opp Perdida</div><div class="text-2xl font-bold" style="color:#F87171;" id="z-kpiLost">—</div></div>
-    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#7B0000,#C23934);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">SSSMs con Zombies</div><div class="text-2xl font-bold" style="color:#FED7D7;" id="z-kpiSSSMs">—</div></div>
+    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);" data-i18n="kpi_total_zombies">🧟 Total Zombies</div><div class="text-2xl font-bold" style="color:#F87171;" id="z-kpiTotal">—</div></div>
+    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);" data-i18n="kpi_won_opp">✅ Opp Ganada</div><div class="text-2xl font-bold" style="color:#34D399;" id="z-kpiWon">—</div></div>
+    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);" data-i18n="kpi_lost_opp">❌ Opp Perdida</div><div class="text-2xl font-bold" style="color:#F87171;" id="z-kpiLost">—</div></div>
+    <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#7B0000,#C23934);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);" data-i18n="kpi_sssms_zombies">SSSMs con Zombies</div><div class="text-2xl font-bold" style="color:#FED7D7;" id="z-kpiSSSMs">—</div></div>
   </div>
   <div class="local-filter-bar flex flex-wrap gap-3 items-start mb-3">
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_zSSM"></div></div>
@@ -648,9 +648,9 @@
       <thead><tr>
         <th class="th-std s" onclick="zombieSortBy('sssm')">SSSM <span class="sort-icon" id="z-si-sssm">▼</span></th>
         <th class="th-std s" onclick="zombieSortBy('dsr')">DSR <span class="sort-icon" id="z-si-dsr">▼</span></th>
-        <th class="th-std s" onclick="zombieSortBy('oppName')">Oportunidad <span class="sort-icon" id="z-si-oppName">▼</span></th>
-        <th class="th-std s" onclick="zombieSortBy('account')">Cuenta <span class="sort-icon" id="z-si-account">▼</span></th>
-        <th class="th-std s" onclick="zombieSortBy('stage')">Stage Opp <span class="sort-icon" id="z-si-stage">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="z-si-oppName">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="z-si-account">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('stage')" data-i18n="th_stage_opp">Stage Opp <span class="sort-icon" id="z-si-stage">▼</span></th>
         <th class="th-std s" onclick="zombieSortBy('status')">Status DSR <span class="sort-icon" id="z-si-status">▼</span></th>
         <th class="th-std s text-right" onclick="zombieSortBy('amount')">Pipeline <span class="sort-icon" id="z-si-amount">▼</span></th>
         <th class="th-std s" onclick="zombieSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="z-si-closeDate">▼</span></th>
@@ -26525,7 +26525,24 @@ const i18n = {
     showing: 'Showing', page: 'Page', btn_prev: '← Prev', btn_next: 'Next →',
     th_account: 'Account', th_opp: 'Opportunity', th_country: 'Country', th_territory: 'Territory',
     th_amount: 'Amount', th_close: 'Close', th_ap: 'AP', th_type: 'Type',
-    th_qualified: 'Qualified', th_copy: 'Copy'
+    th_qualified: 'Qualified', th_copy: 'Copy',
+    lbl_region: 'Region', lbl_buscar: 'Search', lbl_registros: 'records', lbl_opportunities: 'opportunities',
+    th_oportunidad: 'Opportunity', th_cuenta: 'Account', th_cierre: 'Close', th_monto: 'Amount',
+    th_bandera: 'Flag', th_estado: 'Status', th_mes: 'Month', th_stage_opp: 'Opp Stage',
+    th_tipo: 'Type', th_pais: 'Country', th_horas_sow: 'SOW Hours',
+    kpi_monto_total: 'Total Amount', kpi_margen_promedio: 'Avg Margin', kpi_bill_rate: 'Avg Bill Rate',
+    kpi_unassigned: 'Unassigned', kpi_pct_assigned: '% Assigned', kpi_opps: 'Opportunities',
+    kpi_total_zombies: '🧟 Total Zombies', kpi_won_opp: '✅ Won Opp', kpi_lost_opp: '❌ Lost Opp',
+    kpi_sssms_zombies: 'SSSMs with Zombies',
+    won_kpi_opps: 'Opportunities', won_kpi_dsrs: 'DSRs Supported', won_kpi_arr: 'Total ARR Supported',
+    won_kpi_tipo: 'By Type', won_kpi_pais: 'By Country', won_kpi_sssm: 'Most Active SSSM',
+    chart_dsrs_arr_stage: 'DSRs AND ARR BY STAGE', chart_cierre_mes: '📅 Close by Month',
+    chart_dsrs_sssm: 'DSRs BY SSSM', chart_pipeline_sssm: 'Pipeline BY SSSM ($M)',
+    chart_dist_sssm: 'Distribution by SSSM',
+    zombie_label: 'ZOMBIE DSRs', zombie_sub: 'closed/lost opp with active DSR',
+    zombie_link: 'view Disciplina Op. →', drill_placeholder: 'Click a bar or SSSM name',
+    summary_opp: 'Summary by Opportunity', rr_unassigned_th: 'Unassigned',
+    rr_inicio_vencido: '🚩 Overdue Start', badge_won: '✅ Won', badge_lost: '❌ Lost'
   },
   es: {
     generated: 'Generado:', btn_refresh: '🔄 Actualizar datos', toast_copied: 'Copiado! Pega en Slack: @Claude ps-dashboard',
@@ -26544,7 +26561,24 @@ const i18n = {
     showing: 'Mostrando', page: 'Página', btn_prev: '← Prev', btn_next: 'Sig →',
     th_account: 'Cuenta', th_opp: 'Oportunidad', th_country: 'País', th_territory: 'Territorio',
     th_amount: 'Monto', th_close: 'Cierre', th_ap: 'AP', th_type: 'Tipo',
-    th_qualified: 'Calificado', th_copy: 'Copiar'
+    th_qualified: 'Calificado', th_copy: 'Copiar',
+    lbl_region: 'Región', lbl_buscar: 'Buscar', lbl_registros: 'registros', lbl_opportunities: 'oportunidades',
+    th_oportunidad: 'Oportunidad', th_cuenta: 'Cuenta', th_cierre: 'Cierre', th_monto: 'Monto',
+    th_bandera: 'Bandera', th_estado: 'Estado', th_mes: 'Mes', th_stage_opp: 'Stage Opp',
+    th_tipo: 'Tipo', th_pais: 'País', th_horas_sow: 'Horas SOW',
+    kpi_monto_total: 'Monto Total', kpi_margen_promedio: 'Margen Promedio', kpi_bill_rate: 'Bill Rate Promedio',
+    kpi_unassigned: 'Sin Asignar', kpi_pct_assigned: '% Asignados', kpi_opps: 'Oportunidades',
+    kpi_total_zombies: '🧟 Total Zombies', kpi_won_opp: '✅ Opp Ganada', kpi_lost_opp: '❌ Opp Perdida',
+    kpi_sssms_zombies: 'SSSMs con Zombies',
+    won_kpi_opps: 'Oportunidades', won_kpi_dsrs: 'DSRs soportados', won_kpi_arr: 'ARR Total Soportado',
+    won_kpi_tipo: 'Por Tipo', won_kpi_pais: 'Por País', won_kpi_sssm: 'SSSM más activo',
+    chart_dsrs_arr_stage: 'DSRs y ARR por Stage', chart_cierre_mes: '📅 Cierre por Mes',
+    chart_dsrs_sssm: 'DSRs por SSSM', chart_pipeline_sssm: 'Pipeline por SSSM ($M)',
+    chart_dist_sssm: 'Distribución por SSSM',
+    zombie_label: 'DSRs Zombies', zombie_sub: 'opp cerrada/perdida con DSR activo',
+    zombie_link: 'ver Disciplina Op. →', drill_placeholder: 'Haz click en una barra o nombre de SSSM',
+    summary_opp: 'Resumen por Oportunidad', rr_unassigned_th: 'Sin Asignar',
+    rr_inicio_vencido: '🚩 Inicio vencido', badge_won: '✅ Ganada', badge_lost: '❌ Perdida'
   },
   pt: {
     generated: 'Gerado:', btn_refresh: '🔄 Atualizar dados', toast_copied: 'Copiado! Cole no Slack: @Claude ps-dashboard',
@@ -26563,9 +26597,28 @@ const i18n = {
     showing: 'Mostrando', page: 'Página', btn_prev: '← Ant', btn_next: 'Próx →',
     th_account: 'Conta', th_opp: 'Oportunidade', th_country: 'País', th_territory: 'Território',
     th_amount: 'Valor', th_close: 'Fechamento', th_ap: 'AP', th_type: 'Tipo',
-    th_qualified: 'Qualificado', th_copy: 'Copiar'
+    th_qualified: 'Qualificado', th_copy: 'Copiar',
+    lbl_region: 'Região', lbl_buscar: 'Buscar', lbl_registros: 'registros', lbl_opportunities: 'oportunidades',
+    th_oportunidad: 'Oportunidade', th_cuenta: 'Conta', th_cierre: 'Fechamento', th_monto: 'Valor',
+    th_bandera: 'Bandeira', th_estado: 'Status', th_mes: 'Mês', th_stage_opp: 'Stage Opp',
+    th_tipo: 'Tipo', th_pais: 'País', th_horas_sow: 'Horas SOW',
+    kpi_monto_total: 'Valor Total', kpi_margen_promedio: 'Margem Média', kpi_bill_rate: 'Taxa Média',
+    kpi_unassigned: 'Sem Alocação', kpi_pct_assigned: '% Alocados', kpi_opps: 'Oportunidades',
+    kpi_total_zombies: '🧟 Total Zumbis', kpi_won_opp: '✅ Opp Ganha', kpi_lost_opp: '❌ Opp Perdida',
+    kpi_sssms_zombies: 'SSSMs com Zumbis',
+    won_kpi_opps: 'Oportunidades', won_kpi_dsrs: 'DSRs Suportados', won_kpi_arr: 'ARR Total Suportado',
+    won_kpi_tipo: 'Por Tipo', won_kpi_pais: 'Por País', won_kpi_sssm: 'SSSM mais ativo',
+    chart_dsrs_arr_stage: 'DSRs E ARR POR STAGE', chart_cierre_mes: '📅 Fechamento por Mês',
+    chart_dsrs_sssm: 'DSRs POR SSSM', chart_pipeline_sssm: 'Pipeline POR SSSM ($M)',
+    chart_dist_sssm: 'Distribuição por SSSM',
+    zombie_label: 'DSRs ZUMBIS', zombie_sub: 'opp fechada/perdida com DSR ativo',
+    zombie_link: 'ver Disciplina Op. →', drill_placeholder: 'Clique em uma barra ou nome de SSSM',
+    summary_opp: 'Resumo por Oportunidade', rr_unassigned_th: 'Sem Assinado',
+    rr_inicio_vencido: '🚩 Início vencido', badge_won: '✅ Ganha', badge_lost: '❌ Perdida'
   }
 };
+
+function _t(key) { return (i18n[currentLang]||i18n.es)[key] || i18n.es[key] || key; }
 
 function setLang(lang) {
   currentLang = lang;
@@ -28124,7 +28177,7 @@ function renderEstimatesTab() {
   document.getElementById('est-kpiMargin').textContent = avgMargin !== '--' ? avgMargin+'%' : '--';
   document.getElementById('est-kpiBillRate').textContent = avgRate !== '--' ? '$'+avgRate+'/hr' : '--';
   document.getElementById('est-kpiTE').textContent = totalTE > 0 ? fmtAmt(totalTE) : '--';
-  document.getElementById('est-rowCount').textContent = data.length + ' registros';
+  document.getElementById('est-rowCount').textContent = data.length + ' ' + _t('lbl_registros');
   // Insights sidebar (siempre desde ESTIMATE_DATA completo, no filtrado)
   const estNow = new Date().toISOString().slice(0,10);
   const estD30 = new Date(Date.now()+30*86400000).toISOString().slice(0,10);
@@ -28219,7 +28272,7 @@ function renderWonTab() {
   _wonExportData = wonOpps;
   const sfBase = 'https://org62.lightning.force.com/lightning/r';
   const countEl = document.getElementById('won-count');
-  if (countEl) countEl.textContent = wonOpps.length + ' oportunidades (' + data.length + ' DSRs)';
+  if (countEl) countEl.textContent = wonOpps.length + ' ' + _t('lbl_opportunities') + ' (' + data.length + ' DSRs)';
   // Insights sidebar (desde WON_DATA completo)
   if (WON_DATA.length) {
     const allWonOpps = Object.values((() => { const m={}; WON_DATA.forEach(d=>{ const k=d.oppId||d.oppName||'_'; if(!m[k]) m[k]={amount:d.amount||0,closeDate:d.closeDate,account:d.account}; }); return m; })());
@@ -28251,12 +28304,12 @@ function renderWonTab() {
     const topPais = Object.entries(byPais).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} (${v})`).join(' \u00b7 ');
     const topSssm = Object.entries(bySssm).sort((a,b)=>b[1]-a[1])[0];
     wonSumEl.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
-      <div class="card-panel p-3 text-center" style="min-width:100px;flex:1;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${wonOpps.length}</div><div style="font-size:0.72rem;color:#706E6B;">Oportunidades</div></div>
-      <div class="card-panel p-3 text-center" style="min-width:100px;flex:1;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${data.length}</div><div style="font-size:0.72rem;color:#706E6B;">DSRs soportados</div></div>
-      <div class="card-panel p-3 text-center" style="min-width:140px;flex:2;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${fmt$(totalAmt)}</div><div style="font-size:0.72rem;color:#706E6B;">ARR Total Soportado</div></div>
-      <div class="card-panel p-3" style="min-width:200px;flex:3;"><div style="font-size:0.72rem;color:#706E6B;margin-bottom:4px;">Por Tipo</div><div style="font-size:0.78rem;color:#3E3E3C;">${topTipo}</div></div>
-      <div class="card-panel p-3" style="min-width:180px;flex:2;"><div style="font-size:0.72rem;color:#706E6B;margin-bottom:4px;">Por Pa\u00eds</div><div style="font-size:0.78rem;color:#3E3E3C;">${topPais}</div></div>
-      ${topSssm ? `<div class="card-panel p-3 text-center" style="min-width:130px;flex:2;"><div style="font-size:1.1rem;font-weight:700;color:#032D60;">${topSssm[0].split(' ')[0]}</div><div style="font-size:0.72rem;color:#706E6B;">SSSM m\u00e1s activo (${topSssm[1]} DSRs)</div></div>` : ''}
+      <div class="card-panel p-3 text-center" style="min-width:100px;flex:1;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${wonOpps.length}</div><div style="font-size:0.72rem;color:#706E6B;">${_t('won_kpi_opps')}</div></div>
+      <div class="card-panel p-3 text-center" style="min-width:100px;flex:1;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${data.length}</div><div style="font-size:0.72rem;color:#706E6B;">${_t('won_kpi_dsrs')}</div></div>
+      <div class="card-panel p-3 text-center" style="min-width:140px;flex:2;"><div style="font-size:1.5rem;font-weight:700;color:#032D60;">${fmt$(totalAmt)}</div><div style="font-size:0.72rem;color:#706E6B;">${_t('won_kpi_arr')}</div></div>
+      <div class="card-panel p-3" style="min-width:200px;flex:3;"><div style="font-size:0.72rem;color:#706E6B;margin-bottom:4px;">${_t('won_kpi_tipo')}</div><div style="font-size:0.78rem;color:#3E3E3C;">${topTipo}</div></div>
+      <div class="card-panel p-3" style="min-width:180px;flex:2;"><div style="font-size:0.72rem;color:#706E6B;margin-bottom:4px;">${_t('won_kpi_pais')}</div><div style="font-size:0.78rem;color:#3E3E3C;">${topPais}</div></div>
+      ${topSssm ? `<div class="card-panel p-3 text-center" style="min-width:130px;flex:2;"><div style="font-size:1.1rem;font-weight:700;color:#032D60;">${topSssm[0].split(' ')[0]}</div><div style="font-size:0.72rem;color:#706E6B;">${_t('won_kpi_sssm')} (${topSssm[1]} DSRs)</div></div>` : ''}
     </div>`;
   } else if (wonSumEl) { wonSumEl.innerHTML = ''; }
   // Table \u2014 one row per opportunity, DSRs as links
@@ -28351,7 +28404,7 @@ function renderRRTab() {
   document.getElementById('rr-kpiUnassigned').textContent = unassigned;
   document.getElementById('rr-kpiPct').textContent = pctAssigned+'%';
   document.getElementById('rr-kpiOpps').textContent = uniqueOpps;
-  document.getElementById('rr-rowCount').textContent = data.length + ' registros';
+  document.getElementById('rr-rowCount').textContent = data.length + ' ' + _t('lbl_registros');
   // Summary by opp
   const oppMap = {};
   data.forEach(d => {
@@ -28415,7 +28468,7 @@ function renderRRTab() {
     let flagHtml = '<span style="color:#706E6B;">—</span>';
     const vencidos = opp.rrs.filter(r => r.startDate && r.startDate < nowStr && (r.status === 'Draft' || r.status === 'Ready to Staff'));
     if (vencidos.length) {
-      flagHtml = `<span style="background:#FDDCDB;color:#C23934;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🚩 Inicio vencido (${vencidos.length})</span>`;
+      flagHtml = `<span style="background:#FDDCDB;color:#C23934;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">${_t('rr_inicio_vencido')} (${vencidos.length})</span>`;
     } else if (opp.closeDate) {
       const daysLeft = Math.round((new Date(opp.closeDate) - new Date(nowStr)) / 86400000);
       if (daysLeft < 0) flagHtml = `<span style="background:#F3F2F2;color:#706E6B;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">✔ cerrado</span>`;
@@ -28489,7 +28542,7 @@ function renderRRTab() {
   const rrStackedScales = { x:{stacked:true,ticks:wTick2,grid:{color:'rgba(255,255,255,0.12)'}}, y:{stacked:true,ticks:{color:'rgba(255,255,255,0.92)',font:{size:10}},grid:{color:'rgba(255,255,255,0.12)'}} };
   const rrLegend = {plugins:{legend:{labels:{color:'rgba(255,255,255,0.92)',font:{size:11}}}}};
   makeChart('chartRRSssm','bar',sssmRREntries.map(([n])=>sssmLabel(n)),[
-    {label:'🚩 Inicio vencido',data:sssmRREntries.map(([,m])=>m.vencido),backgroundColor:'#F87171',borderRadius:0},
+    {label:_t('rr_inicio_vencido'),data:sssmRREntries.map(([,m])=>m.vencido),backgroundColor:'#F87171',borderRadius:0},
     {label:'⚡ Close <30d',data:sssmRREntries.map(([,m])=>m.urgente),backgroundColor:'#FBBF24',borderRadius:0},
     {label:'✅ Normal',data:sssmRREntries.map(([,m])=>m.normal),backgroundColor:'#34D399',borderRadius:0},
   ],{scales:rrStackedScales,...rrLegend});
@@ -28501,7 +28554,7 @@ function renderRRTab() {
   });
   const apRREntries = Object.entries(apRRMap).sort((a,b) => a[0].localeCompare(b[0]));
   makeChart('chartRRAp','bar',apRREntries.map(([n])=>sssmLabel(n)),[
-    {label:'🚩 Inicio vencido',data:apRREntries.map(([,m])=>m.vencido),backgroundColor:'#F87171',borderRadius:0},
+    {label:_t('rr_inicio_vencido'),data:apRREntries.map(([,m])=>m.vencido),backgroundColor:'#F87171',borderRadius:0},
     {label:'⚡ Close <30d',data:apRREntries.map(([,m])=>m.urgente),backgroundColor:'#FBBF24',borderRadius:0},
     {label:'✅ Normal',data:apRREntries.map(([,m])=>m.normal),backgroundColor:'#34D399',borderRadius:0},
   ],{scales:rrStackedScales,...rrLegend});
@@ -28563,14 +28616,14 @@ function renderZombieTab() {
   if (kpiWon) kpiWon.textContent = allZ.filter(d => d.stage === '06 - Project Booked').length;
   if (kpiLost) kpiLost.textContent = allZ.filter(d => d.stage === 'Dead - Lost').length;
   if (kpiSSSMs) kpiSSSMs.textContent = new Set(allZ.map(d=>d.sssm)).size;
-  if (rowCount) rowCount.textContent = data.length + ' registros';
+  if (rowCount) rowCount.textContent = data.length + ' ' + _t('lbl_registros');
   const tbody = document.getElementById('z-tableBody');
   if (!tbody) return;
   tbody.innerHTML = data.map(d => {
     const won = d.stage === '06 - Project Booked';
     const stageBadge = won
-      ? '<span style="background:#EFFFEE;color:#04844B;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:600;">✅ Ganada</span>'
-      : '<span style="background:#FEEFEE;color:#C23934;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:600;">❌ Perdida</span>';
+      ? `<span style="background:#EFFFEE;color:#04844B;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:600;">${_t('badge_won')}</span>`
+      : `<span style="background:#FEEFEE;color:#C23934;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:600;">${_t('badge_lost')}</span>`;
     return `<tr class="table-row">
       <td class="px-3 py-2">${d.sssm||'—'}</td>
       <td class="px-3 py-2"><a href="${d.dsrId ? `https://org62.lightning.force.com/lightning/r/Deal_Support_Request__c/${d.dsrId}/view` : '#'}" target="_blank" class="opp-link font-mono text-xs">${d.dsr||'—'}</a></td>
