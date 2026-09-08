@@ -158,10 +158,10 @@
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t4',this)" style="display:none"><span data-i18n="tab_ai">🤖 AI Readiness</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t5',this)" style="display:none"><span data-i18n="tab_risk">🚨 Risk Radar</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t6',this)"><span data-i18n="tab_detail">📄 DSR Detail</span></button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('testimates',this)">📋 Estimates</button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('twon',this)">🏆 Won Deals</button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('trrlatam',this)">👥 RR LATAM</button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('tzombie',this)">🧟 Disciplina Op.</button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('testimates',this)"><span data-i18n="tab_estimates">📋 Estimates</span></button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('twon',this)"><span data-i18n="tab_won">🏆 Won Deals</span></button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('trrlatam',this)"><span data-i18n="tab_rr">👥 RR LATAM</span></button>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('tzombie',this)"><span data-i18n="tab_zombie">🧟 Disciplina Op.</span></button>
   </div>
 </div>
 
@@ -465,7 +465,6 @@
   </div>
 </div>
 
-</div><!-- end p-6 -->
 
 <div id="testimates" class="tab-content hidden">
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-4">
@@ -651,6 +650,7 @@
     </table>
   </div>
 </div><!-- end tzombie -->
+</div><!-- end tab-content-wrap -->
 </div><!-- end main-content-area -->
 
 <script>
@@ -26508,6 +26508,7 @@ const i18n = {
     btn_reset: '↺ Reset', btn_expand_all: '⊞ Expand all', btn_collapse_all: '⊟ Collapse all',
     tab_summary: '📋 Summary', tab_sssm_view: '👤 SSSM View', tab_sssm_coverage: '👥 Workload',
     tab_funnel: '🔻 Funnel', tab_ai: '🤖 AI Readiness', tab_risk: '🚨 Risk Radar', tab_detail: '📄 DSR Detail',
+    tab_estimates: '📋 Estimates', tab_won: '🏆 Won Deals', tab_rr: '👥 RR LATAM', tab_zombie: '🧟 Disciplina Op.',
     kpi_active_dsrs: 'Active DSRs', kpi_total_pipeline: 'Total Pipeline', kpi_commit_arr: 'Commit ARR',
     kpi_pct_qualified: '% Qualified', kpi_avg_score: 'Avg PS Score',
     sssm_view_desc: 'Grouped view: SSSM → Stage → Status · matches org62 report',
@@ -26526,6 +26527,7 @@ const i18n = {
     btn_reset: '↺ Reset', btn_expand_all: '⊞ Expandir todo', btn_collapse_all: '⊟ Colapsar todo',
     tab_summary: '📋 Resumen', tab_sssm_view: '👤 Vista SSSM', tab_sssm_coverage: '👥 Carga',
     tab_funnel: '🔻 Funnel', tab_ai: '🤖 AI Readiness', tab_risk: '🚨 Risk Radar', tab_detail: '📄 Detalle DSR',
+    tab_estimates: '📋 Estimates', tab_won: '🏆 Deals Ganados', tab_rr: '👥 RR LATAM', tab_zombie: '🧟 Disciplina Op.',
     kpi_active_dsrs: 'DSRs Activos', kpi_total_pipeline: 'Pipeline Total', kpi_commit_arr: 'Commit ARR',
     kpi_pct_qualified: '% Calificados', kpi_avg_score: 'Avg PS Score',
     sssm_view_desc: 'Vista agrupada: SSSM → Stage → Status · igual al reporte org62',
@@ -26544,6 +26546,7 @@ const i18n = {
     btn_reset: '↺ Reset', btn_expand_all: '⊞ Expandir tudo', btn_collapse_all: '⊟ Recolher tudo',
     tab_summary: '📋 Resumo', tab_sssm_view: '👤 Visão SSSM', tab_sssm_coverage: '👥 Carga',
     tab_funnel: '🔻 Funil', tab_ai: '🤖 AI Readiness', tab_risk: '🚨 Risk Radar', tab_detail: '📄 Detalhe DSR',
+    tab_estimates: '📋 Estimates', tab_won: '🏆 Deals Ganhos', tab_rr: '👥 RR LATAM', tab_zombie: '🧟 Disciplina Op.',
     kpi_active_dsrs: 'DSRs Ativos', kpi_total_pipeline: 'Pipeline Total', kpi_commit_arr: 'Commit ARR',
     kpi_pct_qualified: '% Qualificados', kpi_avg_score: 'Avg PS Score',
     sssm_view_desc: 'Visão agrupada: SSSM → Etapa → Status · igual ao relatório org62',
