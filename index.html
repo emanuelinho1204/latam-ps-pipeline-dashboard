@@ -24,6 +24,11 @@
   .heat-low { background: #FEEFEE; color: #C23934; border: 1px solid rgba(194,57,52,0.2); }
   .sort-btn { cursor: pointer; user-select: none; color: #0176D3; }
   .sort-btn:hover { color: #014486; }
+  .th-std { padding:0.5rem 0.75rem; background:#F3F2F2; font-weight:600; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+  .th-std.s { cursor:pointer; user-select:none; }
+  .th-std.s:hover { background:#EAEAEA; }
+  .sort-icon { font-size:0.62rem; opacity:0.45; margin-left:2px; }
+  .sort-icon.sort-active { opacity:1; color:#0176D3; }
   .btn-sm { font-size: 0.7rem; padding: 3px 10px; border-radius: 6px; border: 1px solid #C9E4F7; color: #032D60; background: #fff; cursor: pointer; white-space: nowrap; position:relative; }
   .btn-sm[title]:hover::after { content: attr(title); position:absolute; bottom:calc(100% + 5px); left:50%; transform:translateX(-50%); background:#032D60; color:#fff; font-size:0.65rem; white-space:nowrap; padding:3px 8px; border-radius:4px; pointer-events:none; z-index:200; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
   .btn-sm[title]:hover::before { content:''; position:absolute; bottom:calc(100% + 1px); left:50%; transform:translateX(-50%); border:4px solid transparent; border-top-color:#032D60; pointer-events:none; z-index:200; }
@@ -437,28 +442,27 @@
   <table class="w-full" style="font-size:0.78rem;">
     <thead><tr>
       <th style="width:28px;background:#F3F2F2;"></th>
-      <th class="text-center sort-btn" onclick="sortTable('heat')">Heat ▲▼</th>
-      <th class="text-center sort-btn" onclick="sortTable('priority')">Prioridad ▲▼</th>
-      <th class="sort-btn" onclick="sortTable('dsr')">DSR ▲▼</th>
-      <th>Est.</th>
-      <th class="sort-btn" onclick="sortTable('sssm')">SSSM ▲▼</th>
-      <th class="sort-btn" onclick="sortTable('account')" data-i18n="th_account">Account ▲▼</th>
-      <th data-i18n="th_opp">Opportunity</th>
-      <th data-i18n="th_country">Country</th>
-      <th data-i18n="th_territory">Territory</th>
-      <th class="sort-btn" onclick="sortTable('stage')">Stage ▲▼</th>
-      <th class="text-right sort-btn" onclick="sortTable('amount')" data-i18n="th_amount">Amount ▲▼</th>
-      <th class="sort-btn" onclick="sortTable('forecast')">Forecast ▲▼</th>
-      <th class="sort-btn" onclick="sortTable('mgrJudgement')">Mgr ▲▼</th>
-      <th class="sort-btn" onclick="sortTable('closeDate')" data-i18n="th_close">Close ▲▼</th>
-      <th class="sort-btn" onclick="sortTable('status')">Status ▲▼</th>
-      <th data-i18n="th_ap">Account Partner</th>
-      <th data-i18n="th_type">Type</th>
-      <th title="Opp Contract Type | Estimate Billing Type">Contract</th>
-      <th class="text-right sort-btn" onclick="sortTable('score')">Score ▲▼</th>
-      <th>Delivery</th>
-      <th data-i18n="th_qualified" style="display:none">Qualified</th>
-      <th>Offering</th>
+      <th class="th-std s text-center" onclick="sortTable('heat')">Heat <span class="sort-icon" id="d6-si-heat">▲▼</span></th>
+      <th class="th-std s" onclick="sortTable('dsr')">DSR <span class="sort-icon" id="d6-si-dsr">▲▼</span></th>
+      <th class="th-std">Est.</th>
+      <th class="th-std s" onclick="sortTable('sssm')">SSSM <span class="sort-icon" id="d6-si-sssm">▲▼</span></th>
+      <th class="th-std s" onclick="sortTable('account')" data-i18n="th_account">Cuenta <span class="sort-icon" id="d6-si-account">▲▼</span></th>
+      <th class="th-std s" onclick="sortTable('oppName')" data-i18n="th_opp">Oportunidad <span class="sort-icon" id="d6-si-oppName">▲▼</span></th>
+      <th class="th-std" data-i18n="th_country">País</th>
+      <th class="th-std" data-i18n="th_territory">Territorio</th>
+      <th class="th-std s" onclick="sortTable('stage')">Stage <span class="sort-icon" id="d6-si-stage">▲▼</span></th>
+      <th class="th-std s text-right" onclick="sortTable('amount')" data-i18n="th_amount">Monto <span class="sort-icon" id="d6-si-amount">▲▼</span></th>
+      <th class="th-std s" onclick="sortTable('forecast')">Forecast <span class="sort-icon" id="d6-si-forecast">▲▼</span></th>
+      <th class="th-std s" onclick="sortTable('mgrJudgement')">Mgr <span class="sort-icon" id="d6-si-mgr">▲▼</span></th>
+      <th class="th-std s" onclick="sortTable('closeDate')" data-i18n="th_close">Cierre <span class="sort-icon" id="d6-si-closeDate">▲▼</span></th>
+      <th class="th-std s" onclick="sortTable('status')">Status <span class="sort-icon" id="d6-si-status">▲▼</span></th>
+      <th class="th-std" data-i18n="th_ap">AP</th>
+      <th class="th-std" data-i18n="th_type">Tipo</th>
+      <th class="th-std" title="Opp Contract Type | Estimate Billing Type">Contrato</th>
+      <th class="th-std s text-right" onclick="sortTable('score')">Score <span class="sort-icon" id="d6-si-score">▲▼</span></th>
+      <th class="th-std">Delivery</th>
+      <th class="th-std" data-i18n="th_qualified" style="display:none">Calificado</th>
+      <th class="th-std">Offering</th>
     </tr></thead>
     <tbody id="detailBody"></tbody>
   </table>
@@ -535,15 +539,15 @@
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
         <th style="width:28px;background:#F3F2F2;"></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Oportunidad</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Cuenta</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">SSSM</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">AP</th>
-        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Monto</th>
-        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Close</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">DSRs</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Tipo</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">País</th>
+        <th class="th-std s" onclick="wonSortBy('oppName')">Oportunidad <span class="sort-icon" id="won-si-oppName">▼</span></th>
+        <th class="th-std s" onclick="wonSortBy('account')">Cuenta <span class="sort-icon" id="won-si-account">▼</span></th>
+        <th class="th-std s" onclick="wonSortBy('sssm')">SSSM <span class="sort-icon" id="won-si-sssm">▼</span></th>
+        <th class="th-std s" onclick="wonSortBy('ap')">AP <span class="sort-icon" id="won-si-ap">▼</span></th>
+        <th class="th-std s text-right" onclick="wonSortBy('amount')">Monto <span class="sort-icon" id="won-si-amount">▼</span></th>
+        <th class="th-std s text-right" onclick="wonSortBy('closeDate')">Close <span class="sort-icon sort-active" id="won-si-closeDate">▲</span></th>
+        <th class="th-std s" onclick="wonSortBy('dsrs')">DSRs <span class="sort-icon" id="won-si-dsrs">▼</span></th>
+        <th class="th-std">Tipo</th>
+        <th class="th-std">País</th>
       </tr></thead>
       <tbody id="won-tableBody"></tbody>
     </table>
@@ -636,15 +640,15 @@
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
       <thead><tr>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">SSSM</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">DSR</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Oportunidad</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Cuenta</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Stage Opp</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Status DSR</th>
-        <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Pipeline</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">Close Date</th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;">AP</th>
+        <th class="th-std s" onclick="zombieSortBy('sssm')">SSSM <span class="sort-icon" id="z-si-sssm">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('dsr')">DSR <span class="sort-icon" id="z-si-dsr">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('oppName')">Oportunidad <span class="sort-icon" id="z-si-oppName">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('account')">Cuenta <span class="sort-icon" id="z-si-account">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('stage')">Stage Opp <span class="sort-icon" id="z-si-stage">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('status')">Status DSR <span class="sort-icon" id="z-si-status">▼</span></th>
+        <th class="th-std s text-right" onclick="zombieSortBy('amount')">Pipeline <span class="sort-icon" id="z-si-amount">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('closeDate')">Close Date <span class="sort-icon sort-active" id="z-si-closeDate">▼</span></th>
+        <th class="th-std s" onclick="zombieSortBy('ap')">AP <span class="sort-icon" id="z-si-ap">▼</span></th>
       </tr></thead>
       <tbody id="z-tableBody"></tbody>
     </table>
@@ -26513,8 +26517,8 @@ const i18n = {
     kpi_pct_qualified: '% Qualified', kpi_avg_score: 'Avg PS Score',
     sssm_view_desc: 'Grouped view: SSSM → Stage → Status · matches org62 report',
     showing: 'Showing', page: 'Page', btn_prev: '← Prev', btn_next: 'Next →',
-    th_account: 'Account ▲▼', th_opp: 'Opportunity', th_country: 'Country', th_territory: 'Territory',
-    th_amount: 'Amount ▲▼', th_close: 'Close ▲▼', th_ap: 'Account Partner', th_type: 'Type',
+    th_account: 'Account', th_opp: 'Opportunity', th_country: 'Country', th_territory: 'Territory',
+    th_amount: 'Amount', th_close: 'Close', th_ap: 'AP', th_type: 'Type',
     th_qualified: 'Qualified', th_copy: 'Copy'
   },
   es: {
@@ -26532,8 +26536,8 @@ const i18n = {
     kpi_pct_qualified: '% Calificados', kpi_avg_score: 'Avg PS Score',
     sssm_view_desc: 'Vista agrupada: SSSM → Stage → Status · igual al reporte org62',
     showing: 'Mostrando', page: 'Página', btn_prev: '← Prev', btn_next: 'Sig →',
-    th_account: 'Cuenta ▲▼', th_opp: 'Oportunidad', th_country: 'País', th_territory: 'Territorio',
-    th_amount: 'Monto ▲▼', th_close: 'Cierre ▲▼', th_ap: 'Account Partner', th_type: 'Tipo',
+    th_account: 'Cuenta', th_opp: 'Oportunidad', th_country: 'País', th_territory: 'Territorio',
+    th_amount: 'Monto', th_close: 'Cierre', th_ap: 'AP', th_type: 'Tipo',
     th_qualified: 'Calificado', th_copy: 'Copiar'
   },
   pt: {
@@ -26551,8 +26555,8 @@ const i18n = {
     kpi_pct_qualified: '% Qualificados', kpi_avg_score: 'Avg PS Score',
     sssm_view_desc: 'Visão agrupada: SSSM → Etapa → Status · igual ao relatório org62',
     showing: 'Mostrando', page: 'Página', btn_prev: '← Ant', btn_next: 'Próx →',
-    th_account: 'Conta ▲▼', th_opp: 'Oportunidade', th_country: 'País', th_territory: 'Território',
-    th_amount: 'Valor ▲▼', th_close: 'Fechamento ▲▼', th_ap: 'Account Partner', th_type: 'Tipo',
+    th_account: 'Conta', th_opp: 'Oportunidade', th_country: 'País', th_territory: 'Território',
+    th_amount: 'Valor', th_close: 'Fechamento', th_ap: 'AP', th_type: 'Tipo',
     th_qualified: 'Qualificado', th_copy: 'Copiar'
   }
 };
@@ -26571,7 +26575,14 @@ function applyTranslations() {
   const t = i18n[currentLang] || i18n.en;
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (t[key] !== undefined) el.textContent = t[key];
+    if (t[key] === undefined) return;
+    if (el.children.length > 0) {
+      // Has child elements (e.g. sort-icon spans) — update only the leading text node
+      const textNode = [...el.childNodes].find(n => n.nodeType === 3);
+      if (textNode) textNode.textContent = t[key] + ' ';
+    } else {
+      el.textContent = t[key];
+    }
   });
 }
 
@@ -27746,6 +27757,9 @@ let detailSortDir = {};
 function sortTable(field) {
   if (sortField === field) sortDir *= -1;
   else { sortField = field; sortDir = -1; }
+  document.querySelectorAll('[id^="d6-si-"]').forEach(el => { el.textContent = '▼'; el.classList.remove('sort-active'); });
+  const si = document.getElementById('d6-si-'+field);
+  if (si) { si.textContent = sortDir === -1 ? '▲' : '▼'; si.classList.add('sort-active'); }
   renderTab6();
 }
 
@@ -28092,6 +28106,14 @@ function renderEstimatesTab() {
 }
 
 // ── Won Deals Tab ──────────────────────────────────────
+let wonSortCol = 'closeDate', wonSortDir = -1;
+function wonSortBy(col) {
+  if (wonSortCol === col) wonSortDir *= -1; else { wonSortCol = col; wonSortDir = -1; }
+  document.querySelectorAll('[id^="won-si-"]').forEach(el => { el.textContent = '▼'; el.classList.remove('sort-active'); });
+  const si = document.getElementById('won-si-'+col);
+  if (si) { si.textContent = wonSortDir === -1 ? '▲' : '▼'; si.classList.add('sort-active'); }
+  renderWonTab();
+}
 function renderWonTab() {
   const fSearch = ((document.getElementById('won-fSearch')||{}).value||'').toLowerCase();
   // Lazy-init won multi-selects
@@ -28116,7 +28138,14 @@ function renderWonTab() {
     };
     wonOppMap[key].dsrs.push(d);
   });
-  const wonOpps = Object.values(wonOppMap).sort((a,b) => new Date(b.closeDate) - new Date(a.closeDate));
+  const wonOpps = Object.values(wonOppMap).sort((a,b) => {
+    let va = a[wonSortCol], vb = b[wonSortCol];
+    if (wonSortCol === 'dsrs') { va = a.dsrs.length; vb = b.dsrs.length; }
+    if (wonSortCol === 'sssm') { va = (a.dsrs[0]||{}).sssm||''; vb = (b.dsrs[0]||{}).sssm||''; }
+    if (wonSortCol === 'closeDate') { return wonSortDir * (new Date(va||0) - new Date(vb||0)); }
+    if (typeof va === 'string') return wonSortDir * (va||'').localeCompare(vb||'');
+    return wonSortDir * ((va||0) < (vb||0) ? 1 : (va||0) > (vb||0) ? -1 : 0);
+  });
   _wonExportData = wonOpps;
   const sfBase = 'https://org62.lightning.force.com/lightning/r';
   const countEl = document.getElementById('won-count');
@@ -28424,6 +28453,14 @@ function toggleInsights() {
   sb.style.display = hidden ? '' : 'none';
   btn.style.display = hidden ? 'none' : '';
 }
+let zombieSortCol = 'closeDate', zombieSortDir = 1;
+function zombieSortBy(col) {
+  if (zombieSortCol === col) zombieSortDir *= -1; else { zombieSortCol = col; zombieSortDir = -1; }
+  document.querySelectorAll('[id^="z-si-"]').forEach(el => { el.textContent = '▼'; el.classList.remove('sort-active'); });
+  const si = document.getElementById('z-si-'+col);
+  if (si) { si.textContent = zombieSortDir === -1 ? '▲' : '▼'; si.classList.add('sort-active'); }
+  renderZombieTab();
+}
 function renderZombieTab() {
   const _zClosed = new Set(['Closed - Resolved','Closed - No Response','Closed - Duplicate','Closed - Not Qualified']);
   const allZ = DSR_DATA.filter(d => (d.stage === '06 - Project Booked' || d.stage === 'Dead - Lost') && !_zClosed.has(d.status));
@@ -28437,6 +28474,12 @@ function renderZombieTab() {
   if (zStage.size) data = data.filter(d => zStage.has(d.stage));
   if (zStatus.size) data = data.filter(d => zStatus.has(d.status));
   if (search) data = data.filter(d => ((d.oppName||'')+(d.account||'')+(d.sssm||'')+(d.dsr||'')).toLowerCase().includes(search));
+  data = data.slice().sort((a,b) => {
+    const va = a[zombieSortCol]||'', vb = b[zombieSortCol]||'';
+    if (zombieSortCol === 'closeDate') return zombieSortDir * (new Date(va||0) - new Date(vb||0));
+    if (typeof va === 'string') return zombieSortDir * va.localeCompare(vb);
+    return zombieSortDir * ((va < vb) ? 1 : (va > vb) ? -1 : 0);
+  });
   const kpiTotal = document.getElementById('z-kpiTotal');
   const kpiWon = document.getElementById('z-kpiWon');
   const kpiLost = document.getElementById('z-kpiLost');
