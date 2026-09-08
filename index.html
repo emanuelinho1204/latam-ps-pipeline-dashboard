@@ -317,7 +317,7 @@
   </div>
   <div class="card-panel" style="padding:0">
     <h3 class="chart-title" style="padding:0.75rem 1rem 0.5rem;" data-i18n="chart_cierre_mes">📅 Cierre por Mes</h3>
-    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="th-std" data-i18n="th_mes">Mes</th><th class="th-std text-right">DSRs</th><th class="th-std text-right">ARR ($M)</th><th class="th-std text-right">Commit ($M)</th></tr></thead><tbody id="closeMonthBody"></tbody></table></div>
+    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="th-std" data-i18n="th_mes">Mes</th><th class="th-std text-right">DSRs</th><th class="th-std text-right">Pipeline ($M)</th><th class="th-std text-right">Commit ($M)</th></tr></thead><tbody id="closeMonthBody"></tbody></table></div>
   </div>
 </div>
 
@@ -26534,9 +26534,9 @@ const i18n = {
     kpi_unassigned: 'Unassigned', kpi_pct_assigned: '% Assigned', kpi_opps: 'Opportunities',
     kpi_total_zombies: '🧟 Total Zombies', kpi_won_opp: '✅ Won Opp', kpi_lost_opp: '❌ Lost Opp',
     kpi_sssms_zombies: 'SSSMs with Zombies',
-    won_kpi_opps: 'Opportunities', won_kpi_dsrs: 'DSRs Supported', won_kpi_arr: 'Total ARR Supported',
+    won_kpi_opps: 'Opportunities', won_kpi_dsrs: 'DSRs Supported', won_kpi_arr: 'Total Pipeline Supported',
     won_kpi_tipo: 'By Type', won_kpi_pais: 'By Country', won_kpi_sssm: 'Most Active SSSM',
-    chart_dsrs_arr_stage: 'DSRs AND ARR BY STAGE', chart_cierre_mes: '📅 Close by Month',
+    chart_dsrs_arr_stage: 'DSRs AND PIPELINE BY STAGE', chart_cierre_mes: '📅 Close by Month',
     chart_dsrs_sssm: 'DSRs BY SSSM', chart_pipeline_sssm: 'Pipeline BY SSSM ($M)',
     chart_dist_sssm: 'Distribution by SSSM',
     zombie_label: 'ZOMBIE DSRs', zombie_sub: 'closed/lost opp with active DSR',
@@ -26570,9 +26570,9 @@ const i18n = {
     kpi_unassigned: 'Sin Asignar', kpi_pct_assigned: '% Asignados', kpi_opps: 'Oportunidades',
     kpi_total_zombies: '🧟 Total Zombies', kpi_won_opp: '✅ Opp Ganada', kpi_lost_opp: '❌ Opp Perdida',
     kpi_sssms_zombies: 'SSSMs con Zombies',
-    won_kpi_opps: 'Oportunidades', won_kpi_dsrs: 'DSRs soportados', won_kpi_arr: 'ARR Total Soportado',
+    won_kpi_opps: 'Oportunidades', won_kpi_dsrs: 'DSRs soportados', won_kpi_arr: 'Pipeline Total Soportado',
     won_kpi_tipo: 'Por Tipo', won_kpi_pais: 'Por País', won_kpi_sssm: 'SSSM más activo',
-    chart_dsrs_arr_stage: 'DSRs y ARR por Stage', chart_cierre_mes: '📅 Cierre por Mes',
+    chart_dsrs_arr_stage: 'DSRs y Pipeline por Stage', chart_cierre_mes: '📅 Cierre por Mes',
     chart_dsrs_sssm: 'DSRs por SSSM', chart_pipeline_sssm: 'Pipeline por SSSM ($M)',
     chart_dist_sssm: 'Distribución por SSSM',
     zombie_label: 'DSRs Zombies', zombie_sub: 'opp cerrada/perdida con DSR activo',
@@ -26606,9 +26606,9 @@ const i18n = {
     kpi_unassigned: 'Sem Alocação', kpi_pct_assigned: '% Alocados', kpi_opps: 'Oportunidades',
     kpi_total_zombies: '🧟 Total Zumbis', kpi_won_opp: '✅ Opp Ganha', kpi_lost_opp: '❌ Opp Perdida',
     kpi_sssms_zombies: 'SSSMs com Zumbis',
-    won_kpi_opps: 'Oportunidades', won_kpi_dsrs: 'DSRs Suportados', won_kpi_arr: 'ARR Total Suportado',
+    won_kpi_opps: 'Oportunidades', won_kpi_dsrs: 'DSRs Suportados', won_kpi_arr: 'Pipeline Total Suportado',
     won_kpi_tipo: 'Por Tipo', won_kpi_pais: 'Por País', won_kpi_sssm: 'SSSM mais ativo',
-    chart_dsrs_arr_stage: 'DSRs E ARR POR STAGE', chart_cierre_mes: '📅 Fechamento por Mês',
+    chart_dsrs_arr_stage: 'DSRs E PIPELINE POR STAGE', chart_cierre_mes: '📅 Fechamento por Mês',
     chart_dsrs_sssm: 'DSRs POR SSSM', chart_pipeline_sssm: 'Pipeline POR SSSM ($M)',
     chart_dist_sssm: 'Distribuição por SSSM',
     zombie_label: 'DSRs ZUMBIS', zombie_sub: 'opp fechada/perdida com DSR ativo',
@@ -28287,7 +28287,7 @@ function renderWonTab() {
     const topSssm = Object.entries(bySssm).sort((a,b)=>b[1]-a[1])[0];
     const fmtW = v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':'$'+v;
     const wonItems = [];
-    wonItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#04844B;font-weight:700">🏆 ${allWonOpps.length} opps ganadas</span><br><span style="font-size:0.7rem;color:#706E6B">ARR total: ${fmtW(totalWonArr)}</span></div>`);
+    wonItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#04844B;font-weight:700">🏆 ${allWonOpps.length} opps ganadas</span><br><span style="font-size:0.7rem;color:#706E6B">Pipeline total: ${fmtW(totalWonArr)}</span></div>`);
     if (wonThisMonth.length) wonItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#0176D3;font-weight:700">📅 ${wonThisMonth.length} ganados este mes</span><br><span style="font-size:0.7rem;color:#706E6B">${wonThisMonth.slice(0,2).map(o=>o.account||'').filter(Boolean).join(', ')}${wonThisMonth.length>2?` +${wonThisMonth.length-2}`:''}</span></div>`);
     if (biggestWon) wonItems.push(`<div style="margin-bottom:0.5rem"><span style="font-weight:700;color:#032D60">💰 Mayor: ${fmtW(biggestWon.amount||0)}</span><br><span style="font-size:0.7rem;color:#706E6B">${biggestWon.account||''}</span></div>`);
     if (topSssm) wonItems.push(`<div><span style="font-weight:700;color:#7B5EA7">⭐ Top SSSM: ${topSssm[0].split(' ')[0]}</span><span style="font-size:0.7rem;color:#706E6B"> (${topSssm[1]} DSRs)</span></div>`);
