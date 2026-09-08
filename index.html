@@ -469,6 +469,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_estEM"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="est-fSearch" type="text" placeholder="Buscar cuenta / opp / estimate..." oninput="renderEstimatesTab()" style="width:250px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"></div>
     <span class="text-xs text-gray-500 ml-auto" id="est-rowCount"></span>
+    <button onclick="resetEstimatesFilters()" class="btn-sm">↺ Reset</button>
     <button onclick="exportEstimatesSlack()" class="btn-sm">⬇ Descargar</button>
   </div>
   <div class="card-panel overflow-auto">
@@ -507,6 +508,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_wonAP"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="won-fSearch" type="text" placeholder="Cuenta / oportunidad..." oninput="renderWonTab()" style="width:240px;border:1px solid #DDDBDA;border-radius:4px;padding:4px 10px;font-size:0.8rem"></div>
     <span class="text-xs ml-auto" style="color:#706E6B;" id="won-count"></span>
+    <button onclick="resetWonFilters()" class="btn-sm">↺ Reset</button>
     <button onclick="exportWonSlack()" class="btn-sm">⬇ Descargar</button>
   </div>
   <div class="card-panel overflow-auto">
@@ -543,6 +545,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_rrAP"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="rr-fSearch" type="text" placeholder="Buscar oportunidad..." oninput="renderRRTab()" style="width:220px;border:1px solid #DDDBDA;border-radius:4px;padding:4px 10px;font-size:0.8rem"></div>
     <span class="text-xs text-gray-500 ml-auto" id="rr-rowCount"></span>
+    <button onclick="resetRRFilters()" class="btn-sm">↺ Reset</button>
     <button onclick="exportRRSlack()" class="btn-sm">⬇ Descargar</button>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
@@ -26811,6 +26814,22 @@ function resetDetailFilters() {
   ['d_fForecast'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   ['d_fDateFrom','d_fDateTo','d_fAmtMin','d_fAmtMax'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   renderTab6();
+}
+
+function resetEstimatesFilters() {
+  ['ms_estStatus','ms_estBilling','ms_estStage','ms_estEM'].forEach(id => { _msSel[id] = new Set(); _msRender(id); });
+  const s = document.getElementById('est-fSearch'); if (s) s.value = '';
+  renderEstimatesTab();
+}
+function resetWonFilters() {
+  ['ms_wonSSM','ms_wonAP'].forEach(id => { _msSel[id] = new Set(); _msRender(id); });
+  const s = document.getElementById('won-fSearch'); if (s) s.value = '';
+  renderWonTab();
+}
+function resetRRFilters() {
+  ['ms_rrSSM','ms_rrStatus','ms_rrCountry','ms_rrAP'].forEach(id => { _msSel[id] = new Set(); _msRender(id); });
+  const s = document.getElementById('rr-fSearch'); if (s) s.value = '';
+  renderRRTab();
 }
 
 function fmt$(n) {
