@@ -24,7 +24,9 @@
   .heat-low { background: #FEEFEE; color: #C23934; border: 1px solid rgba(194,57,52,0.2); }
   .sort-btn { cursor: pointer; user-select: none; color: #0176D3; }
   .sort-btn:hover { color: #014486; }
-  .btn-sm { font-size: 0.7rem; padding: 3px 10px; border-radius: 6px; border: 1px solid #C9E4F7; color: #032D60; background: #fff; cursor: pointer; white-space: nowrap; }
+  .btn-sm { font-size: 0.7rem; padding: 3px 10px; border-radius: 6px; border: 1px solid #C9E4F7; color: #032D60; background: #fff; cursor: pointer; white-space: nowrap; position:relative; }
+  .btn-sm[title]:hover::after { content: attr(title); position:absolute; bottom:calc(100% + 5px); left:50%; transform:translateX(-50%); background:#032D60; color:#fff; font-size:0.65rem; white-space:nowrap; padding:3px 8px; border-radius:4px; pointer-events:none; z-index:200; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+  .btn-sm[title]:hover::before { content:''; position:absolute; bottom:calc(100% + 1px); left:50%; transform:translateX(-50%); border:4px solid transparent; border-top-color:#032D60; pointer-events:none; z-index:200; }
   .btn-sm:hover { background: #EEF8FF; border-color: #0176D3; }
   .chart-title { font-size: 0.7rem; font-weight: 800; color: #0D9DDA; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
   .rr-table { table-layout: auto; width: 100%; }
