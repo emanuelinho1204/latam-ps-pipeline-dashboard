@@ -212,10 +212,7 @@
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Forecast</label>
-      <select id="sssm_fForecast" onchange="applySSSmFilters()">
-        <option value="">Todos</option>
-        <option>Commit</option><option>Best Case</option><option>Pipeline</option><option>Omitted</option>
-      </select>
+      <div class="ms-container" id="ms_sForecast"></div>
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Close From</label>
@@ -227,11 +224,11 @@
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Min Monto ($K)</label>
-      <input type="number" id="sssm_fAmtMin" onchange="applySSSmFilters()" placeholder="0" style="width:80px;">
+      <input type="number" id="sssm_fAmtMin" onchange="applySSSmFilters()" placeholder="0" style="width:100px;">
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Max Monto ($M)</label>
-      <input type="number" id="sssm_fAmtMax" onchange="applySSSmFilters()" placeholder="" style="width:80px;">
+      <input type="number" id="sssm_fAmtMax" onchange="applySSSmFilters()" placeholder="" style="width:100px;">
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Tipo Contrato</label>
@@ -396,10 +393,7 @@
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Forecast</label>
-      <select id="d_fForecast" onchange="renderTab6()">
-        <option value="">Todos</option>
-        <option>Commit</option><option>Best Case</option><option>Pipeline</option><option>Omitted</option>
-      </select>
+      <div class="ms-container" id="ms_dForecast"></div>
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Close From</label>
@@ -411,11 +405,11 @@
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Min Monto ($K)</label>
-      <input type="number" id="d_fAmtMin" onchange="renderTab6()" placeholder="0" style="width:80px;">
+      <input type="number" id="d_fAmtMin" onchange="renderTab6()" placeholder="0" style="width:100px;">
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Max Monto ($M)</label>
-      <input type="number" id="d_fAmtMax" onchange="renderTab6()" placeholder="" style="width:80px;">
+      <input type="number" id="d_fAmtMax" onchange="renderTab6()" placeholder="" style="width:100px;">
     </div>
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Tipo Contrato</label>
@@ -26887,7 +26881,8 @@ function applySSSmFilters() {
   const statusSel = msGet('ms_status');
   const stageSel  = msGet('ms_stage');
   const mgrSel    = msGet('ms_mgr');
-  const forecast  = (document.getElementById('sssm_fForecast')||{}).value||'';
+  if (!_msOpts['ms_sForecast']) msInit('ms_sForecast', ['Commit','Best Case','Pipeline','Omitted'].map(v=>({value:v,label:v})), applySSSmFilters);
+  const forecastSel = msGet('ms_sForecast');
   const dateFrom  = (document.getElementById('sssm_fDateFrom')||{}).value||'';
   const dateTo    = (document.getElementById('sssm_fDateTo')||{}).value||'';
   const amtMin    = parseFloat((document.getElementById('sssm_fAmtMin')||{}).value||0) * 1000;
@@ -26905,7 +26900,7 @@ function applySSSmFilters() {
       return mgrSel.some(m => m !== '__none__' && m === v);
     });
   }
-  if (forecast)         data = data.filter(d => d.forecast === forecast);
+  if (forecastSel.length) data = data.filter(d => forecastSel.includes(d.forecast));
   if (dateFrom)         data = data.filter(d => d.closeDate >= dateFrom);
   if (dateTo)           data = data.filter(d => d.closeDate <= dateTo);
   if (amtMin > 0)       data = data.filter(d => (d.amount||0) >= amtMin);
@@ -26971,11 +26966,9 @@ function renderSSSmLoadBars() {
 }
 
 function resetSSSmFilters() {
-  ['ms_sssm','ms_terr','ms_status','ms_stage','ms_mgr','ms_sssmContract'].forEach(id => {
-    _msSel[id] = new Set();
-    _msRender(id);
+  ['ms_sssm','ms_terr','ms_status','ms_stage','ms_mgr','ms_sForecast','ms_sssmContract'].forEach(id => {
+    if (_msSel[id]) { _msSel[id] = new Set(); _msRender(id); }
   });
-  ['sssm_fForecast'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   ['sssm_fDateFrom','sssm_fDateTo','sssm_fAmtMin','sssm_fAmtMax'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   renderSSSmLoadBars();
   renderSSSmGroupedView(filtered);
@@ -26999,8 +26992,7 @@ function selectSSSM(name) {
 }
 
 function resetDetailFilters() {
-  ['ms_dSSSM','ms_dAP','ms_dContract'].forEach(id => { _msSel[id] = new Set(); _msRender(id); });
-  ['d_fForecast'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['ms_dSSSM','ms_dAP','ms_dForecast','ms_dContract'].forEach(id => { if (_msSel[id]) { _msSel[id] = new Set(); _msRender(id); } });
   ['d_fDateFrom','d_fDateTo','d_fAmtMin','d_fAmtMax'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   renderTab6();
 }
@@ -27662,7 +27654,8 @@ function renderTab5() {
 function renderTab6() {
   const dSSSmSel  = msGet('ms_dSSSM');
   const dAPSel    = msGet('ms_dAP');
-  const dForecast = (document.getElementById('d_fForecast')||{}).value||'';
+  if (!_msOpts['ms_dForecast']) msInit('ms_dForecast', ['Commit','Best Case','Pipeline','Omitted'].map(v=>({value:v,label:v})), renderTab6);
+  const dForecastSel = msGet('ms_dForecast');
   const dDateFrom = (document.getElementById('d_fDateFrom')||{}).value||'';
   const dDateTo   = (document.getElementById('d_fDateTo')||{}).value||'';
   const dAmtMin   = parseFloat((document.getElementById('d_fAmtMin')||{}).value||0) * 1000;
@@ -27671,7 +27664,7 @@ function renderTab6() {
   let data = [...filtered].map(d => ({...d, _heat: heatScore(d, QUALI_MAP[d.dsr]), _quali: QUALI_MAP[d.dsr]}));
   if (dSSSmSel.length)   data = data.filter(d => dSSSmSel.includes(d.sssm));
   if (dAPSel.length)     data = data.filter(d => dAPSel.includes(d.ap));
-  if (dForecast)         data = data.filter(d => d.forecast === dForecast);
+  if (dForecastSel.length) data = data.filter(d => dForecastSel.includes(d.forecast));
   if (dDateFrom)         data = data.filter(d => d.closeDate >= dDateFrom);
   if (dDateTo)           data = data.filter(d => d.closeDate <= dDateTo);
   if (dAmtMin > 0)       data = data.filter(d => (d.amount||0) >= dAmtMin);
