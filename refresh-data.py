@@ -119,7 +119,7 @@ def fetch(instance_url, token):
         "AND Opportunity__r.CloseDate >= 2026-02-01 "
         "AND Opportunity__r.CloseDate <= 2028-01-31 "
         "ORDER BY Owner.Name, Opportunity__r.StageName, Status__c "
-        "LIMIT 250",
+        "LIMIT 500",
         instance_url, token
     )
     log(f"{len(dsr_records)} DSRs obtenidos.")
