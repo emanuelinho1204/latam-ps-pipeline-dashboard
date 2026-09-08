@@ -286,21 +286,21 @@
       <span style="margin-left:auto;color:rgba(255,255,255,0.65);font-size:0.72rem;white-space:nowrap;" data-i18n="zombie_link">ver Disciplina Op. →</span>
     </div>
   </div>
-  <div class="card-panel">
+  <div class="card-panel" style="padding:0">
     <div class="overflow-x-auto">
     <table class="w-full text-sm"><thead><tr>
-      <th>SSSM</th>
-      <th class="text-right">Working</th>
-      <th class="text-right">On Hold</th>
-      <th class="text-right">In Queue</th>
-      <th class="text-right">Waiting</th>
-      <th class="text-right">Total</th>
-      <th class="text-right" title="Pipeline total dividido entre número de DSRs">Pipeline/DSR</th>
-      <th class="text-right">Avg Score</th>
-      <th class="text-right">AI-Native</th>
-      <th class="text-right">AI-Aug</th>
-      <th class="text-right" title="Promedio de productos Salesforce detectados × nivel de monto">Complexity</th>
-      <th class="text-right" title="DSRs con opp cerrada o perdida">🧟</th>
+      <th class="th-std">SSSM</th>
+      <th class="th-std text-right">Working</th>
+      <th class="th-std text-right">On Hold</th>
+      <th class="th-std text-right">In Queue</th>
+      <th class="th-std text-right">Waiting</th>
+      <th class="th-std text-right">Total</th>
+      <th class="th-std text-right" title="Pipeline total dividido entre número de DSRs">Pipeline/DSR</th>
+      <th class="th-std text-right">Avg Score</th>
+      <th class="th-std text-right">AI-Native</th>
+      <th class="th-std text-right">AI-Aug</th>
+      <th class="th-std text-right" title="Promedio de productos Salesforce detectados × nivel de monto">Complexity</th>
+      <th class="th-std text-right" title="DSRs con opp cerrada o perdida">🧟</th>
     </tr></thead><tbody id="sssmBody"></tbody></table>
     </div>
   </div>
@@ -310,14 +310,14 @@
 <div id="t3" class="tab-content hidden">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
     <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;" data-i18n="chart_dsrs_arr_stage">DSRs y ARR por Stage</h3><div class="chart-container"><canvas id="chartFunnel"></canvas></div></div>
-    <div class="card-panel">
-      <h3 class="chart-title">Stage × Forecast</h3>
-      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>Stage</th><th class="text-right">Commit</th><th class="text-right">Best Case</th><th class="text-right">Pipeline</th><th class="text-right">Total</th></tr></thead><tbody id="stageForecastBody"></tbody></table></div>
+    <div class="card-panel" style="padding:0">
+      <h3 class="chart-title" style="padding:0.75rem 1rem 0.5rem;">Stage × Forecast</h3>
+      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="th-std">Stage</th><th class="th-std text-right">Commit</th><th class="th-std text-right">Best Case</th><th class="th-std text-right">Pipeline</th><th class="th-std text-right">Total</th></tr></thead><tbody id="stageForecastBody"></tbody></table></div>
     </div>
   </div>
-  <div class="card-panel">
-    <h3 class="chart-title" data-i18n="chart_cierre_mes">📅 Cierre por Mes</h3>
-    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th data-i18n="th_mes">Mes</th><th class="text-right">DSRs</th><th class="text-right">ARR ($M)</th><th class="text-right">Commit ($M)</th></tr></thead><tbody id="closeMonthBody"></tbody></table></div>
+  <div class="card-panel" style="padding:0">
+    <h3 class="chart-title" style="padding:0.75rem 1rem 0.5rem;" data-i18n="chart_cierre_mes">📅 Cierre por Mes</h3>
+    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th class="th-std" data-i18n="th_mes">Mes</th><th class="th-std text-right">DSRs</th><th class="th-std text-right">ARR ($M)</th><th class="th-std text-right">Commit ($M)</th></tr></thead><tbody id="closeMonthBody"></tbody></table></div>
   </div>
 </div>
 
@@ -631,7 +631,7 @@
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_zSSM"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Stage</div><div class="ms-container" id="ms_zStage"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Status DSR</div><div class="ms-container" id="ms_zStatus"></div></div>
-    <div><div class="text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_region">Región</div><div class="ms-container" id="ms_zRegion"></div></div>
+    <div><div class="text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_territory">Territory</div><div class="ms-container" id="ms_zTerr"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="z-fSearch" type="text" placeholder="Cuenta / opp / DSR..." oninput="renderZombieTab()"></div>
     <div>
       <div style="font-size:0.72rem;margin-bottom:3px;visibility:hidden;">x</div>
@@ -28599,13 +28599,13 @@ function renderZombieTab() {
   if (!_msOpts['ms_zSSM']) msInit('ms_zSSM', [...new Set(allZ.map(d=>d.sssm).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderZombieTab);
   if (!_msOpts['ms_zStage']) msInit('ms_zStage', ['06 - Project Booked','Dead - Lost'].map(v=>({value:v,label:v})), renderZombieTab);
   if (!_msOpts['ms_zStatus']) msInit('ms_zStatus', [...new Set(allZ.map(d=>d.status).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderZombieTab);
-  if (!_msOpts['ms_zRegion']) msInit('ms_zRegion', [...new Set(allZ.map(d=>d.region).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderZombieTab);
-  const zSSM = msGet('ms_zSSM'), zStage = msGet('ms_zStage'), zStatus = msGet('ms_zStatus'), zRegion = msGet('ms_zRegion');
+  if (!_msOpts['ms_zTerr']) msInit('ms_zTerr', ['Mexico','Growth Norte','Growth Sur','Brazil','Other'].map(v=>({value:v,label:v})), renderZombieTab);
+  const zSSM = msGet('ms_zSSM'), zStage = msGet('ms_zStage'), zStatus = msGet('ms_zStatus'), zTerr = msGet('ms_zTerr');
   const search = ((document.getElementById('z-fSearch')||{}).value||'').toLowerCase();
   if (zSSM.size) data = data.filter(d => zSSM.has(d.sssm));
   if (zStage.size) data = data.filter(d => zStage.has(d.stage));
   if (zStatus.size) data = data.filter(d => zStatus.has(d.status));
-  if (zRegion.size) data = data.filter(d => zRegion.has(d.region));
+  if (zTerr.size) data = data.filter(d => zTerr.has(getTerritory(d.country)));
   if (search) data = data.filter(d => ((d.oppName||'')+(d.account||'')+(d.sssm||'')+(d.dsr||'')).toLowerCase().includes(search));
   data = data.slice().sort((a,b) => {
     const va = a[zombieSortCol]||'', vb = b[zombieSortCol]||'';
@@ -28644,7 +28644,7 @@ function renderZombieTab() {
   }).join('') || '<tr><td colspan="9" class="px-3 py-4 text-center" style="color:#04844B;">✅ Sin DSRs zombies</td></tr>';
 }
 function resetZombieFilters() {
-  ['ms_zSSM','ms_zStage','ms_zStatus','ms_zRegion'].forEach(id => { if(_msSel[id]) { _msSel[id] = new Set(); _msRender(id); } });
+  ['ms_zSSM','ms_zStage','ms_zStatus','ms_zTerr'].forEach(id => { if(_msSel[id]) { _msSel[id] = new Set(); _msRender(id); } });
   const s = document.getElementById('z-fSearch'); if (s) s.value = '';
   renderZombieTab();
 }
