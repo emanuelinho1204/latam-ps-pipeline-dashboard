@@ -124,92 +124,12 @@
 </div>
 <div id="copyToast" class="hidden">✅ <span data-i18n="toast_copied">Copied! Paste in Slack: @Claude ps-dashboard</span></div>
 
-<!-- Refresh Modal -->
-<!-- FILTER BAR -->
-<div class="bg-white border-b border-[#DDDBDA] px-6 py-3 shadow-sm">
-  <div class="flex flex-wrap gap-3 items-end">
-    <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_sssm">SSSM</label>
-      <select id="fSSSM" onchange="applyFilters()" class="min-w-32">
-        <option value="" data-i18n="opt_all">All</option>
-      </select>
-    </div>
-    <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_stage">Stage</label>
-      <select id="fStage" onchange="applyFilters()" class="min-w-36">
-        <option value="" data-i18n="opt_all">All</option>
-        <option>01 - Discovery</option>
-        <option>02 - Scoping</option>
-        <option>03 - Initial Proposal</option>
-        <option>04 - Active Negotiation</option>
-      </select>
-    </div>
-    <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_forecast">Forecast</label>
-      <select id="fForecast" onchange="applyFilters()">
-        <option value="" data-i18n="opt_all">All</option>
-        <option>Commit</option>
-        <option>Best Case</option>
-        <option>Pipeline</option>
-        <option>Omitted</option>
-      </select>
-    </div>
-    <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_status">Status</label>
-      <select id="fStatus" onchange="applyFilters()">
-        <option value="" data-i18n="opt_all">All</option>
-        <option>Working</option>
-        <option>On Hold</option>
-        <option>In Queue</option>
-        <option>Waiting on Requestor</option>
-      </select>
-    </div>
-    <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_date_from">Close From</label>
-      <input type="date" id="fDateFrom" onchange="applyFilters()">
-    </div>
-    <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_date_to">Close To</label>
-      <input type="date" id="fDateTo" onchange="applyFilters()">
-    </div>
-    <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_amt_min">Min Amount ($K)</label>
-      <input type="number" id="fAmtMin" onchange="applyFilters()" placeholder="0" style="width:80px">
-    </div>
-    <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_amt_max">Max Amount ($M)</label>
-      <input type="number" id="fAmtMax" onchange="applyFilters()" placeholder="30" style="width:80px">
-    </div>
-    <div style="display:none">
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_qual">Qualification</label>
-      <select id="fQual" onchange="applyFilters()">
-        <option value="" data-i18n="opt_all">All</option>
-        <option value="qualified" data-i18n="opt_qualified">Qualified</option>
-        <option value="not_qualified" data-i18n="opt_not_qualified">Not Qualified</option>
-        <option value="pending" data-i18n="opt_pending">Pending</option>
-      </select>
-    </div>
-    <div style="display:none">
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_delivery">Delivery Model</label>
-      <select id="fDelivery" onchange="applyFilters()" class="min-w-36">
-        <option value="" data-i18n="opt_all">All</option>
-        <option>AI-Native Agentic</option>
-        <option>AI-Augmented</option>
-        <option>Traditional</option>
-        <option>Not Qualified</option>
-        <option value="pending_dm" data-i18n="opt_pending">Pending</option>
-      </select>
-    </div>
-    <div>
-      <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_country">Country</label>
-      <select id="fCountry" onchange="applyFilters()">
-        <option value="" data-i18n="opt_all">All</option>
-      </select>
-    </div>
-    <div class="flex items-end">
-      <button onclick="resetFilters()" class="text-sm px-3 py-1.5 rounded transition-colors border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]" data-i18n="btn_reset">↺ Reset</button>
-    </div>
-  </div>
+<!-- Hidden filter inputs kept for JS compatibility -->
+<div style="display:none">
+  <select id="fSSSM"></select><select id="fStage"></select><select id="fForecast"></select>
+  <select id="fStatus"></select><input id="fDateFrom"><input id="fDateTo">
+  <input id="fAmtMin"><input id="fAmtMax"><select id="fQual"></select>
+  <select id="fDelivery"></select><select id="fCountry"></select>
 </div>
 
 <!-- ALERT BAR -->
@@ -282,6 +202,29 @@
     <div>
       <label class="block text-xs mb-1" style="color:#706E6B;">Mgr Judgement</label>
       <div class="ms-container" id="ms_mgr"></div>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Forecast</label>
+      <select id="sssm_fForecast" onchange="applySSSmFilters()" style="font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
+        <option value="">Todos</option>
+        <option>Commit</option><option>Best Case</option><option>Pipeline</option><option>Omitted</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Close From</label>
+      <input type="date" id="sssm_fDateFrom" onchange="applySSSmFilters()" style="font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Close To</label>
+      <input type="date" id="sssm_fDateTo" onchange="applySSSmFilters()" style="font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Min Monto ($K)</label>
+      <input type="number" id="sssm_fAmtMin" onchange="applySSSmFilters()" placeholder="0" style="width:80px;font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Max Monto ($M)</label>
+      <input type="number" id="sssm_fAmtMax" onchange="applySSSmFilters()" placeholder="" style="width:80px;font-size:0.8rem;border:1px solid #DDDBDA;border-radius:4px;padding:4px 8px;">
     </div>
     <div class="flex items-end">
       <button onclick="resetSSSmFilters()" class="text-xs px-3 py-1.5 rounded border border-[#DDDBDA] text-[#032D60] hover:bg-[#EAF5FE] hover:border-[#0176D3]">↺ Reset</button>
@@ -473,12 +416,12 @@
     <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">Bill Rate Promedio</div><div class="text-2xl font-bold text-blue-900" id="est-kpiBillRate">—</div></div>
     <div class="card-panel kpi-card p-3"><div class="text-xs text-gray-500 mb-1">T&amp;E Total</div><div class="text-2xl font-bold text-blue-900" id="est-kpiTE">—</div></div>
   </div>
-  <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-center">
+  <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-end">
     <div><div class="text-xs mb-1" style="color:#706E6B;">Approval Status</div><div class="ms-container" id="ms_estStatus"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Billing Type</div><div class="ms-container" id="ms_estBilling"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Stage</div><div class="ms-container" id="ms_estStage"></div></div>
-    <div><div class="text-xs mb-1" style="color:#706E6B;">EM</div><div class="ms-container" id="ms_estEM"></div></div>
-    <input id="est-fSearch" type="text" placeholder="Buscar cuenta / opp / estimate..." oninput="renderEstimatesTab()" style="width:250px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem">
+    <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_estEM"></div></div>
+    <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="est-fSearch" type="text" placeholder="Buscar cuenta / opp / estimate..." oninput="renderEstimatesTab()" style="width:250px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"></div>
     <span class="text-xs text-gray-500 ml-auto" id="est-rowCount"></span>
   </div>
   <div class="card-panel overflow-auto">
@@ -488,7 +431,8 @@
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('name')">Estimate <span class="sort-icon" id="est-si-name">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('oppName')">Oportunidad <span class="sort-icon" id="est-si-oppName">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('account')">Cuenta <span class="sort-icon" id="est-si-account">▼</span></th>
-        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('ap')">AP / EM <span class="sort-icon" id="est-si-ap">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('ap')">AP <span class="sort-icon" id="est-si-ap">▼</span></th>
+        <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('em')">SSSM <span class="sort-icon" id="est-si-em">▼</span></th>
         <th class="px-3 py-2 text-left" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('stage')">Stage <span class="sort-icon" id="est-si-stage">▼</span></th>
         <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('closeDate')">Cierre <span class="sort-icon" id="est-si-closeDate">▼</span></th>
         <th class="px-3 py-2 text-right" style="background:#F3F2F2;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;cursor:pointer" onclick="estSortBy('amount')">Monto <span class="sort-icon sort-active" id="est-si-amount">▲</span></th>
@@ -2237,27 +2181,6 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a253y000001mh0jAAA",
-    "dsr": "DS-1455593",
-    "sssm": "Irineu Silva",
-    "status": "On Hold",
-    "oppName": "BASA - CTO and Assurance Services - CSG",
-    "oppId": "0063y00001AdCcrAAF",
-    "amount": 29666049.69,
-    "closeDate": "2027-01-21",
-    "ap": "Alex Siqueira",
-    "requestType": "EM Support",
-    "forecast": "Best Case",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "Banco Da Amazonia S/A",
-    "country": "BR",
-    "mgrJudgement": "UP -",
-    "contractType": "Fixed Price",
-    "stage": "03 - Initial Proposal"
-  },
-  {
     "dsrId": "a25ed000002CAIbAAO",
     "dsr": "DS-1737260",
     "sssm": "Irineu Silva",
@@ -2273,6 +2196,27 @@ let DSR_DATA = [
     "region": "LACA",
     "requestTypeDetail": "Scoping/SOW",
     "account": "Banco do Brasil SA",
+    "country": "BR",
+    "mgrJudgement": "UP -",
+    "contractType": "Fixed Price",
+    "stage": "03 - Initial Proposal"
+  },
+  {
+    "dsrId": "a253y000001mh0jAAA",
+    "dsr": "DS-1455593",
+    "sssm": "Irineu Silva",
+    "status": "On Hold",
+    "oppName": "BASA - CTO and Assurance Services - CSG",
+    "oppId": "0063y00001AdCcrAAF",
+    "amount": 29666049.69,
+    "closeDate": "2027-01-21",
+    "ap": "Alex Siqueira",
+    "requestType": "EM Support",
+    "forecast": "Best Case",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco Da Amazonia S/A",
     "country": "BR",
     "mgrJudgement": "UP -",
     "contractType": "Fixed Price",
@@ -2297,6 +2241,48 @@ let DSR_DATA = [
     "country": "BR",
     "mgrJudgement": null,
     "contractType": "Fixed Price - Ratable",
+    "stage": "04 - Active Negotiation"
+  },
+  {
+    "dsrId": "a253y000000yBawAAE",
+    "dsr": "DS-1356200",
+    "sssm": "Irineu Silva",
+    "status": "Working",
+    "oppName": "CEF - MC - SOW -  Ano1 - CSG",
+    "oppId": "0063y00001A0J5eAAF",
+    "amount": 25760077.29,
+    "closeDate": "2026-09-18",
+    "ap": "Alex Siqueira",
+    "requestType": "EM Support",
+    "forecast": "Commit",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Caixa Econômica Federal",
+    "country": "BR",
+    "mgrJudgement": "UP+",
+    "contractType": "Fixed Price",
+    "stage": "04 - Active Negotiation"
+  },
+  {
+    "dsrId": "a25ed000002AHrFAAW",
+    "dsr": "DS-1732864",
+    "sssm": "Irineu Silva",
+    "status": "Working",
+    "oppName": "E-Networks Communications - CO - Release 2 - FY27 CSG #QL",
+    "oppId": "006ed00000Xw4JZAAZ",
+    "amount": 5991442.54,
+    "closeDate": "2026-09-18",
+    "ap": "Julián Mesa",
+    "requestType": "EM Support",
+    "forecast": "Commit",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "E-Networks Communications Org",
+    "country": "US",
+    "mgrJudgement": "UP+",
+    "contractType": "Fixed Price",
     "stage": "04 - Active Negotiation"
   },
   {
@@ -2342,48 +2328,6 @@ let DSR_DATA = [
     "stage": "04 - Active Negotiation"
   },
   {
-    "dsrId": "a25ed000002AHrFAAW",
-    "dsr": "DS-1732864",
-    "sssm": "Irineu Silva",
-    "status": "Working",
-    "oppName": "E-Networks Communications - CO - Release 2 - FY27 CSG #QL",
-    "oppId": "006ed00000Xw4JZAAZ",
-    "amount": 5991442.54,
-    "closeDate": "2026-09-18",
-    "ap": "Julián Mesa",
-    "requestType": "EM Support",
-    "forecast": "Commit",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "E-Networks Communications Org",
-    "country": "US",
-    "mgrJudgement": "UP+",
-    "contractType": "Fixed Price",
-    "stage": "04 - Active Negotiation"
-  },
-  {
-    "dsrId": "a253y000000yBawAAE",
-    "dsr": "DS-1356200",
-    "sssm": "Irineu Silva",
-    "status": "Working",
-    "oppName": "CEF - MC - SOW -  Ano1 - CSG",
-    "oppId": "0063y00001A0J5eAAF",
-    "amount": 25760077.29,
-    "closeDate": "2026-09-18",
-    "ap": "Alex Siqueira",
-    "requestType": "EM Support",
-    "forecast": "Commit",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "Caixa Econômica Federal",
-    "country": "BR",
-    "mgrJudgement": "UP+",
-    "contractType": "Fixed Price",
-    "stage": "04 - Active Negotiation"
-  },
-  {
     "dsrId": "a25ed000001iG25AAE",
     "dsr": "DS-1699455",
     "sssm": "Israel Hernandez",
@@ -2426,27 +2370,6 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a25ed000002C2OHAA0",
-    "dsr": "DS-1736951",
-    "sssm": "Israel Hernandez",
-    "status": "Working",
-    "oppName": "Telcel B2B - MX - Whitelabel #QL",
-    "oppId": "006ed00000jX5v3AAC",
-    "amount": 1200000,
-    "closeDate": "2026-12-03",
-    "ap": "Julián Mesa",
-    "requestType": "EM Support",
-    "forecast": "Pipeline",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "Radiomóvil DIPSA, S.A. de C.V.",
-    "country": "MX",
-    "mgrJudgement": null,
-    "contractType": "Fixed Capacity",
-    "stage": "02 - Scoping"
-  },
-  {
     "dsrId": "a25ed0000028z6nAAA",
     "dsr": "DS-1729814",
     "sssm": "Israel Hernandez",
@@ -2465,6 +2388,27 @@ let DSR_DATA = [
     "country": "HN",
     "mgrJudgement": "UP+",
     "contractType": null,
+    "stage": "02 - Scoping"
+  },
+  {
+    "dsrId": "a25ed000002C2OHAA0",
+    "dsr": "DS-1736951",
+    "sssm": "Israel Hernandez",
+    "status": "Working",
+    "oppName": "Telcel B2B - MX - Whitelabel #QL",
+    "oppId": "006ed00000jX5v3AAC",
+    "amount": 1200000,
+    "closeDate": "2026-12-03",
+    "ap": "Julián Mesa",
+    "requestType": "EM Support",
+    "forecast": "Pipeline",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Radiomóvil DIPSA, S.A. de C.V.",
+    "country": "MX",
+    "mgrJudgement": null,
+    "contractType": "Fixed Capacity",
     "stage": "02 - Scoping"
   },
   {
@@ -2531,34 +2475,34 @@ let DSR_DATA = [
     "stage": "01 - Discovery"
   },
   {
-    "dsrId": "a25ed000001leZJAAY",
-    "dsr": "DS-1702257",
+    "dsrId": "a25ed000001KqebAAC",
+    "dsr": "DS-1680290",
     "sssm": "Ixchel Saucedo",
-    "status": "On Hold",
-    "oppName": "Diltex - B2C and B2B Commerce As-Is Assessment - OF - Licenses SWE 50KUSD 400 Hours",
-    "oppId": "006ed00000bHUKXAA4",
-    "amount": 0,
-    "closeDate": "2026-10-31",
+    "status": "In Queue",
+    "oppName": "Gesemex - MX - Consumer Goods Sales and Implementation - SOW - TM - #QL",
+    "oppId": "006ed00000WZ2pJAAT",
+    "amount": 1000000,
+    "closeDate": "2026-12-21",
     "ap": "Jorge Salafia",
     "requestType": "EM Support",
     "forecast": "Pipeline",
     "nextStep": null,
     "region": "LACA",
     "requestTypeDetail": "Scoping/SOW",
-    "account": "Diltex S.A. de C.V.",
+    "account": "Gesemex Red de Distribuidores Exxon Mexico SA de CV",
     "country": "MX",
     "mgrJudgement": "UP+",
-    "contractType": "Fixed Price - Ratable",
+    "contractType": "Time & Materials",
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a25ed0000012VYbAAM",
-    "dsr": "DS-1655160",
+    "dsrId": "a25ed000001gifBAAQ",
+    "dsr": "DS-1697908",
     "sssm": "Ixchel Saucedo",
     "status": "On Hold",
-    "oppName": "Office Depot Odemas - Loyalty, Marketing Cloud, Data 360 - SOW",
-    "oppId": "006ed00000QD0mPAAT",
-    "amount": 500000,
+    "oppName": "PubSec MX - CENACE Centro Nacional de Control de Energia - Mulesoft - SOW",
+    "oppId": "006ed00000aVLQ3AAO",
+    "amount": 250000,
     "closeDate": "2027-01-31",
     "ap": "Jorge Salafia",
     "requestType": "EM Support",
@@ -2566,8 +2510,8 @@ let DSR_DATA = [
     "nextStep": null,
     "region": "LACA",
     "requestTypeDetail": "Scoping/SOW",
-    "account": "Office Depot de México, S.A. de C.V.",
-    "country": "MX",
+    "account": "OPERADOR NACIONAL DE ELECTRICIDAD - CENACE",
+    "country": "EC",
     "mgrJudgement": "OUT",
     "contractType": "Time & Materials",
     "stage": "02 - Scoping"
@@ -2594,13 +2538,13 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a25ed000001gifBAAQ",
-    "dsr": "DS-1697908",
+    "dsrId": "a25ed0000012VYbAAM",
+    "dsr": "DS-1655160",
     "sssm": "Ixchel Saucedo",
     "status": "On Hold",
-    "oppName": "PubSec MX - CENACE Centro Nacional de Control de Energia - Mulesoft - SOW",
-    "oppId": "006ed00000aVLQ3AAO",
-    "amount": 250000,
+    "oppName": "Office Depot Odemas - Loyalty, Marketing Cloud, Data 360 - SOW",
+    "oppId": "006ed00000QD0mPAAT",
+    "amount": 500000,
     "closeDate": "2027-01-31",
     "ap": "Jorge Salafia",
     "requestType": "EM Support",
@@ -2608,10 +2552,31 @@ let DSR_DATA = [
     "nextStep": null,
     "region": "LACA",
     "requestTypeDetail": "Scoping/SOW",
-    "account": "OPERADOR NACIONAL DE ELECTRICIDAD - CENACE",
-    "country": "EC",
+    "account": "Office Depot de México, S.A. de C.V.",
+    "country": "MX",
     "mgrJudgement": "OUT",
     "contractType": "Time & Materials",
+    "stage": "02 - Scoping"
+  },
+  {
+    "dsrId": "a25ed000001leZJAAY",
+    "dsr": "DS-1702257",
+    "sssm": "Ixchel Saucedo",
+    "status": "On Hold",
+    "oppName": "Diltex - B2C and B2B Commerce As-Is Assessment - OF - Licenses SWE 50KUSD 400 Hours",
+    "oppId": "006ed00000bHUKXAA4",
+    "amount": 0,
+    "closeDate": "2026-10-31",
+    "ap": "Jorge Salafia",
+    "requestType": "EM Support",
+    "forecast": "Pipeline",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Diltex S.A. de C.V.",
+    "country": "MX",
+    "mgrJudgement": "UP+",
+    "contractType": "Fixed Price - Ratable",
     "stage": "02 - Scoping"
   },
   {
@@ -2673,7 +2638,7 @@ let DSR_DATA = [
     "requestTypeDetail": "Scoping/SOW",
     "account": "Consorcio Ecuatoriano de Telecomunicaciones S.A. CONECEL",
     "country": "EC",
-    "mgrJudgement": null,
+    "mgrJudgement": "UP+",
     "contractType": "Time & Materials",
     "stage": "02 - Scoping"
   },
@@ -2693,6 +2658,69 @@ let DSR_DATA = [
     "region": "LACA",
     "requestTypeDetail": "Scoping/SOW",
     "account": "FEMSA SERVICIOS, S.A. DE C.V.",
+    "country": "MX",
+    "mgrJudgement": "UP+",
+    "contractType": "Time & Materials",
+    "stage": "03 - Initial Proposal"
+  },
+  {
+    "dsrId": "a25ed000001giP3AAI",
+    "dsr": "DS-1697898",
+    "sssm": "Ixchel Saucedo",
+    "status": "On Hold",
+    "oppName": "PubSec MX - CFE Distribucion - Mulesoft HCC, CTO, APIs Management - SOW Direct with Customer",
+    "oppId": "006ed00000aVY2HAAW",
+    "amount": 707040,
+    "closeDate": "2026-12-18",
+    "ap": "Jorge Salafia",
+    "requestType": "EM Support",
+    "forecast": "Best Case",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "CFE Distribución",
+    "country": "MX",
+    "mgrJudgement": "UP -",
+    "contractType": "Time & Materials",
+    "stage": "03 - Initial Proposal"
+  },
+  {
+    "dsrId": "a25ed000001Zo2zAAC",
+    "dsr": "DS-1692775",
+    "sssm": "Ixchel Saucedo",
+    "status": "On Hold",
+    "oppName": "FEMSA_SPIFF_NEW BUSINESS_SOW",
+    "oppId": "006ed00000ZN37WAAT",
+    "amount": 4861560,
+    "closeDate": "2026-10-23",
+    "ap": "Daniel Isunza",
+    "requestType": "EM Support",
+    "forecast": "Best Case",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "account": "FEMSA SERVICIOS, S.A. DE C.V.",
+    "country": "MX",
+    "mgrJudgement": "UP -",
+    "contractType": "Time & Materials",
+    "stage": "03 - Initial Proposal"
+  },
+  {
+    "dsrId": "a25ed0000028ojFAAQ",
+    "dsr": "DS-1729416",
+    "sssm": "Ixchel Saucedo",
+    "status": "On Hold",
+    "oppName": "General Motors Mexico (Financial) - Marketing Cloud - SOW - AI Augmented - RFP",
+    "oppId": "006ed00000hyfXNAAY",
+    "amount": 426120,
+    "closeDate": "2026-10-31",
+    "ap": "Jorge Salafia",
+    "requestType": "EM Support",
+    "forecast": "Best Case",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "GM Financial de México, S.A. de C.V., SOFOM, E.R.",
     "country": "MX",
     "mgrJudgement": "UP+",
     "contractType": "Time & Materials",
@@ -2720,48 +2748,6 @@ let DSR_DATA = [
     "stage": "03 - Initial Proposal"
   },
   {
-    "dsrId": "a25ed0000028ojFAAQ",
-    "dsr": "DS-1729416",
-    "sssm": "Ixchel Saucedo",
-    "status": "On Hold",
-    "oppName": "General Motors Mexico (Financial) - Marketing Cloud - SOW - AI Augmented - RFP",
-    "oppId": "006ed00000hyfXNAAY",
-    "amount": 426120,
-    "closeDate": "2026-10-31",
-    "ap": "Jorge Salafia",
-    "requestType": "EM Support",
-    "forecast": "Best Case",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "GM Financial de México, S.A. de C.V., SOFOM, E.R.",
-    "country": "MX",
-    "mgrJudgement": "UP+",
-    "contractType": "Time & Materials",
-    "stage": "03 - Initial Proposal"
-  },
-  {
-    "dsrId": "a25ed000001Zo2zAAC",
-    "dsr": "DS-1692775",
-    "sssm": "Ixchel Saucedo",
-    "status": "Working",
-    "oppName": "FEMSA_SPIFF_NEW BUSINESS_SOW",
-    "oppId": "006ed00000ZN37WAAT",
-    "amount": 4861560,
-    "closeDate": "2026-10-23",
-    "ap": "Daniel Isunza",
-    "requestType": "EM Support",
-    "forecast": "Best Case",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "RFP",
-    "account": "FEMSA SERVICIOS, S.A. DE C.V.",
-    "country": "MX",
-    "mgrJudgement": "UP -",
-    "contractType": "Time & Materials",
-    "stage": "03 - Initial Proposal"
-  },
-  {
     "dsrId": "a25ed0000028og1AAA",
     "dsr": "DS-1729414",
     "sssm": "Ixchel Saucedo",
@@ -2779,27 +2765,6 @@ let DSR_DATA = [
     "account": "General Motors de México, S. de R.L. de C.V.",
     "country": "MX",
     "mgrJudgement": "UP+",
-    "contractType": "Time & Materials",
-    "stage": "03 - Initial Proposal"
-  },
-  {
-    "dsrId": "a25ed000001giP3AAI",
-    "dsr": "DS-1697898",
-    "sssm": "Ixchel Saucedo",
-    "status": "Working",
-    "oppName": "PubSec MX - CFE Distribucion - Mulesoft HCC, CTO, APIs Management - SOW Direct with Customer",
-    "oppId": "006ed00000aVY2HAAW",
-    "amount": 707040,
-    "closeDate": "2026-12-18",
-    "ap": "Jorge Salafia",
-    "requestType": "EM Support",
-    "forecast": "Best Case",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "CFE Distribución",
-    "country": "MX",
-    "mgrJudgement": "UP -",
     "contractType": "Time & Materials",
     "stage": "03 - Initial Proposal"
   },
@@ -2888,27 +2853,6 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a25ed0000018fbhAAA",
-    "dsr": "DS-1669775",
-    "sssm": "Juan Schunck",
-    "status": "Waiting on Requestor",
-    "oppName": "BBVA - Squads Core Sales Services FSC Marketing - TM - 3 years",
-    "oppId": "006ed00000L7DhCAAV",
-    "amount": 100000,
-    "closeDate": "2027-01-31",
-    "ap": "Sarai Morales",
-    "requestType": "EM Support",
-    "forecast": "Pipeline",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "BBVA México, S.A., Institución de Banca Múltiple, Grupo Financiero, BBVA México",
-    "country": "MX",
-    "mgrJudgement": "UP -",
-    "contractType": "Fixed Price",
-    "stage": "02 - Scoping"
-  },
-  {
     "dsrId": "a25ed000001s6UUAAY",
     "dsr": "DS-1707455",
     "sssm": "Juan Schunck",
@@ -2930,24 +2874,45 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a25ed000001OXblAAG",
-    "dsr": "DS-1683774",
+    "dsrId": "a25ed0000018fbhAAA",
+    "dsr": "DS-1669775",
     "sssm": "Juan Schunck",
-    "status": "Working",
-    "oppName": "Claro PE - Comms Cloud - White label #QL",
-    "oppId": "006ed00000XAsP7AAL",
-    "amount": 6154000,
-    "closeDate": "2026-11-12",
-    "ap": "Julián Mesa",
+    "status": "Waiting on Requestor",
+    "oppName": "BBVA - Squads Core Sales Services FSC Marketing - TM - 3 years",
+    "oppId": "006ed00000L7DhCAAV",
+    "amount": 100000,
+    "closeDate": "2027-01-31",
+    "ap": "Sarai Morales",
     "requestType": "EM Support",
     "forecast": "Pipeline",
     "nextStep": null,
     "region": "LACA",
     "requestTypeDetail": "Scoping/SOW",
-    "account": "America Movil Peru S.A.C.",
-    "country": "PE",
+    "account": "BBVA México, S.A., Institución de Banca Múltiple, Grupo Financiero, BBVA México",
+    "country": "MX",
     "mgrJudgement": "UP -",
-    "contractType": "Time & Materials",
+    "contractType": "Fixed Price",
+    "stage": "02 - Scoping"
+  },
+  {
+    "dsrId": "a25ed000001S3VRAA0",
+    "dsr": "DS-1686636",
+    "sssm": "Juan Schunck",
+    "status": "Working",
+    "oppName": "FISERV - AR - MKT - Loyalty Management MVP",
+    "oppId": "006ed00000XDh8zAAD",
+    "amount": 350000,
+    "closeDate": "2027-01-15",
+    "ap": "Gustavo Marcelo Pulitano",
+    "requestType": "EM Support",
+    "forecast": "Pipeline",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "First Data Cono Sur S.R.L.",
+    "country": "AR",
+    "mgrJudgement": "UP+",
+    "contractType": null,
     "stage": "02 - Scoping"
   },
   {
@@ -2972,24 +2937,24 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a25ed000001S3VRAA0",
-    "dsr": "DS-1686636",
+    "dsrId": "a25ed000001OXblAAG",
+    "dsr": "DS-1683774",
     "sssm": "Juan Schunck",
     "status": "Working",
-    "oppName": "FISERV - AR - MKT - Loyalty Management MVP",
-    "oppId": "006ed00000XDh8zAAD",
-    "amount": 350000,
-    "closeDate": "2027-01-15",
-    "ap": "Gustavo Marcelo Pulitano",
+    "oppName": "Claro PE - Comms Cloud - White label #QL",
+    "oppId": "006ed00000XAsP7AAL",
+    "amount": 6154000,
+    "closeDate": "2026-11-12",
+    "ap": "Julián Mesa",
     "requestType": "EM Support",
     "forecast": "Pipeline",
     "nextStep": null,
     "region": "LACA",
     "requestTypeDetail": "Scoping/SOW",
-    "account": "First Data Cono Sur S.R.L.",
-    "country": "AR",
-    "mgrJudgement": "UP+",
-    "contractType": null,
+    "account": "America Movil Peru S.A.C.",
+    "country": "PE",
+    "mgrJudgement": "UP -",
+    "contractType": "Time & Materials",
     "stage": "02 - Scoping"
   },
   {
@@ -3098,27 +3063,6 @@ let DSR_DATA = [
     "stage": "03 - Initial Proposal"
   },
   {
-    "dsrId": "a25ed000001zzcHAAQ",
-    "dsr": "DS-1713556",
-    "sssm": "Juan Schunck",
-    "status": "Working",
-    "oppName": "PubSec Education MX - Universidad Ibero - Mulesoft - SOW",
-    "oppId": "006ed00000eUMnHAAW",
-    "amount": 283628,
-    "closeDate": "2026-10-31",
-    "ap": "Jorge Salafia",
-    "requestType": "EM Support",
-    "forecast": "Commit",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "Universidad Iberoamericana",
-    "country": "MX",
-    "mgrJudgement": "UP+",
-    "contractType": "Time & Materials",
-    "stage": "04 - Active Negotiation"
-  },
-  {
     "dsrId": "a25ed00000174uLAAQ",
     "dsr": "DS-1666063",
     "sssm": "Juan Schunck",
@@ -3135,6 +3079,27 @@ let DSR_DATA = [
     "requestTypeDetail": "Scoping/SOW",
     "account": "First Data Cono Sur S.R.L.",
     "country": "AR",
+    "mgrJudgement": "UP+",
+    "contractType": "Time & Materials",
+    "stage": "04 - Active Negotiation"
+  },
+  {
+    "dsrId": "a25ed000001zzcHAAQ",
+    "dsr": "DS-1713556",
+    "sssm": "Juan Schunck",
+    "status": "Working",
+    "oppName": "PubSec Education MX - Universidad Ibero - Mulesoft - SOW",
+    "oppId": "006ed00000eUMnHAAW",
+    "amount": 283628,
+    "closeDate": "2026-10-31",
+    "ap": "Jorge Salafia",
+    "requestType": "EM Support",
+    "forecast": "Commit",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Universidad Iberoamericana",
+    "country": "MX",
     "mgrJudgement": "UP+",
     "contractType": "Time & Materials",
     "stage": "04 - Active Negotiation"
@@ -3177,7 +3142,7 @@ let DSR_DATA = [
     "requestTypeDetail": "Scoping/SOW",
     "account": "Digicel Caribbean Limited",
     "country": "JM",
-    "mgrJudgement": null,
+    "mgrJudgement": "UP+",
     "contractType": null,
     "stage": "02 - Scoping"
   },
@@ -3266,6 +3231,27 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
+    "dsrId": "a25ed000002Br9VAAS",
+    "dsr": "DS-1736525",
+    "sssm": "Luis Mauricio Pacheco",
+    "status": "Working",
+    "oppName": "Liverpool - MX - CO - Helpdesk remediation",
+    "oppId": "006ed00000jPo9OAAS",
+    "amount": 300000,
+    "closeDate": "2026-11-30",
+    "ap": "Diego Ramos",
+    "requestType": "EM Support",
+    "forecast": "Pipeline",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "SERVICIOS LIVERPOOL S.A. DE C.V.",
+    "country": "MX",
+    "mgrJudgement": null,
+    "contractType": "Time & Materials",
+    "stage": "02 - Scoping"
+  },
+  {
     "dsrId": "a25ed0000027O7hAAE",
     "dsr": "DS-1725960",
     "sssm": "Luis Mauricio Pacheco",
@@ -3282,6 +3268,27 @@ let DSR_DATA = [
     "requestTypeDetail": "RFP",
     "account": "Bancolombia S.A.",
     "country": "CO",
+    "mgrJudgement": "UP -",
+    "contractType": null,
+    "stage": "02 - Scoping"
+  },
+  {
+    "dsrId": "a25ed0000028a8PAAQ",
+    "dsr": "DS-1728830",
+    "sssm": "Luis Mauricio Pacheco",
+    "status": "Working",
+    "oppName": "Operaciones Satelitales - ITSM MVP 1 - Incidents, Problem, Change, CMDB - SOW - #QL",
+    "oppId": "006ed00000hnBG5AAM",
+    "amount": 250000,
+    "closeDate": "2026-11-30",
+    "ap": "Jorge Salafia",
+    "requestType": "EM Support",
+    "forecast": "Pipeline",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Grupo Televisa, S.A.B.",
+    "country": "MX",
     "mgrJudgement": "UP -",
     "contractType": null,
     "stage": "02 - Scoping"
@@ -3308,48 +3315,6 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a25ed000002Br9VAAS",
-    "dsr": "DS-1736525",
-    "sssm": "Luis Mauricio Pacheco",
-    "status": "Working",
-    "oppName": "Liverpool - MX - CO - Helpdesk remediation",
-    "oppId": "006ed00000jPo9OAAS",
-    "amount": 300000,
-    "closeDate": "2026-11-30",
-    "ap": "Diego Ramos",
-    "requestType": "EM Support",
-    "forecast": "Pipeline",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "SERVICIOS LIVERPOOL S.A. DE C.V.",
-    "country": "MX",
-    "mgrJudgement": null,
-    "contractType": "Time & Materials",
-    "stage": "02 - Scoping"
-  },
-  {
-    "dsrId": "a25ed0000028a8PAAQ",
-    "dsr": "DS-1728830",
-    "sssm": "Luis Mauricio Pacheco",
-    "status": "Working",
-    "oppName": "Operaciones Satelitales - ITSM MVP 1 - Incidents, Problem, Change, CMDB - SOW - #QL",
-    "oppId": "006ed00000hnBG5AAM",
-    "amount": 250000,
-    "closeDate": "2026-11-30",
-    "ap": "Jorge Salafia",
-    "requestType": "EM Support",
-    "forecast": "Pipeline",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "Grupo Televisa, S.A.B.",
-    "country": "MX",
-    "mgrJudgement": "UP -",
-    "contractType": null,
-    "stage": "02 - Scoping"
-  },
-  {
     "dsrId": "a25ed0000022CNJAA2",
     "dsr": "DS-1715254",
     "sssm": "Luis Mauricio Pacheco",
@@ -3368,48 +3333,6 @@ let DSR_DATA = [
     "country": "MX",
     "mgrJudgement": "UP+",
     "contractType": "Time & Materials",
-    "stage": "03 - Initial Proposal"
-  },
-  {
-    "dsrId": "a25ed000000UOOHAA4",
-    "dsr": "DS-1573719",
-    "sssm": "Luis Mauricio Pacheco",
-    "status": "Working",
-    "oppName": "FSP - MX - Agent for Sales in Whatsapp Channel - SOW",
-    "oppId": "006ed000008DePdAAK",
-    "amount": 201375,
-    "closeDate": "2026-12-18",
-    "ap": "Jorge Salafia",
-    "requestType": "EM Support",
-    "forecast": "Best Case",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "Pharma Plus, S.A. de C.V.",
-    "country": "MX",
-    "mgrJudgement": "UP -",
-    "contractType": "Time & Materials",
-    "stage": "03 - Initial Proposal"
-  },
-  {
-    "dsrId": "a25ed000001xSirAAE",
-    "dsr": "DS-1711488",
-    "sssm": "Luis Mauricio Pacheco",
-    "status": "Working",
-    "oppName": "MX - RCD PAM Hotels -  Agentforce Voice #RFP #QL",
-    "oppId": "006ed00000dxtq2AAA",
-    "amount": 155903.61,
-    "closeDate": "2026-12-31",
-    "ap": "Gabriel Arturo Rada",
-    "requestType": "EM Support",
-    "forecast": "Best Case",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "RFP",
-    "account": "Solaya Hospitality Management Group S. de R.L. de C.V.",
-    "country": "MX",
-    "mgrJudgement": "UP+",
-    "contractType": "Fixed Price",
     "stage": "03 - Initial Proposal"
   },
   {
@@ -3449,6 +3372,48 @@ let DSR_DATA = [
     "region": "LACA",
     "requestTypeDetail": "RFP",
     "account": "Banco Nacional de México, S.A., Integrante del Grupo Financiero Banamex",
+    "country": "MX",
+    "mgrJudgement": "UP+",
+    "contractType": "Fixed Price",
+    "stage": "03 - Initial Proposal"
+  },
+  {
+    "dsrId": "a25ed000000UOOHAA4",
+    "dsr": "DS-1573719",
+    "sssm": "Luis Mauricio Pacheco",
+    "status": "Working",
+    "oppName": "FSP - MX - Agent for Sales in Whatsapp Channel - SOW",
+    "oppId": "006ed000008DePdAAK",
+    "amount": 201375,
+    "closeDate": "2026-12-18",
+    "ap": "Jorge Salafia",
+    "requestType": "EM Support",
+    "forecast": "Best Case",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Pharma Plus, S.A. de C.V.",
+    "country": "MX",
+    "mgrJudgement": "UP -",
+    "contractType": "Time & Materials",
+    "stage": "03 - Initial Proposal"
+  },
+  {
+    "dsrId": "a25ed000001xSirAAE",
+    "dsr": "DS-1711488",
+    "sssm": "Luis Mauricio Pacheco",
+    "status": "Working",
+    "oppName": "MX - RCD PAM Hotels -  Agentforce Voice #RFP #QL",
+    "oppId": "006ed00000dxtq2AAA",
+    "amount": 155903.61,
+    "closeDate": "2026-12-31",
+    "ap": "Gabriel Arturo Rada",
+    "requestType": "EM Support",
+    "forecast": "Best Case",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "RFP",
+    "account": "Solaya Hospitality Management Group S. de R.L. de C.V.",
     "country": "MX",
     "mgrJudgement": "UP+",
     "contractType": "Fixed Price",
@@ -3518,27 +3483,6 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a25ed000002AyPxAAK",
-    "dsr": "DS-1734389",
-    "sssm": "Nelson Stebulaitis Filho",
-    "status": "Working",
-    "oppName": "PRODESP DER FS Implementation CSG New",
-    "oppId": "006ed00000idVPBAA2",
-    "amount": 8000000,
-    "closeDate": "2027-01-25",
-    "ap": "Juliana Brites",
-    "requestType": "EM Support",
-    "forecast": "Pipeline",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "PRODESP-Companhia de Processamento de Dados do Estado de São Paulo",
-    "country": "BR",
-    "mgrJudgement": null,
-    "contractType": "Fixed Price",
-    "stage": "02 - Scoping"
-  },
-  {
     "dsrId": "a25ed000002AyMjAAK",
     "dsr": "DS-1734387",
     "sssm": "Nelson Stebulaitis Filho",
@@ -3560,25 +3504,25 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a25ed000001TDXZAA4",
-    "dsr": "DS-1687873",
+    "dsrId": "a25ed000002AyPxAAK",
+    "dsr": "DS-1734389",
     "sssm": "Nelson Stebulaitis Filho",
     "status": "Working",
-    "oppName": "DTP (ANATEL) Atendimento CSG New",
-    "oppId": "006ed00000YEoW1AAL",
-    "amount": 3200000,
-    "closeDate": "2026-10-15",
-    "ap": "Alex Siqueira",
+    "oppName": "PRODESP DER FS Implementation CSG New",
+    "oppId": "006ed00000idVPBAA2",
+    "amount": 8000000,
+    "closeDate": "2027-01-25",
+    "ap": "Juliana Brites",
     "requestType": "EM Support",
-    "forecast": "Best Case",
+    "forecast": "Pipeline",
     "nextStep": null,
     "region": "LACA",
     "requestTypeDetail": "Scoping/SOW",
-    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
+    "account": "PRODESP-Companhia de Processamento de Dados do Estado de São Paulo",
     "country": "BR",
-    "mgrJudgement": "UP -",
-    "contractType": "Time & Materials",
-    "stage": "03 - Initial Proposal"
+    "mgrJudgement": null,
+    "contractType": "Fixed Price",
+    "stage": "02 - Scoping"
   },
   {
     "dsrId": "a25ed000002AxyXAAS",
@@ -3602,25 +3546,25 @@ let DSR_DATA = [
     "stage": "03 - Initial Proposal"
   },
   {
-    "dsrId": "a25ed000001ro1JAAQ",
-    "dsr": "DS-1707011",
+    "dsrId": "a25ed000001TDXZAA4",
+    "dsr": "DS-1687873",
     "sssm": "Nelson Stebulaitis Filho",
     "status": "Working",
-    "oppName": "CLARO (BR) Comms CPQ Design CSG New #QL",
-    "oppId": "006ed00000ckmDRAAY",
-    "amount": 643416.64,
-    "closeDate": "2026-09-14",
-    "ap": "Juliana Brites",
+    "oppName": "DTP (ANATEL) Atendimento CSG New",
+    "oppId": "006ed00000YEoW1AAL",
+    "amount": 3200000,
+    "closeDate": "2026-10-15",
+    "ap": "Alex Siqueira",
     "requestType": "EM Support",
-    "forecast": "Commit",
+    "forecast": "Best Case",
     "nextStep": null,
     "region": "LACA",
     "requestTypeDetail": "Scoping/SOW",
-    "account": "*Claro S.A.",
+    "account": "EMPRESA DE TECNOLOGIA E INFORMACOES DA PREVIDENCIA S.A. - DATAPREV",
     "country": "BR",
-    "mgrJudgement": "IN",
-    "contractType": "Fixed Price",
-    "stage": "04 - Active Negotiation"
+    "mgrJudgement": "UP -",
+    "contractType": "Time & Materials",
+    "stage": "03 - Initial Proposal"
   },
   {
     "dsrId": "a25ed000002AyL7AAK",
@@ -3640,6 +3584,27 @@ let DSR_DATA = [
     "account": "Prodesp - Empresa de TI do Estado de São Paulo_PPT",
     "country": "BR",
     "mgrJudgement": null,
+    "contractType": "Fixed Price",
+    "stage": "04 - Active Negotiation"
+  },
+  {
+    "dsrId": "a25ed000001ro1JAAQ",
+    "dsr": "DS-1707011",
+    "sssm": "Nelson Stebulaitis Filho",
+    "status": "Working",
+    "oppName": "CLARO (BR) Comms CPQ Design CSG New #QL",
+    "oppId": "006ed00000ckmDRAAY",
+    "amount": 643416.64,
+    "closeDate": "2026-09-14",
+    "ap": "Juliana Brites",
+    "requestType": "EM Support",
+    "forecast": "Commit",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "*Claro S.A.",
+    "country": "BR",
+    "mgrJudgement": "IN",
     "contractType": "Fixed Price",
     "stage": "04 - Active Negotiation"
   },
@@ -3665,27 +3630,6 @@ let DSR_DATA = [
     "stage": "01 - Discovery"
   },
   {
-    "dsrId": "a25ed000001WEk1AAG",
-    "dsr": "DS-1689609",
-    "sssm": "Regina Garrido",
-    "status": "In Queue",
-    "oppName": "Bradesco Cockpit PJ - Agentforce Add-on- CSG",
-    "oppId": "006ed00000YfxIIAAZ",
-    "amount": 1122000,
-    "closeDate": "2026-11-27",
-    "ap": "Ademir Aurelio Monteiro",
-    "requestType": "EM Support",
-    "forecast": "Best Case",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "Banco Bradesco S.A.",
-    "country": "BR",
-    "mgrJudgement": "UP -",
-    "contractType": "Time & Materials",
-    "stage": "02 - Scoping"
-  },
-  {
     "dsrId": "a25ed000001LueXAAS",
     "dsr": "DS-1681413",
     "sssm": "Regina Garrido",
@@ -3697,6 +3641,27 @@ let DSR_DATA = [
     "ap": "Ademir Aurelio Monteiro",
     "requestType": "EM Support",
     "forecast": "Pipeline",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Banco Bradesco S.A.",
+    "country": "BR",
+    "mgrJudgement": "UP -",
+    "contractType": "Time & Materials",
+    "stage": "02 - Scoping"
+  },
+  {
+    "dsrId": "a25ed000001WEk1AAG",
+    "dsr": "DS-1689609",
+    "sssm": "Regina Garrido",
+    "status": "In Queue",
+    "oppName": "Bradesco Cockpit PJ - Agentforce Add-on- CSG",
+    "oppId": "006ed00000YfxIIAAZ",
+    "amount": 1122000,
+    "closeDate": "2026-11-27",
+    "ap": "Ademir Aurelio Monteiro",
+    "requestType": "EM Support",
+    "forecast": "Best Case",
     "nextStep": null,
     "region": "LACA",
     "requestTypeDetail": "Scoping/SOW",
@@ -3812,27 +3777,6 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a25ed000001XT5tAAG",
-    "dsr": "DS-1690809",
-    "sssm": "Regina Garrido",
-    "status": "Working",
-    "oppName": "Unimed  Nordeste/RS - ARI Investment - Agentforce Mulesoft - CSG",
-    "oppId": "006ed00000YxDVVAA3",
-    "amount": 0,
-    "closeDate": "2026-09-30",
-    "ap": "Graziela de Fatima Rodolfo Perez",
-    "requestType": "EM Support",
-    "forecast": "Commit",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "Unimed Nordeste/RS (Unimed Serra Gaucha)",
-    "country": "BR",
-    "mgrJudgement": "UP+",
-    "contractType": "Fixed Price",
-    "stage": "04 - Active Negotiation"
-  },
-  {
     "dsrId": "a25ed000001GT0fAAG",
     "dsr": "DS-1677055",
     "sssm": "Regina Garrido",
@@ -3851,6 +3795,27 @@ let DSR_DATA = [
     "country": "BR",
     "mgrJudgement": "UP+",
     "contractType": "Time & Materials",
+    "stage": "04 - Active Negotiation"
+  },
+  {
+    "dsrId": "a25ed000001XT5tAAG",
+    "dsr": "DS-1690809",
+    "sssm": "Regina Garrido",
+    "status": "Working",
+    "oppName": "Unimed  Nordeste/RS - ARI Investment - Agentforce Mulesoft - CSG",
+    "oppId": "006ed00000YxDVVAA3",
+    "amount": 0,
+    "closeDate": "2026-09-30",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "requestType": "EM Support",
+    "forecast": "Commit",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Unimed Nordeste/RS (Unimed Serra Gaucha)",
+    "country": "BR",
+    "mgrJudgement": "UP+",
+    "contractType": "Fixed Price",
     "stage": "04 - Active Negotiation"
   },
   {
@@ -4295,27 +4260,6 @@ let DSR_DATA = [
     "stage": "02 - Scoping"
   },
   {
-    "dsrId": "a25ed000001KqebAAC",
-    "dsr": "DS-1680290",
-    "sssm": "SOW/EM Support: LATAM",
-    "status": "In Queue",
-    "oppName": "Gesemex - MX - Consumer Goods Sales and Implementation - SOW - TM - #QL",
-    "oppId": "006ed00000WZ2pJAAT",
-    "amount": 1000000,
-    "closeDate": "2026-12-21",
-    "ap": "Jorge Salafia",
-    "requestType": "EM Support",
-    "forecast": "Pipeline",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "Gesemex Red de Distribuidores Exxon Mexico SA de CV",
-    "country": "MX",
-    "mgrJudgement": "UP+",
-    "contractType": "Time & Materials",
-    "stage": "02 - Scoping"
-  },
-  {
     "dsrId": "a25ed000002CE4TAAW",
     "dsr": "DS-1737391",
     "sssm": "SOW/EM Support: LATAM",
@@ -4332,7 +4276,7 @@ let DSR_DATA = [
     "requestTypeDetail": "Scoping/SOW",
     "account": "Zurich Seguros de Vida S.A.",
     "country": "CL",
-    "mgrJudgement": null,
+    "mgrJudgement": "UP+",
     "contractType": null,
     "stage": "02 - Scoping"
   },
@@ -4353,7 +4297,7 @@ let DSR_DATA = [
     "requestTypeDetail": "RFP",
     "account": "Banco Macro S.A.",
     "country": "AR",
-    "mgrJudgement": null,
+    "mgrJudgement": "UP+",
     "contractType": null,
     "stage": "02 - Scoping"
   },
@@ -4374,7 +4318,7 @@ let DSR_DATA = [
     "requestTypeDetail": "Scoping/SOW",
     "account": "Telecentro S.A.",
     "country": "AR",
-    "mgrJudgement": null,
+    "mgrJudgement": "UP+",
     "contractType": "Fixed Price",
     "stage": "02 - Scoping"
   },
@@ -4505,27 +4449,6 @@ let DSR_DATA = [
     "stage": "01 - Discovery"
   },
   {
-    "dsrId": "a25ed0000021mKnAAI",
-    "dsr": "DS-1714923",
-    "sssm": "Thais Ishii",
-    "status": "Working",
-    "oppName": "Unimed - CTO & Prime Implementation - New Business - CSG",
-    "oppId": "006ed00000enmHNAAY",
-    "amount": 2000000,
-    "closeDate": "2026-12-30",
-    "ap": "Graziela de Fatima Rodolfo Perez",
-    "requestType": "EM Support",
-    "forecast": "Pipeline",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "Unimed Nacional",
-    "country": "BR",
-    "mgrJudgement": "UP -",
-    "contractType": "Time & Materials",
-    "stage": "02 - Scoping"
-  },
-  {
     "dsrId": "a25ed000002A8ETAA0",
     "dsr": "DS-1732494",
     "sssm": "Thais Ishii",
@@ -4543,6 +4466,27 @@ let DSR_DATA = [
     "account": "Unidas Locacoes E Servicos S/A",
     "country": "BR",
     "mgrJudgement": null,
+    "contractType": "Time & Materials",
+    "stage": "02 - Scoping"
+  },
+  {
+    "dsrId": "a25ed0000021mKnAAI",
+    "dsr": "DS-1714923",
+    "sssm": "Thais Ishii",
+    "status": "Working",
+    "oppName": "Unimed - CTO & Prime Implementation - New Business - CSG",
+    "oppId": "006ed00000enmHNAAY",
+    "amount": 2000000,
+    "closeDate": "2026-12-30",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "requestType": "EM Support",
+    "forecast": "Pipeline",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Unimed Nacional",
+    "country": "BR",
+    "mgrJudgement": "UP -",
     "contractType": "Time & Materials",
     "stage": "02 - Scoping"
   },
@@ -4568,27 +4512,6 @@ let DSR_DATA = [
     "stage": "03 - Initial Proposal"
   },
   {
-    "dsrId": "a25ed000001yDMnAAM",
-    "dsr": "DS-1712314",
-    "sssm": "Thais Ishii",
-    "status": "Waiting on Requestor",
-    "oppName": "Whirlpool - ARI Investiment",
-    "oppId": "006ed00000e8d8PAAQ",
-    "amount": 0,
-    "closeDate": "2026-09-30",
-    "ap": "Graziela de Fatima Rodolfo Perez",
-    "requestType": "EM Support",
-    "forecast": "Best Case",
-    "nextStep": null,
-    "region": "LACA",
-    "requestTypeDetail": "Scoping/SOW",
-    "account": "Whirlpool S.A.",
-    "country": "BR",
-    "mgrJudgement": "UP -",
-    "contractType": "Time & Materials",
-    "stage": "03 - Initial Proposal"
-  },
-  {
     "dsrId": "a25ed00000283vdAAA",
     "dsr": "DS-1727582",
     "sssm": "Thais Ishii",
@@ -4604,6 +4527,27 @@ let DSR_DATA = [
     "region": "LACA",
     "requestTypeDetail": "Scoping/SOW",
     "account": "Thermo King do Brasil Ltda",
+    "country": "BR",
+    "mgrJudgement": "UP -",
+    "contractType": "Time & Materials",
+    "stage": "03 - Initial Proposal"
+  },
+  {
+    "dsrId": "a25ed000001yDMnAAM",
+    "dsr": "DS-1712314",
+    "sssm": "Thais Ishii",
+    "status": "Waiting on Requestor",
+    "oppName": "Whirlpool - ARI Investiment",
+    "oppId": "006ed00000e8d8PAAQ",
+    "amount": 0,
+    "closeDate": "2026-09-30",
+    "ap": "Graziela de Fatima Rodolfo Perez",
+    "requestType": "EM Support",
+    "forecast": "Best Case",
+    "nextStep": null,
+    "region": "LACA",
+    "requestTypeDetail": "Scoping/SOW",
+    "account": "Whirlpool S.A.",
     "country": "BR",
     "mgrJudgement": "UP -",
     "contractType": "Time & Materials",
@@ -5378,17 +5322,49 @@ let ESTIMATE_MAP = {
     "tAndE": null,
     "discountPct": 0
   },
+  "0063y000019kzWfAAI": {
+    "id": "aH2ed0000006WQDCA2",
+    "name": "Sebrae-COE",
+    "billingType": "Fixed Price",
+    "rateCardRegion": "LATAM",
+    "tAndE": 799340.08,
+    "discountPct": 0
+  },
   "0063y000019mgyzAAA": {
-    "id": "aH2ed000000fyfhCAA",
+    "id": "aH23y000000fyfhCAA",
     "name": "ItauCartoes_SOW",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM Brazil",
     "tAndE": null,
     "discountPct": 0
   },
+  "0063y000019nTVEAA2": {
+    "id": "aH2ed000000HMqXCAW",
+    "name": "SPW-DD-Itaú-Máquina de Engajamento- Modernização da Plataforma-202601-V2.0",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 255555.05,
+    "discountPct": 0
+  },
+  "0063y00001A0J5eAAF": {
+    "id": "aH2ed0000007meDCAQ",
+    "name": "Caixa-36meses",
+    "billingType": "Fixed Price",
+    "rateCardRegion": "LATAM",
+    "tAndE": 1956000,
+    "discountPct": 11.56
+  },
+  "0063y00001AdCcrAAF": {
+    "id": "aH2ed0000008wurCAA",
+    "name": "v3_BASA_5years",
+    "billingType": "Fixed Price",
+    "rateCardRegion": "LATAM",
+    "tAndE": 1005484.25,
+    "discountPct": 25
+  },
   "0063y00001B7UmHAAV": {
     "id": "aH2ed000000DEYDCA4",
-    "name": "Loyalty argentina PRIME",
+    "name": "Loyalty argentina PRIME 690K - 7 meses",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": null,
@@ -5410,6 +5386,14 @@ let ESTIMATE_MAP = {
     "tAndE": null,
     "discountPct": 0
   },
+  "006ed000007mRgEAAU": {
+    "id": "aH2ed000000Qco1CAC",
+    "name": "v2_FY27 - RCA SERASA",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 200000,
+    "discountPct": 0
+  },
   "006ed000008DePdAAK": {
     "id": "aH2ed000000QuubCAC",
     "name": "Estimate Agentforce FSP FY27",
@@ -5418,12 +5402,36 @@ let ESTIMATE_MAP = {
     "tAndE": 10069,
     "discountPct": 0
   },
+  "006ed0000099n9BAAQ": {
+    "id": "aH2ed000000W6OrCAK",
+    "name": "Estimate RFQ Banamex Miura MVP Fase 1 V2 / Risk",
+    "billingType": "Fixed Price",
+    "rateCardRegion": "LATAM",
+    "tAndE": 32056,
+    "discountPct": 23.82
+  },
   "006ed00000AOUOzAAP": {
     "id": "aH2ed000000Gc2vCAC",
     "name": "Banistmo - Fundacional FSC",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": 11258.5,
+    "discountPct": 0
+  },
+  "006ed00000DRqB7AAL": {
+    "id": "aH2ed000000MnTVCA0",
+    "name": "Directv - CTO - Comms - Part Time",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
+    "discountPct": 5.17
+  },
+  "006ed00000HC2AkAAL": {
+    "id": "aH2ed000000X4pdCAC",
+    "name": "02 SQUADs paralelos 2026 BANCO AGRICOLA - SPW V1 /  FY25 Q2.1 V2",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 66396.16,
     "discountPct": 0
   },
   "006ed00000LqUHFAA3": {
@@ -5434,9 +5442,25 @@ let ESTIMATE_MAP = {
     "tAndE": 42539,
     "discountPct": 0
   },
+  "006ed00000MI1fJAAT": {
+    "id": "aH2ed000000It7hCAC",
+    "name": "ClaimsPortal",
+    "billingType": "Fixed Price",
+    "rateCardRegion": "LATAM",
+    "tAndE": 145218,
+    "discountPct": 25
+  },
   "006ed00000MI4zlAAD": {
     "id": "aH2ed000000EJu1CAG",
     "name": "v1 - Crefisa - MCP",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
+    "discountPct": 0
+  },
+  "006ed00000MpdnRAAR": {
+    "id": "aH2ed000000VrMbCAK",
+    "name": "Advisory  NTT - 18 Semanas - FSC",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": null,
@@ -5450,12 +5474,36 @@ let ESTIMATE_MAP = {
     "tAndE": 54292,
     "discountPct": 0
   },
-  "006ed00000OJqgEAAT": {
-    "id": "aH2ed000000FRZNCA4",
-    "name": "Implementacion PYME",
+  "006ed00000NSrAcAAL": {
+    "id": "aH2ed000000TqODCA0",
+    "name": "v1_Estimate - CTO Porto Atendimento Corp",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": null,
+    "discountPct": 5.17
+  },
+  "006ed00000NZnQQAA1": {
+    "id": "aH2ed000000X3tZCAS",
+    "name": "Estimate ARI Telmex 2 Sept",
+    "billingType": "Fixed Price",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
+    "discountPct": 0
+  },
+  "006ed00000OJqgEAAT": {
+    "id": "aH2ed000000FRZNCA4",
+    "name": "Implementación PYME - Escenario Inicial",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
+    "discountPct": 0
+  },
+  "006ed00000P4MYDAA3": {
+    "id": "aH2ed000000FryTCAS",
+    "name": "Martech - B2B - VNOV2025",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 50000,
     "discountPct": 0
   },
   "006ed00000PpFGLAA3": {
@@ -5474,12 +5522,28 @@ let ESTIMATE_MAP = {
     "tAndE": null,
     "discountPct": 0
   },
+  "006ed00000SeUnFAAV": {
+    "id": "aH2ed000000UvGzCAK",
+    "name": "v2_Sicredi - Ari",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
+    "discountPct": 0
+  },
   "006ed00000T5tUbAAJ": {
     "id": "aH2ed000000V6ynCAC",
     "name": "OptimizacionIA",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": 72130,
+    "discountPct": 0
+  },
+  "006ed00000Ua5MVAAZ": {
+    "id": "aH2ed000000QzsfCAC",
+    "name": "SWE For SCOPING",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
     "discountPct": 0
   },
   "006ed00000UdoDQAAZ": {
@@ -5492,10 +5556,34 @@ let ESTIMATE_MAP = {
   },
   "006ed00000VQeMYAA1": {
     "id": "aH2ed000000ObrFCAS",
-    "name": "v1_Crefisa Agentic Foundation",
+    "name": "v1_Crefisa Agentic Foundation - Agentic Banking",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": 150000,
+    "discountPct": 0
+  },
+  "006ed00000VvkNdAAJ": {
+    "id": "aH2ed000000Rr6fCAC",
+    "name": "MMM - V2 -Extended Timeline w/ GDC Mexico",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "AMER REG",
+    "tAndE": null,
+    "discountPct": 20
+  },
+  "006ed00000Vwew6AAB": {
+    "id": "aH2ed000000X4mPCAS",
+    "name": "V2 Estimate RCD Data Cloud Prime - All Phases",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 24429,
+    "discountPct": 0
+  },
+  "006ed00000WeTwxAAF": {
+    "id": "aH2ed000000RHUbCAO",
+    "name": "ARI - Neoenergia",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
     "discountPct": 0
   },
   "006ed00000XAsP7AAL": {
@@ -5506,6 +5594,30 @@ let ESTIMATE_MAP = {
     "tAndE": null,
     "discountPct": 10
   },
+  "006ed00000XLWczAAH": {
+    "id": "aH2ed000000PVtRCAW",
+    "name": "FABE- MC + Data Cloud + loyalty_V2",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 37803,
+    "discountPct": 0
+  },
+  "006ed00000Xw4JZAAZ": {
+    "id": "aH2ed000000X4PpCAK",
+    "name": "v3-FullImplementation",
+    "billingType": "Fixed Price",
+    "rateCardRegion": "LATAM",
+    "tAndE": 352741,
+    "discountPct": 0
+  },
+  "006ed00000YEoW1AAL": {
+    "id": "aH2ed000000VAj3CAG",
+    "name": "ANATEL (multi cloud) v3",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 300000,
+    "discountPct": 0
+  },
   "006ed00000YlUGnAAN": {
     "id": "aH2ed000000NpTFCA0",
     "name": "v2_SWE PRUDENTIAL - AF",
@@ -5514,12 +5626,28 @@ let ESTIMATE_MAP = {
     "tAndE": null,
     "discountPct": 0
   },
+  "006ed00000YxDVVAA3": {
+    "id": "aH2ed000000SnLxCAK",
+    "name": "2026-06-02 Estimate-Unimed Nordeste/RS-SWE-MuleSoft+Agent+DE+WA-V2.0",
+    "billingType": "Fixed Price",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
+    "discountPct": 0
+  },
   "006ed00000Z01XpAAJ": {
     "id": "aH2ed000000WMTdCAO",
-    "name": "ROM-E-Agro-Recontratacao",
+    "name": "2026-08-10-ROM-E-Agro-Recontratação_e_simulação_crédito-V1.0",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": 58800,
+    "discountPct": 0
+  },
+  "006ed00000ZMe5tAAD": {
+    "id": "aH2ed000000PojBCAS",
+    "name": "Migración Whatsapp - UCP con SUBCO",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
     "discountPct": 0
   },
   "006ed00000ZN37WAAT": {
@@ -5530,12 +5658,44 @@ let ESTIMATE_MAP = {
     "tAndE": 265000,
     "discountPct": 3.88
   },
+  "006ed00000ZR5lsAAD": {
+    "id": "aH2ed000000OXVtCAO",
+    "name": "ROM Digital Onboarding Impl Estimate FSC Experience Mulesoft Agentforce",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 139031,
+    "discountPct": 0
+  },
+  "006ed00000ZshYUAAZ": {
+    "id": "aH2ed000000Pk65CAC",
+    "name": "Estimate BCP MVP",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 37677,
+    "discountPct": 0
+  },
+  "006ed00000aBBzVAAW": {
+    "id": "aH2ed000000VpvtCAC",
+    "name": "Portal B2B - Equatorial QL",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
+    "discountPct": 0
+  },
   "006ed00000aBQX8AAO": {
     "id": "aH2ed000000SEfxCAG",
     "name": "v1_Sicred Agentic Banking",
     "billingType": "Fixed Price",
     "rateCardRegion": "LATAM",
     "tAndE": 300000,
+    "discountPct": 0
+  },
+  "006ed00000aVY2HAAW": {
+    "id": "aH2ed000000WXwvCAG",
+    "name": "HCC-08-26+Mulesoft",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 88608,
     "discountPct": 0
   },
   "006ed00000aiO8MAAU": {
@@ -5562,9 +5722,17 @@ let ESTIMATE_MAP = {
     "tAndE": 199520,
     "discountPct": 0
   },
+  "006ed00000bFmWrAAK": {
+    "id": "aH2ed000000UonNCAS",
+    "name": "Digital Origination Optimized 25%",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 85000,
+    "discountPct": 18
+  },
   "006ed00000bK051AAC": {
     "id": "aH2ed000000X129CAC",
-    "name": "Phase 01 - Activacion MCA",
+    "name": "Phase 01 - Activación MCA - 03 Marcas",
     "billingType": "Fixed Price",
     "rateCardRegion": "LATAM",
     "tAndE": 29000,
@@ -5578,6 +5746,14 @@ let ESTIMATE_MAP = {
     "tAndE": 8500,
     "discountPct": 0
   },
+  "006ed00000buLfZAAU": {
+    "id": "aH2ed000000VvurCAC",
+    "name": "Envases Universales CTO",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 23398.65,
+    "discountPct": 0
+  },
   "006ed00000cNDpuAAG": {
     "id": "aH2ed000000SCB7CAO",
     "name": "v2_Atendimento Corp",
@@ -5588,11 +5764,27 @@ let ESTIMATE_MAP = {
   },
   "006ed00000ckmDRAAY": {
     "id": "aH2ed000000WCR3CAO",
-    "name": "Estimate CPQ Design v3",
+    "name": "Estimate CPQ Design v3 (uso de IA - Outcome Based)",
     "billingType": "Fixed Price",
     "rateCardRegion": "LATAM",
     "tAndE": 32000,
     "discountPct": 27.25
+  },
+  "006ed00000cqjpZAAQ": {
+    "id": "aH2ed000000SiULCA0",
+    "name": "FEMSA_PROPIMEX",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 15030.06,
+    "discountPct": 0
+  },
+  "006ed00000crZRZAA2": {
+    "id": "aH2ed000000ToxVCAS",
+    "name": "BallPark - Claude ASAP wo/ data",
+    "billingType": "Fixed Price",
+    "rateCardRegion": "LATAM",
+    "tAndE": 42500,
+    "discountPct": 14
   },
   "006ed00000dxtq2AAA": {
     "id": "aH2ed000000UzFlCAK",
@@ -5604,7 +5796,7 @@ let ESTIMATE_MAP = {
   },
   "006ed00000e8d8PAAQ": {
     "id": "aH2ed000000Wpx3CAC",
-    "name": "Estimate_WhirlpoolSA_ARI",
+    "name": "Estimate_WhirlpoolSA_ARI_ProjectBlueSky_v1.0_2026-08-26",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": 234169.1,
@@ -5612,7 +5804,15 @@ let ESTIMATE_MAP = {
   },
   "006ed00000eBGqTAAW": {
     "id": "aH2ed000000VdbNCAS",
-    "name": "Dos Pinos - Remediation Plan",
+    "name": "Dos Pinos - Remediation Plan - Security (Short)",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
+    "discountPct": 0
+  },
+  "006ed00000eU8cDAAS": {
+    "id": "aH2ed000000Wfb7CAC",
+    "name": "BB_ARI_V3",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": null,
@@ -5626,6 +5826,14 @@ let ESTIMATE_MAP = {
     "tAndE": 20000,
     "discountPct": 14
   },
+  "006ed00000eZ8WkAAK": {
+    "id": "aH2ed000000WnDhCAK",
+    "name": "SWE Zello",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
+    "discountPct": 0
+  },
   "006ed00000eadv3AAA": {
     "id": "aH2ed000000WuBxCAK",
     "name": "Colmena ARI",
@@ -5634,9 +5842,17 @@ let ESTIMATE_MAP = {
     "tAndE": null,
     "discountPct": 0
   },
+  "006ed00000ej7JFAAY": {
+    "id": "aH2ed000000WCUHCA4",
+    "name": "Estimate_FEMSA_PrimeImplementation_NB_Core_v[1.0]_2026-08-04",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
+    "discountPct": 0
+  },
   "006ed00000ejEe5AAE": {
     "id": "aH2ed000000WZCLCA4",
-    "name": "Yduqs - ARI Investment Estimate",
+    "name": "2026-08-18 - Yduqs - ARI Investment Estimate",
     "billingType": "Fixed Price",
     "rateCardRegion": "LATAM",
     "tAndE": 311600,
@@ -5652,10 +5868,18 @@ let ESTIMATE_MAP = {
   },
   "006ed00000fZyXxAAK": {
     "id": "aH2ed000000V6IrCAK",
-    "name": "Bradesco Seguros-Jornada de Leads",
+    "name": "2026-07-02-Estimate-Bradesco Seguros-Jornada de Leads-Fase 1",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": 246400,
+    "discountPct": 0
+  },
+  "006ed00000fnQubAAE": {
+    "id": "aH2ed000000VJETCA4",
+    "name": "Advisory SWAP",
+    "billingType": "Order Form",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
     "discountPct": 0
   },
   "006ed00000fnc69AAA": {
@@ -5674,9 +5898,25 @@ let ESTIMATE_MAP = {
     "tAndE": null,
     "discountPct": 5
   },
+  "006ed00000gd68bAAA": {
+    "id": "aH2ed000000WUhJCAW",
+    "name": "2026-08-14 - CPFL RFP v01",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 186775.33,
+    "discountPct": 0
+  },
+  "006ed00000giPKIAA2": {
+    "id": "aH2ed000000VT7NCAW",
+    "name": "Seguros Pichincha - Plan & Design - 6 Semanas",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 1908,
+    "discountPct": 0
+  },
   "006ed00000gyS9KAAU": {
     "id": "aH2ed000000VrZVCA0",
-    "name": "Lielu - MC Next + Agentforce",
+    "name": "Lielu - MC Next + Agentforce + Sales Cloud UX (SCOPEZILLA)",
     "billingType": "Fixed Price",
     "rateCardRegion": "LATAM",
     "tAndE": null,
@@ -5684,7 +5924,7 @@ let ESTIMATE_MAP = {
   },
   "006ed00000hErYMAA0": {
     "id": "aH2ed000000WfeLCAS",
-    "name": "EQUINOX ARI DATA CLOUD",
+    "name": "EQUINOX ARI DATA CLOUD MKT CLOUD AGENTFORCE SERVICE",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": null,
@@ -5692,7 +5932,7 @@ let ESTIMATE_MAP = {
   },
   "006ed00000hEt2IAAS": {
     "id": "aH2ed000000WQAfCAO",
-    "name": "Estimate Net Zero Bancolombia",
+    "name": "Estimate Net Zero Bancolombia - Updated",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": 75213,
@@ -5708,7 +5948,7 @@ let ESTIMATE_MAP = {
   },
   "006ed00000hq60XAAQ": {
     "id": "aH2ed000000WOVRCA4",
-    "name": "Bauducco ARI",
+    "name": "2026-08-11 - Bauducco ARI",
     "billingType": "Fixed Price",
     "rateCardRegion": "LATAM",
     "tAndE": 112491.53,
@@ -5724,7 +5964,7 @@ let ESTIMATE_MAP = {
   },
   "006ed00000hrg1xAAA": {
     "id": "aH2ed000000WNcbCAG",
-    "name": "PERSONAL PAY BRE ALONE IMPLEMENTATION",
+    "name": "PERSONAL PAY BRE ALONE IMPLEMENTATION APEX (IA AUGMENTED) WO DATACLOUD",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": null,
@@ -5738,340 +5978,20 @@ let ESTIMATE_MAP = {
     "tAndE": 5735.2,
     "discountPct": 0
   },
-  "006ed00000i1937AAA": {
-    "id": "aH2ed000000Wpc5CAC",
-    "name": "Estimate Banco Atlantida FY27",
-    "billingType": "Fixed Price",
-    "rateCardRegion": "LATAM",
-    "tAndE": 59941,
-    "discountPct": 0
-  },
-  "006ed00000ifk2LAAQ": {
-    "id": "aH2ed000000Whg9CAC",
-    "name": "Unidas CPQ",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 107150.4,
-    "discountPct": 0
-  },
-  "006ed00000ix0vVAAQ": {
-    "id": "aH2ed000000WpfJCAS",
-    "name": "SWE - Claro Ecuador - Data Cloud",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 12940,
-    "discountPct": 0
-  },
-  "006ed00000jCgcfAAC": {
-    "id": "aH2ed000000Wtm9CAC",
-    "name": "ARI Totalplay",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "0063y000019kzWfAAI": {
-    "id": "aH2ed0000006WQDCA2",
-    "name": "Sebrae-COE",
-    "billingType": "Fixed Price",
-    "rateCardRegion": "LATAM",
-    "tAndE": 799340.08,
-    "discountPct": 0
-  },
-  "0063y000019nTVEAA2": {
-    "id": "aH2ed000000HMqXCAW",
-    "name": "SPW-DD-Itau",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 255555.05,
-    "discountPct": 0
-  },
-  "0063y00001A0J5eAAF": {
-    "id": "aH2ed0000007meDCAQ",
-    "name": "Caixa-36meses",
-    "billingType": "Fixed Price",
-    "rateCardRegion": "LATAM",
-    "tAndE": 1956000,
-    "discountPct": 11.56
-  },
-  "0063y00001AdCcrAAF": {
-    "id": "aH2ed0000008wurCAA",
-    "name": "v3_BASA_5years",
-    "billingType": "Fixed Price",
-    "rateCardRegion": "LATAM",
-    "tAndE": 1005484.25,
-    "discountPct": 25
-  },
-  "006ed000007mRgEAAU": {
-    "id": "aH2ed000000Qco1CAC",
-    "name": "v2_FY27 - RCA SERASA",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 200000,
-    "discountPct": 0
-  },
-  "006ed0000099n9BAAQ": {
-    "id": "aH2ed000000W6OrCAK",
-    "name": "Estimate RFQ Banamex Miura MVP",
-    "billingType": "Fixed Price",
-    "rateCardRegion": "LATAM",
-    "tAndE": 32056,
-    "discountPct": 23.82
-  },
-  "006ed00000DRqB7AAL": {
-    "id": "aH2ed000000MnTVCA0",
-    "name": "Directv - CTO - Comms",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 5.17
-  },
-  "006ed00000HC2AkAAL": {
-    "id": "aH2ed000000X4pdCAC",
-    "name": "BANCO AGRICOLA - SPW V1",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 66396.16,
-    "discountPct": 0
-  },
-  "006ed00000MI1fJAAT": {
-    "id": "aH2ed000000It7hCAC",
-    "name": "ClaimsPortal",
-    "billingType": "Fixed Price",
-    "rateCardRegion": "LATAM",
-    "tAndE": 145218,
-    "discountPct": 25
-  },
-  "006ed00000MpdnRAAR": {
-    "id": "aH2ed000000VrMbCAK",
-    "name": "Advisory NTT - FSC",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000NSrAcAAL": {
-    "id": "aH2ed000000TqODCA0",
-    "name": "CTO Porto Atendimento Corp",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 5.17
-  },
-  "006ed00000NZnQQAA1": {
-    "id": "aH2ed000000X3tZCAS",
-    "name": "Estimate ARI Telmex",
-    "billingType": "Fixed Price",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000P4MYDAA3": {
-    "id": "aH2ed000000FryTCAS",
-    "name": "Martech - B2B",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 50000,
-    "discountPct": 0
-  },
-  "006ed00000SeUnFAAV": {
-    "id": "aH2ed000000UvGzCAK",
-    "name": "v2_Sicredi - Ari",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000Ua5MVAAZ": {
-    "id": "aH2ed000000QzsfCAC",
-    "name": "SWE For SCOPING",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000VvkNdAAJ": {
-    "id": "aH2ed000000Rr6fCAC",
-    "name": "MMM - V2",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "AMER REG",
-    "tAndE": null,
-    "discountPct": 20
-  },
-  "006ed00000Vwew6AAB": {
-    "id": "aH2ed000000X4mPCAS",
-    "name": "V2 Estimate RCD Data Cloud Prime",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 24429,
-    "discountPct": 0
-  },
-  "006ed00000WeTwxAAF": {
-    "id": "aH2ed000000RHUbCAO",
-    "name": "ARI - Neoenergia",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000XLWczAAH": {
-    "id": "aH2ed000000PVtRCAW",
-    "name": "FABE MC Data Cloud loyalty_V2",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 37803,
-    "discountPct": 0
-  },
-  "006ed00000Xw4JZAAZ": {
-    "id": "aH2ed000000X4PpCAK",
-    "name": "v3-FullImplementation",
-    "billingType": "Fixed Price",
-    "rateCardRegion": "LATAM",
-    "tAndE": 352741,
-    "discountPct": 0
-  },
-  "006ed00000YEoW1AAL": {
-    "id": "aH2ed000000VAj3CAG",
-    "name": "ANATEL multi cloud v3",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 300000,
-    "discountPct": 0
-  },
-  "006ed00000YxDVVAA3": {
-    "id": "aH2ed000000SnLxCAK",
-    "name": "Unimed Nordeste SWE",
-    "billingType": "Fixed Price",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000ZMe5tAAD": {
-    "id": "aH2ed000000PojBCAS",
-    "name": "Migracion Whatsapp UCP",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000ZR5lsAAD": {
-    "id": "aH2ed000000OXVtCAO",
-    "name": "ROM Digital Onboarding",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 139031,
-    "discountPct": 0
-  },
-  "006ed00000ZshYUAAZ": {
-    "id": "aH2ed000000Pk65CAC",
-    "name": "Estimate BCP MVP",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 37677,
-    "discountPct": 0
-  },
-  "006ed00000aBBzVAAW": {
-    "id": "aH2ed000000VpvtCAC",
-    "name": "Portal B2B - Equatorial QL",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000aVY2HAAW": {
-    "id": "aH2ed000000WXwvCAG",
-    "name": "HCC Mulesoft",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 88608,
-    "discountPct": 0
-  },
-  "006ed00000bFmWrAAK": {
-    "id": "aH2ed000000UonNCAS",
-    "name": "Digital Origination",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 85000,
-    "discountPct": 18
-  },
-  "006ed00000buLfZAAU": {
-    "id": "aH2ed000000VvurCAC",
-    "name": "Envases Universales CTO",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 23398.65,
-    "discountPct": 0
-  },
-  "006ed00000cqjpZAAQ": {
-    "id": "aH2ed000000SiULCA0",
-    "name": "FEMSA_PROPIMEX",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 15030.06,
-    "discountPct": 0
-  },
-  "006ed00000crZRZAA2": {
-    "id": "aH2ed000000ToxVCAS",
-    "name": "BallPark - Claude ASAP wo data",
-    "billingType": "Fixed Price",
-    "rateCardRegion": "LATAM",
-    "tAndE": 42500,
-    "discountPct": 14
-  },
-  "006ed00000eU8cDAAS": {
-    "id": "aH2ed000000Wfb7CAC",
-    "name": "BB_ARI_V3",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000eZ8WkAAK": {
-    "id": "aH2ed000000WnDhCAK",
-    "name": "SWE Zello",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000ej7JFAAY": {
-    "id": "aH2ed000000WCUHCA4",
-    "name": "FEMSA Prime Implementation",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000fnQubAAE": {
-    "id": "aH2ed000000VJETCA4",
-    "name": "Advisory SWAP",
-    "billingType": "Order Form",
-    "rateCardRegion": "LATAM",
-    "tAndE": null,
-    "discountPct": 0
-  },
-  "006ed00000gd68bAAA": {
-    "id": "aH2ed000000WUhJCAW",
-    "name": "CPFL RFP v01",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 186775.33,
-    "discountPct": 0
-  },
-  "006ed00000giPKIAA2": {
-    "id": "aH2ed000000VT7NCAW",
-    "name": "Seguros Pichincha Plan Design",
-    "billingType": "Time and Materials",
-    "rateCardRegion": "LATAM",
-    "tAndE": 1908,
-    "discountPct": 0
-  },
   "006ed00000hyfXNAAY": {
     "id": "aH2ed000000WOTpCAO",
     "name": "GM_MCA_106_A",
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": 23305.08,
+    "discountPct": 0
+  },
+  "006ed00000i1937AAA": {
+    "id": "aH2ed000000Wpc5CAC",
+    "name": "Estimate Banco Atlantida FY27  - $106 AHBR",
+    "billingType": "Fixed Price",
+    "rateCardRegion": "LATAM",
+    "tAndE": 59941,
     "discountPct": 0
   },
   "006ed00000iH1kjAAC": {
@@ -6084,10 +6004,26 @@ let ESTIMATE_MAP = {
   },
   "006ed00000iVEDSAA4": {
     "id": "aH2ed000000WaGTCA0",
-    "name": "Hypera CSG Accelerate Program",
+    "name": "Hypera - SWE - New Business - Life Science - CSG- Accelerate Program",
     "billingType": "Order Form",
     "rateCardRegion": "LATAM",
     "tAndE": null,
+    "discountPct": 0
+  },
+  "006ed00000ifk2LAAQ": {
+    "id": "aH2ed000000Whg9CAC",
+    "name": "2026-08-24 _Unidas CPQ",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 107150.4,
+    "discountPct": 0
+  },
+  "006ed00000ix0vVAAQ": {
+    "id": "aH2ed000000WpfJCAS",
+    "name": "SWE - Claro Ecuador - Data Cloud & MC",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": 12940,
     "discountPct": 0
   },
   "006ed00000ix1GUAAY": {
@@ -6096,6 +6032,14 @@ let ESTIMATE_MAP = {
     "billingType": "Time and Materials",
     "rateCardRegion": "LATAM",
     "tAndE": 0,
+    "discountPct": 0
+  },
+  "006ed00000jCgcfAAC": {
+    "id": "aH2ed000000Wtm9CAC",
+    "name": "ARI Totalplay",
+    "billingType": "Time and Materials",
+    "rateCardRegion": "LATAM",
+    "tAndE": null,
     "discountPct": 0
   }
 };
@@ -25027,9 +24971,8 @@ function showShareMenu(btn, key) {
   const dsrLink = d.dsrId ? `${sfBase}/Deal_Support_Request__c/${d.dsrId}/view` : null;
   const oppLink = d.oppId ? `${sfBase}/Opportunity/${d.oppId}/view` : null;
   // Estimate: use stored estId or look up dynamically from ESTIMATE_MAP
-  const _estRec = d.estId ? null : (d.oppId && typeof ESTIMATE_MAP !== 'undefined' ? (ESTIMATE_MAP[d.oppId]||null) : null);
-  const _estId  = d.estId || (_estRec ? _estRec.id : null);
-  const _estName = d.estId ? (d.name||null) : (_estRec ? _estRec.name : null);
+  const _estId  = d.estId || null;
+  const _estName = _estId ? (d.name||null) : null;
   const estLink = _estId ? `${sfBase}/ffscpq__Estimate__c/${_estId}/view` : null;
   const mainName = d.oppName || d.name || d.dsr || '';
   const mainLink = oppLink || dsrLink || estLink || '';
@@ -25179,6 +25122,12 @@ function applySSSmFilters() {
   const statusSel = msGet('ms_status');
   const stageSel  = msGet('ms_stage');
   const mgrSel    = msGet('ms_mgr');
+  const forecast  = (document.getElementById('sssm_fForecast')||{}).value||'';
+  const dateFrom  = (document.getElementById('sssm_fDateFrom')||{}).value||'';
+  const dateTo    = (document.getElementById('sssm_fDateTo')||{}).value||'';
+  const amtMin    = parseFloat((document.getElementById('sssm_fAmtMin')||{}).value||0) * 1000;
+  const amtMaxRaw = (document.getElementById('sssm_fAmtMax')||{}).value||'';
+  const amtMax    = amtMaxRaw !== '' ? parseFloat(amtMaxRaw) * 1e6 : Infinity;
   let data = [...filtered];
   if (sssmSel.length)   data = data.filter(d => sssmSel.includes(d.sssm));
   if (terrSel.length)   data = data.filter(d => terrSel.includes(getTerritory(d.country)));
@@ -25191,6 +25140,11 @@ function applySSSmFilters() {
       return mgrSel.some(m => m !== '__none__' && m === v);
     });
   }
+  if (forecast)         data = data.filter(d => d.forecast === forecast);
+  if (dateFrom)         data = data.filter(d => d.closeDate >= dateFrom);
+  if (dateTo)           data = data.filter(d => d.closeDate <= dateTo);
+  if (amtMin > 0)       data = data.filter(d => (d.amount||0) >= amtMin);
+  if (amtMax < Infinity) data = data.filter(d => (d.amount||0) <= amtMax);
   renderSSSmLoadBars();
   setTimeout(function() { renderSSSmGroupedView(data); }, 0);
 }
@@ -25387,64 +25341,21 @@ function statusBadge(s) {
 function initFilters() {
   document.getElementById('genDate').textContent = GENERATED;
   const sssms = [...new Set(DSR_DATA.map(d => d.sssm))].sort();
-  // Global SSSM filter
-  const sssmSel = document.getElementById('fSSSM');
-  sssms.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sssmSel.appendChild(o); });
-  // SSSM View multi-select
+  // SSSM View multi-selects
   initSSSmMultiSelects();
   msInit('ms_sssm', sssms.map(s => ({value:s, label:s})));
   // DSR Detail multi-selects
   const aps = [...new Set(DSR_DATA.map(d => d.ap).filter(Boolean))].sort();
   msInit('ms_dSSSM', sssms.map(s => ({value:s, label:s})), renderTab6);
   msInit('ms_dAP',   aps.map(a => ({value:a, label:a})),   renderTab6);
-  // Country filter
-  const ctrySel = document.getElementById('fCountry');
-  const countries = [...new Set(DSR_DATA.map(d => d.country).filter(Boolean))].sort();
-  countries.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; ctrySel.appendChild(o); });
-  const todayStr = new Date().toISOString().slice(0,10);
-  document.getElementById('fDateFrom').value = todayStr;
-  const sixmo = new Date(); sixmo.setDate(sixmo.getDate()+180);
-  document.getElementById('fDateTo').value = sixmo.toISOString().split('T')[0];
-  document.getElementById('fAmtMax').value = 30;
   applyTranslations();
   applyFilters();
 }
 
 function applyFilters() {
-  const sssm = document.getElementById('fSSSM').value;
-  const stage = document.getElementById('fStage').value;
-  const forecast = document.getElementById('fForecast').value;
-  const status = document.getElementById('fStatus').value;
-  const dateFrom = document.getElementById('fDateFrom').value;
-  const dateTo = document.getElementById('fDateTo').value;
-  const amtMin = parseFloat(document.getElementById('fAmtMin').value || 0) * 1000;
-  const amtMax = parseFloat(document.getElementById('fAmtMax').value || 30) * 1e6;
-  const qual = document.getElementById('fQual').value;
-  const delivery = document.getElementById('fDelivery').value;
-  const country = document.getElementById('fCountry').value;
-
-  filtered = DSR_DATA.filter(d => {
-    const q = QUALI_MAP[d.dsr];
-    if (sssm && d.sssm !== sssm) return false;
-    if (stage && d.stage !== stage) return false;
-    if (forecast && d.forecast !== forecast) return false;
-    if (status && d.status !== status) return false;
-    if (dateFrom && d.closeDate < dateFrom) return false;
-    if (dateTo && d.closeDate > dateTo) return false;
-    if (d.amount < amtMin) return false;
-    if (d.amount > amtMax) return false;
-    if (country && d.country !== country) return false;
-    if (qual === 'qualified' && (!q || q.qualified !== 'YES')) return false;
-    if (qual === 'not_qualified' && (!q || q.qualified !== 'NO')) return false;
-    if (qual === 'pending' && q) return false;
-    if (delivery === 'pending_dm' && q) return false;
-    if (delivery && delivery !== 'pending_dm' && (!q || q.deliveryModel !== delivery)) return false;
-    return true;
-  });
-
+  filtered = [...DSR_DATA];
   currentPage = 1;
   updateAlerts();
-  // Only re-render the visible tab — hidden tabs render on demand in showTab()
   try {
     if (activeTabId === 't1') renderTab1();
     else if (activeTabId === 't2') renderTab2();
@@ -25459,22 +25370,7 @@ function applyFilters() {
   } catch(e) { console.warn('render '+activeTabId, e); }
 }
 
-function resetFilters() {
-  document.getElementById('fSSSM').value = '';
-  document.getElementById('fStage').value = '';
-  document.getElementById('fForecast').value = '';
-  document.getElementById('fStatus').value = '';
-  const todayStr = new Date().toISOString().slice(0,10);
-  document.getElementById('fDateFrom').value = todayStr;
-  const sixmo = new Date(); sixmo.setDate(sixmo.getDate()+180);
-  document.getElementById('fDateTo').value = sixmo.toISOString().split('T')[0];
-  document.getElementById('fAmtMin').value = '';
-  document.getElementById('fAmtMax').value = 30;
-  document.getElementById('fQual').value = '';
-  document.getElementById('fDelivery').value = '';
-  document.getElementById('fCountry').value = '';
-  applyFilters();
-}
+function resetFilters() { applyFilters(); }
 
 function updateAlerts() {
   const today = new Date();
@@ -26312,7 +26208,8 @@ function renderEstimatesTab() {
       <td class="px-3 py-2"><a href="${sfBase}/ffscpq__Estimate__c/${d.id}/view" target="_blank" style="color:#0176D3">${d.name||'--'}</a></td>
       <td class="px-3 py-2"><a href="${sfBase}/Opportunity/${d.oppId}/view" target="_blank" style="color:#0176D3">${(d.oppName||'').substring(0,40)}${(d.oppName||'').length>40?'…':''}</a></td>
       <td class="px-3 py-2">${d.account||'--'}</td>
-      <td class="px-3 py-2" style="color:#706E6B;font-size:0.72rem">${d.ap||''}${d.em?'<br>'+d.em:''}</td>
+      <td class="px-3 py-2" style="color:#706E6B;font-size:0.72rem">${d.ap||'--'}</td>
+      <td class="px-3 py-2" style="color:#706E6B;font-size:0.72rem">${d.em||'--'}</td>
       <td class="px-3 py-2"><span style="color:${stCol};font-weight:600;font-size:0.72rem">${d.stage||'--'}</span></td>
       <td class="px-3 py-2 text-right" style="color:#706E6B">${d.closeDate||'--'}</td>
       <td class="px-3 py-2 text-right" style="font-weight:600">${d.amount?fmtAmt(d.amount):'<span style="color:#AEACAB">$0</span>'}</td>
