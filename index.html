@@ -13,7 +13,8 @@
   .tab-btn:hover:not(.active) { color: #0176D3; background: rgba(255,255,255,0.5); }
   .kpi-card { background: #FFFFFF; border: 1px solid #C9E4F7; border-radius: 16px; padding: 1.25rem; box-shadow: 0 6px 20px rgba(3,45,96,.09); }
   .table-row:hover { background: #EAF5FE; }
-  select, input[type=date], input[type=number] { background: #FFFFFF; border: 1px solid #C9E4F7; color: #032D60; border-radius: 0.375rem; padding: 0.375rem 0.625rem; font-size: 0.875rem; }
+  select, input[type=date], input[type=number], input[type=text] { background: #FFFFFF; border: 1px solid #C9E4F7; color: #032D60; border-radius: 0.375rem; padding: 0.375rem 0.625rem; font-size: 0.8rem; }
+  .local-filter-bar input[type=text] { min-width: 180px; }
   select:focus, input:focus { outline: none; border-color: #0176D3; box-shadow: 0 0 0 2px #EAF5FE; }
   .alert-chip { border-radius: 9999px; padding: 0.25rem 0.75rem; font-size: 0.8rem; font-weight: 600; display: inline-block; margin-right: 0.5rem; margin-bottom: 0.5rem; border: 1px solid transparent; }
   .heat-high { background: #EFFFEE; color: #04844B; border: 1px solid rgba(4,132,75,0.2); }
@@ -233,7 +234,7 @@
       <label class="block text-xs mb-1" style="color:#706E6B;">Tipo Contrato</label>
       <div class="ms-container" id="ms_sssmContract"></div>
     </div>
-    <div class="flex items-end gap-2 ml-auto">
+    <div class="flex items-end gap-2">
       <button onclick="resetSSSmFilters()" class="btn-sm">↺ Reset</button>
       <button onclick="exportSSSmSlack()" class="btn-sm">⬇ Descargar</button>
       <button onclick="toggleAllGroups(true)" class="btn-sm">⊞ Expand all</button>
@@ -250,20 +251,20 @@
 
 <!-- TAB 2: SSSM COVERAGE -->
 <div id="t2" class="tab-content hidden">
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-    <div class="card-panel"><h3 class="chart-title">DSRs por SSSM</h3><div class="chart-container"><canvas id="chartSSSM"></canvas></div></div>
-    <div class="card-panel"><h3 class="chart-title">Pipeline por SSSM ($M)</h3><div class="chart-container"><canvas id="chartSSSMArr"></canvas></div></div>
-    <div id="workloadDonutPanel" class="card-panel flex flex-col" style="min-height:310px;overflow:hidden;">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6" style="grid-auto-rows:340px;">
+    <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;">DSRs por SSSM</h3><div class="chart-container"><canvas id="chartSSSM"></canvas></div></div>
+    <div class="card-panel" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;"><h3 class="chart-title" style="color:#7EBFEF;">Pipeline por SSSM ($M)</h3><div class="chart-container"><canvas id="chartSSSMArr"></canvas></div></div>
+    <div id="workloadDonutPanel" class="card-panel flex flex-col" style="background:linear-gradient(135deg,#032D60 0%,#0B3BCC 100%);border:none;overflow:hidden;">
       <div class="flex items-center justify-between mb-2" style="flex-shrink:0;">
-        <h3 class="text-sm font-semibold" id="workloadDonutTitle" style="color:#032D60;">Distribución por SSSM</h3>
+        <h3 class="text-sm font-semibold" id="workloadDonutTitle" style="color:#7EBFEF;">Distribución por SSSM</h3>
       </div>
-      <div id="workloadDonutPlaceholder" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9EA1A3;font-size:0.8rem;gap:0.5rem;text-align:center;">
+      <div id="workloadDonutPlaceholder" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);font-size:0.8rem;gap:0.5rem;text-align:center;">
         <span style="font-size:1.8rem;">🍩</span>
         <span>Haz click en una barra<br>o nombre de SSSM</span>
       </div>
       <div id="workloadDonutChart" style="display:none;flex-direction:column;align-items:center;gap:0.4rem;">
-        <div style="width:100%;height:260px;position:relative;"><canvas id="chartSSSmDonut"></canvas></div>
-        <div id="workloadDonutStats" style="font-size:0.75rem;text-align:center;line-height:1.6;"></div>
+        <div style="width:100%;height:230px;position:relative;"><canvas id="chartSSSmDonut"></canvas></div>
+        <div id="workloadDonutStats" style="font-size:0.75rem;text-align:center;line-height:1.6;color:rgba(255,255,255,0.85);"></div>
       </div>
     </div>
   </div>
@@ -406,7 +407,7 @@
       <label class="block text-xs mb-1" style="color:#706E6B;">Tipo Contrato</label>
       <div class="ms-container" id="ms_dContract"></div>
     </div>
-    <div class="flex items-end gap-2 ml-auto">
+    <div class="flex items-end gap-2">
       <button onclick="resetDetailFilters()" class="btn-sm">↺ Reset</button>
       <button onclick="exportTab6CSV()" class="btn-sm">⬇ CSV</button>
       <button onclick="exportDSRSlack()" class="btn-sm">⬇ Descargar</button>
@@ -462,15 +463,17 @@
     <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Bill Rate Promedio</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="est-kpiBillRate">—</div></div>
     <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">T&amp;E Total</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="est-kpiTE">—</div></div>
   </div>
-  <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-end">
+  <div class="local-filter-bar flex flex-wrap gap-3 items-end mb-3">
     <div><div class="text-xs mb-1" style="color:#706E6B;">Approval Status</div><div class="ms-container" id="ms_estStatus"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Billing Type</div><div class="ms-container" id="ms_estBilling"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Stage</div><div class="ms-container" id="ms_estStage"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_estEM"></div></div>
-    <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="est-fSearch" type="text" placeholder="Buscar cuenta / opp / estimate..." oninput="renderEstimatesTab()" style="width:250px;border:1px solid #DDDBDA;border-radius:4px;padding:5px 10px;font-size:0.8rem"></div>
-    <span class="text-xs text-gray-500 ml-auto" id="est-rowCount"></span>
-    <button onclick="resetEstimatesFilters()" class="btn-sm">↺ Reset</button>
-    <button onclick="exportEstimatesSlack()" class="btn-sm">⬇ Descargar</button>
+    <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="est-fSearch" type="text" placeholder="Buscar cuenta / opp / estimate..." oninput="renderEstimatesTab()"></div>
+    <div class="flex items-end gap-2">
+      <button onclick="resetEstimatesFilters()" class="btn-sm">↺ Reset</button>
+      <button onclick="exportEstimatesSlack()" class="btn-sm">⬇ Descargar</button>
+      <span class="text-xs" style="color:#706E6B;align-self:center;" id="est-rowCount"></span>
+    </div>
   </div>
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
@@ -501,15 +504,16 @@
 </div>
 
 <div id="twon" class="tab-content hidden">
-<div class="p-4">
   <div id="won-summary" class="mb-3"></div>
-  <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-end">
+  <div class="local-filter-bar flex flex-wrap gap-3 items-end mb-3">
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_wonSSM"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_wonAP"></div></div>
-    <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="won-fSearch" type="text" placeholder="Cuenta / oportunidad..." oninput="renderWonTab()" style="width:240px;border:1px solid #DDDBDA;border-radius:4px;padding:4px 10px;font-size:0.8rem"></div>
-    <span class="text-xs ml-auto" style="color:#706E6B;" id="won-count"></span>
-    <button onclick="resetWonFilters()" class="btn-sm">↺ Reset</button>
-    <button onclick="exportWonSlack()" class="btn-sm">⬇ Descargar</button>
+    <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="won-fSearch" type="text" placeholder="Cuenta / oportunidad..." oninput="renderWonTab()"></div>
+    <div class="flex items-end gap-2">
+      <button onclick="resetWonFilters()" class="btn-sm">↺ Reset</button>
+      <button onclick="exportWonSlack()" class="btn-sm">⬇ Descargar</button>
+      <span class="text-xs" style="color:#706E6B;align-self:center;" id="won-count"></span>
+    </div>
   </div>
   <div class="card-panel overflow-auto">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
@@ -529,24 +533,24 @@
     </table>
   </div>
 </div>
-</div>
 <div id="trrlatam" class="tab-content hidden">
-<div class="p-4">
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
     <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Total RRs</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="rr-kpiTotal">—</div></div>
     <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Sin Asignar</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="rr-kpiUnassigned">—</div></div>
     <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">% Asignados</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="rr-kpiPct">—</div></div>
     <div class="card-panel kpi-card p-3" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Oportunidades</div><div class="text-2xl font-bold" style="color:#FFFFFF;" id="rr-kpiOpps">—</div></div>
   </div>
-  <div class="card-panel p-3 mb-3 flex flex-wrap gap-3 items-end">
+  <div class="local-filter-bar flex flex-wrap gap-3 items-end mb-3">
     <div><div class="text-xs mb-1" style="color:#706E6B;">SSSM</div><div class="ms-container" id="ms_rrSSM"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Status</div><div class="ms-container" id="ms_rrStatus"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">Región</div><div class="ms-container" id="ms_rrCountry"></div></div>
     <div><div class="text-xs mb-1" style="color:#706E6B;">AP</div><div class="ms-container" id="ms_rrAP"></div></div>
-    <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="rr-fSearch" type="text" placeholder="Buscar oportunidad..." oninput="renderRRTab()" style="width:220px;border:1px solid #DDDBDA;border-radius:4px;padding:4px 10px;font-size:0.8rem"></div>
-    <span class="text-xs text-gray-500 ml-auto" id="rr-rowCount"></span>
-    <button onclick="resetRRFilters()" class="btn-sm">↺ Reset</button>
-    <button onclick="exportRRSlack()" class="btn-sm">⬇ Descargar</button>
+    <div><div class="text-xs mb-1" style="color:#706E6B;">Buscar</div><input id="rr-fSearch" type="text" placeholder="Buscar oportunidad..." oninput="renderRRTab()"></div>
+    <div class="flex items-end gap-2">
+      <button onclick="resetRRFilters()" class="btn-sm">↺ Reset</button>
+      <button onclick="exportRRSlack()" class="btn-sm">⬇ Descargar</button>
+      <span class="text-xs" style="color:#706E6B;align-self:center;" id="rr-rowCount"></span>
+    </div>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
     <div class="card-panel"><h3 class="chart-title">RRs por SSSM</h3><div class="chart-container"><canvas id="chartRRSssm"></canvas></div></div>
@@ -586,7 +590,6 @@
       <tbody id="rr-tableBody"></tbody>
     </table>
   </div>
-</div>
 </div><!-- end trrlatam -->
 </div><!-- end main-content-area -->
 
@@ -27134,7 +27137,7 @@ function renderSSSmDonut(name) {
     slices.map(x=>x.l),
     [{data:slices.map(x=>x.d), backgroundColor:slices.map(x=>x.c), borderWidth:2, borderColor:'#fff', hoverOffset:6}],
     {cutout:'68%', plugins:{
-      legend:{position:'right', labels:{font:{size:11},padding:12,color:'#444'}},
+      legend:{position:'right', labels:{font:{size:11},padding:12,color:'rgba(255,255,255,0.85)'}},
       tooltip:{callbacks:{label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' (' + ((ctx.parsed/m.total)*100).toFixed(0) + '%)'}}
     }}
   );
@@ -27220,15 +27223,19 @@ function renderTab2() {
   const arrs = chartEntries.map(([,m]) => +(m.arr/1e6).toFixed(2));
   const sssmChartClick = (e, els) => { if (els.length > 0) renderSSSmDonut(sssmChartEntries[els[0].index][0]); };
   const sssmChartHover = (e, els) => { e.native.target.style.cursor = els.length > 0 ? 'pointer' : 'default'; };
-  const stackedScales = { x: { stacked:true, ticks:{color:'#706E6B',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45}, grid:{color:'#EEF8FF'} }, y: { stacked:true, ticks:{color:'#706E6B',font:{size:10}}, grid:{color:'#EEF8FF'} } };
+  const wTick = {color:'rgba(255,255,255,0.7)',font:{size:window.innerWidth<640?8:10},maxRotation:90,minRotation:45};
+  const wGrid = {color:'rgba(255,255,255,0.08)'};
+  const wLegend = {labels:{color:'rgba(255,255,255,0.85)',font:{size:11}}};
+  const stackedScales = { x:{stacked:true,ticks:wTick,grid:wGrid}, y:{stacked:true,ticks:{color:'rgba(255,255,255,0.7)',font:{size:10}},grid:wGrid} };
   makeChart('chartSSSM','bar',labels,[
     {label:'Working', data:chartEntries.map(([,m])=>m.working-m.staleWorking), backgroundColor:'#04844B', borderRadius:0},
     {label:'Working - Opp vencida', data:chartEntries.map(([,m])=>m.staleWorking), backgroundColor:'#C23934', borderRadius:0},
     {label:'On Hold', data:chartEntries.map(([,m])=>m.onhold),  backgroundColor:'#C56200', borderRadius:0},
     {label:'In Queue',data:chartEntries.map(([,m])=>m.inqueue), backgroundColor:'#5A8FBF', borderRadius:0},
     {label:'Waiting', data:chartEntries.map(([,m])=>m.waiting), backgroundColor:'#B4C8E6', borderRadius:0},
-  ],{onClick:sssmChartClick,onHover:sssmChartHover,scales:stackedScales});
-  makeChart('chartSSSMArr','bar',labels,[{label:'Pipeline ($M)',data:arrs,backgroundColor:'#0176D3',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover});
+  ],{onClick:sssmChartClick,onHover:sssmChartHover,scales:stackedScales,plugins:{legend:wLegend}});
+  const wScalesSingle = {x:{ticks:wTick,grid:wGrid},y:{ticks:{color:'rgba(255,255,255,0.7)',font:{size:10}},grid:wGrid}};
+  makeChart('chartSSSMArr','bar',labels,[{label:'Pipeline ($M)',data:arrs,backgroundColor:'#4DA6FF',borderRadius:3}],{onClick:sssmChartClick,onHover:sssmChartHover,scales:wScalesSingle,plugins:{legend:wLegend}});
 }
 
 function renderTab3() {
