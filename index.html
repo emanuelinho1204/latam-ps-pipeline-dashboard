@@ -30393,14 +30393,16 @@ function renderRRTab() {
   if (stage3PlusNoRR.length) rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠ ${stage3PlusNoRR.length} opp${stage3PlusNoRR.length>1?'s':''} Stage 03+ sin RR</span><br><span style="font-size:0.7rem;color:#706E6B">${stage3PlusNoRR.slice(0,3).map(e=>e.oppName||'').filter(Boolean).join(', ')}${stage3PlusNoRR.length>3?` +${stage3PlusNoRR.length-3}`:''}</span></div>`);
   const _recentChangeFlagOpps = [...new Set(RR_DATA.filter(r => { const lsc = _rrOppLastStage[r.oppId]; return lsc && lsc >= _14dAgo && (r.startDate < nowStr || (r.closeDate && r.closeDate <= new Date(Date.now()+30*86400000).toISOString().slice(0,10))); }).map(r=>r.oppId))];
   if (_recentChangeFlagOpps.length) rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#0176D3;font-weight:700">🔄 ${_recentChangeFlagOpps.length} opp${_recentChangeFlagOpps.length>1?'s':''} con RR flagged + stage cambió ≤14d</span><br><span style="font-size:0.7rem;color:#706E6B">${_recentChangeFlagOpps.slice(0,3).map(id=>(RR_DATA.find(r=>r.oppId===id)||{}).oppName||id).join(', ')}${_recentChangeFlagOpps.length>3?` +${_recentChangeFlagOpps.length-3}`:''}</span></div>`);
-  const _chgOppsRR = Object.keys(_oppChanges).filter(id => RR_DATA.some(r=>r.oppId===id));
-  if (_chgOppsRR.length) {
-    const _chgSummary = _chgOppsRR.slice(0,4).map(id => {
-      const oName = (RR_DATA.find(r=>r.oppId===id)||{}).oppName||id;
+  const _allChgOpps = Object.keys(_oppChanges);
+  if (_allChgOpps.length) {
+    const _chgSummary = _allChgOpps.slice(0,5).map(id => {
+      const hasRR = RR_DATA.some(r=>r.oppId===id);
+      const oName = ((RR_DATA.find(r=>r.oppId===id)||DSR_DATA.find(d=>d.oppId===id)||{}).oppName||id);
       const campos = [...new Set(_oppChanges[id].map(c=>c.campo))].join(', ');
-      return `<span style="font-size:0.7rem;color:#706E6B;display:block;">${oName.substring(0,35)}${oName.length>35?'…':''} <span style="color:#C56200">(${campos})</span></span>`;
+      const rrTag = hasRR ? '<span style="color:#04844B;font-weight:600">✓ RR</span>' : '<span style="color:#C56200;font-weight:600">sin RR</span>';
+      return `<span style="font-size:0.7rem;color:#706E6B;display:block;">${oName.substring(0,32)}${oName.length>32?'…':''} <span style="color:#C56200">(${campos})</span> ${rrTag}</span>`;
     }).join('');
-    rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#7B5EA7;font-weight:700">📋 ${_chgOppsRR.length} opp${_chgOppsRR.length>1?'s':''} con cambios en este refresh</span><br>${_chgSummary}${_chgOppsRR.length>4?`<span style="font-size:0.7rem;color:#706E6B">+${_chgOppsRR.length-4} más</span>`:''}</div>`);
+    rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#7B5EA7;font-weight:700">📋 ${_allChgOpps.length} opp${_allChgOpps.length>1?'s':''} con cambios en este refresh</span><br>${_chgSummary}${_allChgOpps.length>5?`<span style="font-size:0.7rem;color:#706E6B">+${_allChgOpps.length-5} más</span>`:''}</div>`);
   }
   setInsights('RR LATAM', rrItems);
   // KPIs
