@@ -233,17 +233,59 @@ def fetch(instance_url, token):
     return dsr_data, estimate_map, rr_data
 
 
+# ── Change Detection ───────────────────────────────────────────────────────────
+
+def extract_existing_dsr_data():
+    """Read current DSR_DATA from index.html before overwriting."""
+    try:
+        with open(INDEX_HTML, "r", encoding="utf-8") as f:
+            content = f.read()
+        m = re.search(r'let DSR_DATA = (\[.*?\]);', content, re.DOTALL)
+        if m:
+            return json.loads(m.group(1))
+    except Exception:
+        pass
+    return []
+
+def detect_changes(old_dsrs, new_dsrs):
+    """Compare DSR snapshots, return list of field-level changes."""
+    old_map = {d["dsrId"]: d for d in old_dsrs}
+    changes = []
+    track = [("closeDate", "CloseDate"), ("stage", "Stage"), ("status", "Status"), ("amount", "Amount")]
+    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    for d in new_dsrs:
+        old = old_map.get(d["dsrId"])
+        if not old:
+            continue
+        for field, label in track:
+            ov = str(old.get(field, "") or "").strip()
+            nv = str(d.get(field, "") or "").strip()
+            if ov != nv and ov and nv:
+                changes.append({
+                    "fecha":   now,
+                    "sssm":    d["sssm"],
+                    "dsr":     d["dsr"],
+                    "oppId":   d["oppId"],
+                    "oppName": d["oppName"],
+                    "campo":   label,
+                    "antes":   ov,
+                    "ahora":   nv,
+                })
+    return changes
+
+
 # ── HTML Update ────────────────────────────────────────────────────────────────
 
-def update_html(dsr_data, estimate_map, rr_data):
+def update_html(dsr_data, estimate_map, rr_data, recent_changes=None):
     log(f"Actualizando {INDEX_HTML}...")
     with open(INDEX_HTML, "r", encoding="utf-8") as f:
         content = f.read()
 
-    today    = datetime.now().strftime("%Y-%m-%d")
-    dsr_json = json.dumps(dsr_data,     ensure_ascii=False, indent=2)
-    est_json = json.dumps(estimate_map, ensure_ascii=False, indent=2)
-    rr_json  = json.dumps(rr_data,      ensure_ascii=False, indent=2)
+    today      = datetime.now().strftime("%Y-%m-%d")
+    dsr_json   = json.dumps(dsr_data,            ensure_ascii=False, indent=2)
+    est_json   = json.dumps(estimate_map,         ensure_ascii=False, indent=2)
+    rr_json    = json.dumps(rr_data,              ensure_ascii=False, indent=2)
+    chg_json   = json.dumps(recent_changes or [], ensure_ascii=False, indent=2)
 
     content, n1 = re.subn(r'let DSR_DATA = \[.*?\];',
                           f'let DSR_DATA = {dsr_json};', content, flags=re.DOTALL)
@@ -253,6 +295,8 @@ def update_html(dsr_data, estimate_map, rr_data):
                           f'let GENERATED = "{today}"', content)
     content, n4 = re.subn(r'const RR_DATA = \[.*?\];',
                           f'const RR_DATA = {rr_json};', content, flags=re.DOTALL)
+    content, n5 = re.subn(r'const RECENT_CHANGES = \[.*?\];',
+                          f'const RECENT_CHANGES = {chg_json};', content, flags=re.DOTALL)
 
     if not (n1 and n2 and n3 and n4):
         raise RuntimeError(
@@ -261,7 +305,8 @@ def update_html(dsr_data, estimate_map, rr_data):
 
     with open(INDEX_HTML, "w", encoding="utf-8") as f:
         f.write(content)
-    log(f"✅ index.html actualizado — {len(dsr_data)} DSRs, {len(estimate_map)} estimates, {len(rr_data)} RRs, {today}")
+    chg_count = len(recent_changes) if recent_changes else 0
+    log(f"✅ index.html actualizado — {len(dsr_data)} DSRs, {len(estimate_map)} estimates, {len(rr_data)} RRs, {today}, {chg_count} cambios")
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
@@ -269,8 +314,13 @@ def update_html(dsr_data, estimate_map, rr_data):
 if __name__ == "__main__":
     try:
         token, instance_url = get_auth()
+        old_dsrs = extract_existing_dsr_data()
         dsr_data, estimate_map, rr_data = fetch(instance_url, token)
-        update_html(dsr_data, estimate_map, rr_data)
+        recent_changes = detect_changes(old_dsrs, dsr_data)
+        if recent_changes:
+            log(f"⚡ {len(recent_changes)} cambios detectados: " +
+                ", ".join(f"{c['campo']}:{c['dsr']}" for c in recent_changes[:6]))
+        update_html(dsr_data, estimate_map, rr_data, recent_changes)
     except Exception as e:
         print(f"❌ Error: {e}", file=sys.stderr)
         sys.exit(1)
