@@ -29029,6 +29029,7 @@ function renderSSSmLoadBars() {
     }).join('<br>');
     sssmItems.unshift(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 Working con opp vencida</span><br><span style="font-size:0.7rem;color:#706E6B">${detail}</span></div>`);
   }
+  const _sssmChgHtml = _changesInsightHtml(); if (_sssmChgHtml) sssmItems.push(_sssmChgHtml);
   setInsights('SSSM View', sssmItems.length ? sssmItems : ['<span style="color:#706E6B;font-size:0.75rem">Sin alertas activas.</span>']);
 }
 
@@ -29509,6 +29510,7 @@ function renderTab2() {
     t2Items.unshift(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 ${pastCloseActive.length} DSR${pastCloseActive.length>1?'s':''} con opp vencida</span><br><span style="font-size:0.7rem;color:#706E6B">${sssmDetail}</span></div>`);
   }
   if (!t2Items.length) t2Items.push('<div style="color:#04844B;">✅ Carga distribuida normalmente</div>');
+  const _t2ChgHtml = _changesInsightHtml(); if (_t2ChgHtml) t2Items.push(_t2ChgHtml);
   setInsights('SSSM Coverage', t2Items);
 
   const chartEntries = [...entries].sort((a,b) => b[1].working - a[1].working);
@@ -29838,6 +29840,7 @@ function renderTab6() {
   if (noQuali > 0) t6Items.push(`<div style="color:#C56200;">🔲 <b>${noQuali}</b> sin calificar</div>`);
   const highPri = data.filter(d => priorityScore(d) >= 8).length;
   if (highPri > 0) t6Items.push(`<div style="color:#C56200;">⚡ <b>${highPri}</b> con prioridad alta (≥8)</div>`);
+  const _t6ChgHtml = _changesInsightHtml(); if (_t6ChgHtml) t6Items.push(_t6ChgHtml);
   setInsights('DSR Detail', t6Items);
 }
 
@@ -30339,12 +30342,7 @@ function renderRRTab() {
   const _rrOppLastStage = {};
   (typeof DSR_DATA !== 'undefined' ? DSR_DATA : []).forEach(d => { if (d.oppId && d.lastStageChange) _rrOppLastStage[d.oppId] = d.lastStageChange; });
   const _14dAgo = new Date(Date.now()-14*86400000).toISOString().slice(0,10);
-  // Build oppId→changes map from RECENT_CHANGES
-  const _oppChanges = {};
-  (typeof RECENT_CHANGES !== 'undefined' ? RECENT_CHANGES : []).forEach(c => {
-    if (!_oppChanges[c.oppId]) _oppChanges[c.oppId] = [];
-    _oppChanges[c.oppId].push(c);
-  });
+  const _oppChanges = _CHG_BY_OPP;
   const _flagNow = new Date().toISOString().slice(0,10);
   const _flag30  = new Date(Date.now()+30*86400000).toISOString().slice(0,10);
   const _rrFlag  = r => r.startDate && r.startDate < _flagNow ? 'Overdue Start' : (r.closeDate && r.closeDate <= _flag30 ? 'Close <30d' : 'Normal');
@@ -30393,17 +30391,7 @@ function renderRRTab() {
   if (stage3PlusNoRR.length) rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠ ${stage3PlusNoRR.length} opp${stage3PlusNoRR.length>1?'s':''} Stage 03+ sin RR</span><br><span style="font-size:0.7rem;color:#706E6B">${stage3PlusNoRR.slice(0,3).map(e=>e.oppName||'').filter(Boolean).join(', ')}${stage3PlusNoRR.length>3?` +${stage3PlusNoRR.length-3}`:''}</span></div>`);
   const _recentChangeFlagOpps = [...new Set(RR_DATA.filter(r => { const lsc = _rrOppLastStage[r.oppId]; return lsc && lsc >= _14dAgo && (r.startDate < nowStr || (r.closeDate && r.closeDate <= new Date(Date.now()+30*86400000).toISOString().slice(0,10))); }).map(r=>r.oppId))];
   if (_recentChangeFlagOpps.length) rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#0176D3;font-weight:700">🔄 ${_recentChangeFlagOpps.length} opp${_recentChangeFlagOpps.length>1?'s':''} con RR flagged + stage cambió ≤14d</span><br><span style="font-size:0.7rem;color:#706E6B">${_recentChangeFlagOpps.slice(0,3).map(id=>(RR_DATA.find(r=>r.oppId===id)||{}).oppName||id).join(', ')}${_recentChangeFlagOpps.length>3?` +${_recentChangeFlagOpps.length-3}`:''}</span></div>`);
-  const _allChgOpps = Object.keys(_oppChanges);
-  if (_allChgOpps.length) {
-    const _chgSummary = _allChgOpps.slice(0,5).map(id => {
-      const hasRR = RR_DATA.some(r=>r.oppId===id);
-      const oName = ((RR_DATA.find(r=>r.oppId===id)||DSR_DATA.find(d=>d.oppId===id)||{}).oppName||id);
-      const campos = [...new Set(_oppChanges[id].map(c=>c.campo))].join(', ');
-      const rrTag = hasRR ? '<span style="color:#04844B;font-weight:600">✓ RR</span>' : '<span style="color:#C56200;font-weight:600">sin RR</span>';
-      return `<span style="font-size:0.7rem;color:#706E6B;display:block;">${oName.substring(0,32)}${oName.length>32?'…':''} <span style="color:#C56200">(${campos})</span> ${rrTag}</span>`;
-    }).join('');
-    rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#7B5EA7;font-weight:700">📋 ${_allChgOpps.length} opp${_allChgOpps.length>1?'s':''} con cambios en este refresh</span><br>${_chgSummary}${_allChgOpps.length>5?`<span style="font-size:0.7rem;color:#706E6B">+${_allChgOpps.length-5} más</span>`:''}</div>`);
-  }
+  const _rrChgHtml = _changesInsightHtml(); if (_rrChgHtml) rrItems.push(_rrChgHtml);
   setInsights('RR LATAM', rrItems);
   // KPIs
   const unassigned = data.filter(d=>!d.resource).length;
@@ -30576,6 +30564,26 @@ function renderRRTab() {
 }
 
 // ── Global Insights Sidebar ────────────────────────────
+// ── Global changes map (built once from RECENT_CHANGES) ──────────────────────
+const _CHG_BY_OPP = (typeof RECENT_CHANGES !== 'undefined' ? RECENT_CHANGES : []).reduce((acc,c) => {
+  if (!acc[c.oppId]) acc[c.oppId] = [];
+  acc[c.oppId].push(c); return acc;
+}, {});
+
+function _changesInsightHtml() {
+  const keys = Object.keys(_CHG_BY_OPP);
+  if (!keys.length) return '';
+  const lines = keys.slice(0,5).map(id => {
+    const hasRR = (typeof RR_DATA !== 'undefined') && RR_DATA.some(r=>r.oppId===id);
+    const rec = (typeof RR_DATA!=='undefined'&&RR_DATA.find(r=>r.oppId===id)) || DSR_DATA.find(d=>d.oppId===id) || {};
+    const oName = rec.oppName || id;
+    const campos = [...new Set(_CHG_BY_OPP[id].map(c=>c.campo))].join(', ');
+    const rrTag = hasRR ? '<span style="color:#04844B;font-weight:600">✓ RR</span>' : '<span style="color:#C56200;font-weight:600">sin RR</span>';
+    return `<span style="font-size:0.7rem;color:#706E6B;display:block;">${oName.substring(0,32)}${oName.length>32?'…':''} <span style="color:#C56200">(${campos})</span> ${rrTag}</span>`;
+  }).join('');
+  return `<div style="margin-bottom:0.5rem"><span style="color:#7B5EA7;font-weight:700">📋 ${keys.length} opp${keys.length>1?'s':''} con cambios en este refresh</span><br>${lines}${keys.length>5?`<span style="font-size:0.7rem;color:#706E6B">+${keys.length-5} más</span>`:''}</div>`;
+}
+
 function setInsights(tabLabel, items) {
   const content = document.getElementById('insights-content');
   const label   = document.getElementById('insights-tab-label');
