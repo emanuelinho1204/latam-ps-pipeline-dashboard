@@ -29970,6 +29970,9 @@ function renderRRTab() {
   const _rrOppSSM = {};
   (typeof DSR_DATA !== 'undefined' ? DSR_DATA : []).forEach(d => { if (d.oppId && d.sssm) _rrOppSSM[d.oppId] = d.sssm; });
   if (!_msOpts['ms_rrSSM']) msInit('ms_rrSSM', [...new Set(RR_DATA.map(d=>_rrOppSSM[d.oppId]).filter(Boolean))].sort().map(v=>({value:v,label:v})), renderRRTab);
+  const _rrOppLastStage = {};
+  (typeof DSR_DATA !== 'undefined' ? DSR_DATA : []).forEach(d => { if (d.oppId && d.lastStageChange) _rrOppLastStage[d.oppId] = d.lastStageChange; });
+  const _14dAgo = new Date(Date.now()-14*86400000).toISOString().slice(0,10);
   const _flagNow = new Date().toISOString().slice(0,10);
   const _flag30  = new Date(Date.now()+30*86400000).toISOString().slice(0,10);
   const _rrFlag  = r => r.startDate && r.startDate < _flagNow ? 'Overdue Start' : (r.closeDate && r.closeDate <= _flag30 ? 'Close <30d' : 'Normal');
@@ -30016,6 +30019,8 @@ function renderRRTab() {
   if (vencidosInsight.length) rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 ${vencidosInsight.length} RR${vencidosInsight.length>1?'s':''} con inicio vencido</span><br><span style="font-size:0.7rem;color:#706E6B">${vencidosInsight.slice(0,3).map(r=>r.oppName||r.name||'').filter(Boolean).join(', ')}${vencidosInsight.length>3?` +${vencidosInsight.length-3}`:''}</span></div>`);
   if (urgentClose.length) rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚡ ${urgentClose.length} RR${urgentClose.length>1?'s':''} con close &lt; 30d</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(urgentClose.map(r=>r.oppName||''))].filter(Boolean).slice(0,3).join(', ')}${urgentClose.length>3?` +${urgentClose.length-3}`:''}</span></div>`);
   if (stage3PlusNoRR.length) rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠ ${stage3PlusNoRR.length} opp${stage3PlusNoRR.length>1?'s':''} Stage 03+ sin RR</span><br><span style="font-size:0.7rem;color:#706E6B">${stage3PlusNoRR.slice(0,3).map(e=>e.oppName||'').filter(Boolean).join(', ')}${stage3PlusNoRR.length>3?` +${stage3PlusNoRR.length-3}`:''}</span></div>`);
+  const _recentChangeFlagOpps = [...new Set(RR_DATA.filter(r => { const lsc = _rrOppLastStage[r.oppId]; return lsc && lsc >= _14dAgo && (r.startDate < nowStr || (r.closeDate && r.closeDate <= new Date(Date.now()+30*86400000).toISOString().slice(0,10))); }).map(r=>r.oppId))];
+  if (_recentChangeFlagOpps.length) rrItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#0176D3;font-weight:700">🔄 ${_recentChangeFlagOpps.length} opp${_recentChangeFlagOpps.length>1?'s':''} con RR flagged + stage cambió ≤14d</span><br><span style="font-size:0.7rem;color:#706E6B">${_recentChangeFlagOpps.slice(0,3).map(id=>(RR_DATA.find(r=>r.oppId===id)||{}).oppName||id).join(', ')}${_recentChangeFlagOpps.length>3?` +${_recentChangeFlagOpps.length-3}`:''}</span></div>`);
   setInsights('RR LATAM', rrItems);
   // KPIs
   const unassigned = data.filter(d=>!d.resource).length;
@@ -30097,6 +30102,11 @@ function renderRRTab() {
       else if (daysLeft < 31) flagHtml = `<span style="background:#FDDCDB;color:#C23934;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🚩 ${daysLeft}d</span>`;
       else if (daysLeft <= 45) flagHtml = `<span style="background:#FEF0C7;color:#7A4504;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${daysLeft}d</span>`;
       else flagHtml = `<span style="background:#D4EDDA;color:#027E46;padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:700;">🏳 ${daysLeft}d</span>`;
+    }
+    const _oLSC = _rrOppLastStage[opp.oppId];
+    if (_oLSC && _oLSC >= _14dAgo && (vencidos.length > 0 || (opp.closeDate && opp.closeDate <= _flag30))) {
+      const _dAgo = Math.round((new Date(nowStr) - new Date(_oLSC)) / 86400000);
+      flagHtml += ` <span style="background:#EAF5FE;color:#0176D3;padding:2px 5px;border-radius:10px;font-size:0.65rem;font-weight:600;white-space:nowrap;" title="Stage de opp cambió hace ${_dAgo}d">🔄 ${_dAgo}d</span>`;
     }
     return `<tr class="table-row">
       <td class="px-1 text-center" style="width:28px;"><button class="share-btn" onclick="showShareMenu(this,'${opp.oppId}');event.stopPropagation();" title="Compartir">⋮</button></td>
