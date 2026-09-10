@@ -109,7 +109,7 @@ def fetch(instance_url, token):
         "Opportunity__r.NextStep, Region__c, Request_Type_Detail__c, "
         "Opportunity__r.Account.Name, Opportunity__r.Account.BillingCountry, "
         "Opportunity__r.Manager_Forecast_Judgement__c, Opportunity__r.ContractType__c, "
-        "Opportunity__r.StageName, Opportunity__c "
+        "Opportunity__r.StageName, Opportunity__c, CreatedDate "
         "FROM Deal_Support_Request__c "
         "WHERE RecordType.Name = 'CSG Professional Services Deal Support' "
         "AND Status__c NOT IN ('Closed - Resolved', 'Closed - No Response', 'Closed - Duplicate', 'Closed - Not Qualified') "
@@ -151,6 +151,7 @@ def fetch(instance_url, token):
             "mgrJudgement":      opp.get("Manager_Forecast_Judgement__c"),
             "contractType":      opp.get("ContractType__c"),
             "stage":             opp.get("StageName", ""),
+            "createdDate":       (r.get("CreatedDate") or "")[:10],
         })
 
     estimate_map = {}
