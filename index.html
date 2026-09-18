@@ -245,6 +245,10 @@
       <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_buscar">Buscar</label>
       <input id="sssm-fSearch" type="text" placeholder="Buscar oportunidad..." oninput="applySSSmFilters()" style="height:32px;padding:0 8px;border:1px solid #C9E4F7;border-radius:6px;font-size:0.82rem;width:160px;">
     </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Buscar DSR</label>
+      <input id="sssm-fSearchDSR" type="text" placeholder="Buscar DSR..." oninput="applySSSmFilters()" style="height:32px;padding:0 8px;border:1px solid #C9E4F7;border-radius:6px;font-size:0.82rem;width:140px;">
+    </div>
     <div style="margin-left:auto;">
       <div style="font-size:0.72rem;margin-bottom:3px;visibility:hidden;">x</div>
       <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
@@ -28108,6 +28112,8 @@ function applySSSmFilters() {
   if (contractSel.length) data = data.filter(d => contractSel.includes(d.contractType));
   const fSearch = ((document.getElementById('sssm-fSearch')||{}).value||'').toLowerCase();
   if (fSearch) data = data.filter(d => (d.oppName||'').toLowerCase().includes(fSearch) || (d.account||'').toLowerCase().includes(fSearch));
+  const fSearchDSR = ((document.getElementById('sssm-fSearchDSR')||{}).value||'').toLowerCase();
+  if (fSearchDSR) data = data.filter(d => (d.dsr||'').toLowerCase().includes(fSearchDSR));
   renderSSSmLoadBars();
   setTimeout(function() { renderSSSmGroupedView(data); }, 0);
 }
@@ -28171,7 +28177,7 @@ function resetSSSmFilters() {
   ['ms_sssm','ms_terr','ms_status','ms_stage','ms_mgr','ms_sForecast','ms_sssmContract'].forEach(id => {
     if (_msSel[id]) { _msSel[id] = new Set(); _msRender(id); }
   });
-  ['sssm_fDateFrom','sssm_fDateTo','sssm_fAmtMin','sssm_fAmtMax','sssm-fSearch'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['sssm_fDateFrom','sssm_fDateTo','sssm_fAmtMin','sssm_fAmtMax','sssm-fSearch','sssm-fSearchDSR'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   renderSSSmLoadBars();
   renderSSSmGroupedView(filtered);
 }
