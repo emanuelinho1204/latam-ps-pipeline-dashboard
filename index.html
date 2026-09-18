@@ -167,7 +167,7 @@
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('twon',this)"><span data-i18n="tab_won">🏆 Won Deals</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('trrlatam',this)"><span data-i18n="tab_rr">👥 RR LATAM</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('tzombie',this)"><span data-i18n="tab_zombie">🧟 Disciplina Op.</span></button>
-    <a href="https://git.soma.salesforce.com/pages/a-moreno/dsr-pipeline-flow/" target="_blank" class="tab-btn px-5 py-3 text-sm font-medium flex items-center gap-1" style="text-decoration:none;">🗺️ DSR Flow ↗</a>
+    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('tdsrflow',this)" title="DSR Pipeline Flow" style="font-size:1.1rem;">🗺️</button>
   </div>
 </div>
 
@@ -30198,6 +30198,9 @@ function exportZombieCSV() {
   <div id="insights-content" style="padding:0.85rem 1rem;font-size:0.78rem;color:#3E3E3C;line-height:1.5;">
     <span style="color:#706E6B;">Cargando…</span>
   </div>
+</div>
+<div id="tdsrflow" class="tab-content hidden" style="height:calc(100vh - 120px);">
+  <iframe src="https://git.soma.salesforce.com/pages/a-moreno/dsr-pipeline-flow/" style="width:100%;height:100%;border:none;" loading="lazy"></iframe>
 </div>
 </div><!-- end layout flex -->
 </body>
