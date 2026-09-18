@@ -29418,6 +29418,14 @@ function showTab(id, btn) {
     if (id === 'trrlatam') renderRRTab();
     if (id === 'twon') renderWonTab();
     if (id === 'tzombie') renderZombieTab();
+    if (id === 'tdsrflow') {
+      const dsrFrame = document.querySelector('#tdsrflow iframe');
+      if (dsrFrame) {
+        const sendLang = () => { try { dsrFrame.contentWindow.postMessage({type:'setLang',lang:currentLang}, '*'); } catch(e) {} };
+        dsrFrame.onload = sendLang;
+        sendLang();
+      }
+    }
   }, 50);
 }
 
