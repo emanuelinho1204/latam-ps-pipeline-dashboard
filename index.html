@@ -28078,6 +28078,9 @@ function setLang(lang) {
     const fn = tabRenders[activeTabId];
     if (fn) try { fn(); } catch(e) {}
   }
+  // Sync language to DSR Flow iframe
+  const dsrFrame = document.querySelector('#tdsrflow iframe');
+  if (dsrFrame) try { dsrFrame.contentWindow.postMessage({type:'setLang',lang}, '*'); } catch(e) {}
 }
 
 function applyTranslations() {
