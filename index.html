@@ -160,8 +160,6 @@
     <button class="tab-btn active px-5 py-3 text-sm font-medium" onclick="showTab('tsssm',this)"><span data-i18n="tab_sssm_view">👤 SSSM View</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t2',this)"><span data-i18n="tab_sssm_coverage">👥 SSSM Coverage</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t3',this)"><span data-i18n="tab_funnel">🔻 Funnel</span></button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t4',this)" style="display:none"><span data-i18n="tab_ai">🤖 AI Readiness</span></button>
-    <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t5',this)" style="display:none"><span data-i18n="tab_risk">🚨 Risk Radar</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('t6',this)"><span data-i18n="tab_detail">📄 DSR Detail</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('testimates',this)"><span data-i18n="tab_estimates">📋 Estimates</span></button>
     <button class="tab-btn px-5 py-3 text-sm font-medium" onclick="showTab('twon',this)"><span data-i18n="tab_won">🏆 Won Deals</span></button>
@@ -330,74 +328,7 @@
   </div>
 </div>
 
-<!-- TAB 4: AI READINESS -->
-<div id="t4" class="tab-content hidden">
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="kpi-card" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">AI-Native Agentic</div><div id="aiK1" class="text-2xl font-bold" style="color:#FFFFFF;"></div></div>
-    <div class="kpi-card" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">AI-Augmented</div><div id="aiK2" class="text-2xl font-bold" style="color:#FFFFFF;"></div></div>
-    <div class="kpi-card" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Not Qualified</div><div id="aiK3" class="text-2xl font-bold" style="color:#FFFFFF;"></div></div>
-    <div class="kpi-card" style="background:linear-gradient(135deg,#032D60,#0176D3);border:none;"><div class="text-xs mb-1" style="color:rgba(255,255,255,0.75);">Avg PS Score</div><div id="aiK4" class="text-2xl font-bold" style="color:#FFFFFF;"></div></div>
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-    <div class="card-panel"><h3 class="chart-title">Delivery Model Distribution</h3><div class="chart-container"><canvas id="chartAIDelivery"></canvas></div></div>
-    <div class="card-panel"><h3 class="chart-title">Top Offerings</h3><div class="chart-container"><canvas id="chartOffering"></canvas></div></div>
-  </div>
-  <div class="card-panel mb-4">
-    <h3 class="chart-title">🏆 Top 10 — PS Score más Alto</h3>
-    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>DSR</th><th>SSSM</th><th>Cuenta</th><th class="text-right">Score</th><th>Delivery Model</th><th>Offering</th></tr></thead><tbody id="aiTop10Body"></tbody></table></div>
-  </div>
-  <div id="aiNote" class="text-xs italic" style="color:#706E6B;"></div>
-  <!-- AI TOOL IMPACT SECTION -->
-  <div class="card-panel mt-6 mb-4">
-    <h3 class="text-sm font-semibold mb-4" style="color:#032D60;">🛠️ PS Tool Adoption &amp; AI Impact</h3>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-      <div style="text-align:center;padding:0.75rem;background:#F8FAFC;border-radius:0.5rem;border:1px solid #DDDBDA;">
-        <div class="text-xs mb-1" style="color:#706E6B;">Deals con AI Tools</div>
-        <div id="aiTool1" class="text-2xl font-bold" style="color:#0176D3;">--</div>
-      </div>
-      <div style="text-align:center;padding:0.75rem;background:#F8FAFC;border-radius:0.5rem;border:1px solid #DDDBDA;">
-        <div class="text-xs mb-1" style="color:#706E6B;">Horas Ahorradas</div>
-        <div id="aiTool2" class="text-2xl font-bold" style="color:#04844B;">--</div>
-      </div>
-      <div style="text-align:center;padding:0.75rem;background:#F8FAFC;border-radius:0.5rem;border:1px solid #DDDBDA;">
-        <div class="text-xs mb-1" style="color:#706E6B;">$ Optimizado</div>
-        <div id="aiTool3" class="text-2xl font-bold" style="color:#7B5EA7;">--</div>
-      </div>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead><tr><th>Herramienta</th><th class="text-right">Deals</th><th class="text-right">Horas</th><th class="text-right">% Opt. Prom.</th><th class="text-right">$ Ahorrado</th></tr></thead>
-        <tbody id="aiToolBody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- TAB 5: RISK RADAR -->
-<div id="t5" class="tab-content hidden">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-    <div class="card-panel">
-      <h3 class="text-base font-semibold mb-3" style="color:#C23934;">⚡ Cierre Inminente (&lt;14 días)</h3>
-      <div id="imminentCards" class="space-y-2"></div>
-    </div>
-    <div class="card-panel">
-      <h3 class="text-base font-semibold mb-3" style="color:#C56200;">💰 Alto Valor Sin Calificar (&gt;$500K)</h3>
-      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr><th>DSR</th><th>Cuenta</th><th class="text-right">Monto</th><th>SSSM</th></tr></thead><tbody id="highValueBody"></tbody></table></div>
-    </div>
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div class="card-panel">
-      <h3 class="text-base font-semibold mb-3" style="color:#C56200;">📊 SSSM con Carga Alta (&gt;15 DSRs)</h3>
-      <div id="overloadedSSSM" class="space-y-2"></div>
-    </div>
-    <div class="card-panel">
-      <h3 class="text-base font-semibold mb-3" style="color:#032D60;">🚩 Risk Flags D1–D5 (en calificados)</h3>
-      <table class="w-full text-sm"><thead><tr><th>Flag</th><th class="text-right">✅ YES</th><th class="text-right">❌ NO</th><th class="text-right">% Risk</th></tr></thead><tbody id="riskFlagsBody"></tbody></table>
-    </div>
-  </div>
-</div>
-
-<!-- TAB 6: DSR DETAIL -->
+<!-- TAB 4: DSR DETAIL -->
 <div id="t6" class="tab-content hidden">
   <div class="local-filter-bar flex flex-wrap gap-3 items-start mb-3">
     <div>
@@ -2624,7 +2555,6 @@ function setLang(lang) {
       'tsssm': () => { applySSSmFilters && applySSSmFilters(); },
       't2': () => { renderWorkloadTab && renderWorkloadTab(); },
       't3': () => { renderTab3 && renderTab3(); },
-      't5': () => { renderEstimatesTab && renderEstimatesTab(); },
       'twon': () => { renderWonTab && renderWonTab(); },
       't_rr': () => { renderRRTab && renderRRTab(); },
       'tzombie': () => { renderZombieTab && renderZombieTab(); },
@@ -3283,8 +3213,6 @@ function applyFilters() {
     if (activeTabId === 't1') renderTab1();
     else if (activeTabId === 't2') renderTab2();
     else if (activeTabId === 't3') renderTab3();
-    else if (activeTabId === 't4') renderTab4();
-    else if (activeTabId === 't5') renderTab5();
     else if (activeTabId === 't6') renderTab6();
     else if (activeTabId === 'tsssm') applySSSmFilters();
     else if (activeTabId === 'testimates') renderEstimatesTab();
@@ -3964,8 +3892,6 @@ function showTab(id, btn) {
     if (id === 't1') renderTab1();
     if (id === 't2') renderTab2();
     if (id === 't3') renderTab3();
-    if (id === 't4') renderTab4();
-    if (id === 't5') renderTab5();
     if (id === 't6') renderTab6();
     if (id === 'tsssm') { renderSSSmLoadBars(); renderSSSmGroupedView(filtered); }
     if (id === 'testimates') renderEstimatesTab();
