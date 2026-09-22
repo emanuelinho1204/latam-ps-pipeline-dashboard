@@ -18,10 +18,14 @@ import subprocess
 import sys
 import urllib.request
 import urllib.parse
-from datetime import datetime
+from datetime import datetime, timedelta
 
-DASHBOARD_DIR = os.path.dirname(os.path.abspath(__file__))
-INDEX_HTML    = os.path.join(DASHBOARD_DIR, "index.html")
+DASHBOARD_DIR  = os.path.dirname(os.path.abspath(__file__))
+INDEX_HTML     = os.path.join(DASHBOARD_DIR, "index.html")
+SHEET_ID       = "1NfRsZqwk-CoRq2hEqAl43MEnmc6H44mnBSOgjWMU4a0"
+SHEET_TAB      = "KPI History"
+MCP_URL        = "http://127.0.0.1:29051/mcp/servers/google-workspace"
+MCP_TOKEN      = "fe704f82-69cc-4533-afad-f57381cdbc51"
 
 
 def log(msg):
@@ -309,7 +313,195 @@ def update_html(dsr_data, estimate_map, rr_data, recent_changes=None):
     log(f"✅ index.html actualizado — {len(dsr_data)} DSRs, {len(estimate_map)} estimates, {len(rr_data)} RRs, {today}, {chg_count} cambios")
 
 
+# ── Google Sheet KPI Logging ───────────────────────────────────────────────────
+
+def _mcp_call(tool_name, arguments):
+    payload = json.dumps({
+        "jsonrpc": "2.0", "id": 1,
+        "method": "tools/call",
+        "params": {"name": tool_name, "arguments": arguments}
+    }).encode()
+    req = urllib.request.Request(
+        MCP_URL, data=payload,
+        headers={"Authorization": f"Bearer {MCP_TOKEN}", "Content-Type": "application/json", "Accept": "application/json, text/event-stream"},
+        method="POST"
+    )
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        return json.loads(resp.read())
+
+def _sheet_next_row(tab):
+    result = _mcp_call("read_sheet_values", {
+        "spreadsheet_id": SHEET_ID,
+        "range_name": f"'{tab}'!A:A",
+    })
+    content = result.get("result", {}).get("content", [])
+    raw = next((c.get("text", "") for c in content if c.get("type") == "text"), "")
+    m = re.search(r"read (\d+) rows", raw)
+    return int(m.group(1)) + 1 if m else 2
+
+
+def write_to_sheet(dsr_data, estimate_map, rr_data, recent_changes=None):
+    try:
+        today = datetime.now().date()
+        today_str = today.isoformat()
+        cutoff_30d = today + timedelta(days=30)
+        zombie_cutoff = (today - timedelta(days=7)).isoformat()
+
+        status_counts = {}
+        for d in dsr_data:
+            s = d.get("status", "")
+            status_counts[s] = status_counts.get(s, 0) + 1
+
+        pipeline_m = sum((d.get("amount") or 0) for d in dsr_data) / 1_000_000
+
+        overdue_rr = sum(
+            1 for r in rr_data
+            if r.get("startDate") and r["startDate"] < today_str
+        )
+        close_30d_rr = sum(
+            1 for r in rr_data
+            if r.get("closeDate") and today_str <= r["closeDate"] <= cutoff_30d.isoformat()
+        )
+
+        def days_since(date_str):
+            try:
+                return (today - datetime.strptime(date_str[:10], "%Y-%m-%d").date()).days
+            except Exception:
+                return None
+
+        working_dsrs = [d for d in dsr_data if d.get("status") == "Working"]
+        working_days = [days_since(d["lastStageChange"]) for d in working_dsrs if d.get("lastStageChange")]
+        avg_working = round(sum(working_days) / len(working_days)) if working_days else 0
+
+        all_days = [days_since(d["lastStageChange"]) for d in dsr_data if d.get("lastStageChange")]
+        stale_30d = sum(1 for x in all_days if x is not None and x > 30)
+        avg_no_change = round(sum(x for x in all_days if x is not None) / len(all_days)) if all_days else 0
+
+        fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+        # ── KPI History ──────────────────────────────────────────────────────────
+        row = [
+            fecha,
+            str(len(dsr_data)),
+            str(status_counts.get("Working", 0)),
+            str(status_counts.get("On Hold", 0)),
+            str(status_counts.get("In Queue", 0)),
+            str(status_counts.get("Waiting", 0)),
+            str(status_counts.get("Vencida", 0)),
+            str(len(estimate_map)),
+            str(len(rr_data)),
+            str(overdue_rr),
+            str(close_30d_rr),
+            f"{pipeline_m:.2f}",
+            str(avg_working),
+            str(stale_30d),
+            str(avg_no_change),
+        ]
+        next_row = _sheet_next_row(SHEET_TAB)
+        _mcp_call("modify_sheet_values", {
+            "spreadsheet_id": SHEET_ID,
+            "range_name": f"'{SHEET_TAB}'!A{next_row}:O{next_row}",
+            "values": [row],
+        })
+        log(f"📊 KPI History row {next_row} escrito: {fecha}")
+
+        # ── SSSM History ─────────────────────────────────────────────────────────
+        sssm_map = {}
+        for d in dsr_data:
+            name = d.get("sssm") or "Unknown"
+            if name not in sssm_map:
+                sssm_map[name] = {
+                    "total": 0, "working": 0, "onhold": 0, "inqueue": 0,
+                    "waiting": 0, "vencida": 0, "arr": 0.0, "zombies": 0,
+                    "working_days": [], "all_days": [],
+                }
+            m = sssm_map[name]
+            m["total"] += 1
+            st = d.get("status", "")
+            if st == "Working":   m["working"] += 1
+            elif st == "On Hold": m["onhold"] += 1
+            elif st == "In Queue":m["inqueue"] += 1
+            elif st == "Waiting": m["waiting"] += 1
+            elif st == "Vencida": m["vencida"] += 1
+            m["arr"] += (d.get("amount") or 0)
+            cd = d.get("closeDate", "")
+            if cd and cd < zombie_cutoff:
+                m["zombies"] += 1
+            ds = days_since(d.get("lastStageChange", ""))
+            if ds is not None:
+                m["all_days"].append(ds)
+                if st == "Working":
+                    m["working_days"].append(ds)
+
+        sssm_rows = []
+        for name, m in sorted(sssm_map.items()):
+            avg_w = round(sum(m["working_days"]) / len(m["working_days"])) if m["working_days"] else 0
+            s30 = sum(1 for x in m["all_days"] if x > 30)
+            avg_nc = round(sum(m["all_days"]) / len(m["all_days"])) if m["all_days"] else 0
+            sssm_rows.append([
+                fecha, name,
+                str(m["total"]), str(m["working"]), str(m["onhold"]),
+                str(m["inqueue"]), str(m["waiting"]), str(m["vencida"]),
+                f"{m['arr']/1_000_000:.2f}",
+                str(m["zombies"]), str(avg_w), str(s30), str(avg_nc),
+            ])
+
+        if sssm_rows:
+            nr = _sheet_next_row("SSSM History")
+            _mcp_call("modify_sheet_values", {
+                "spreadsheet_id": SHEET_ID,
+                "range_name": f"'SSSM History'!A{nr}:M{nr + len(sssm_rows) - 1}",
+                "values": sssm_rows,
+            })
+            log(f"📊 SSSM History: {len(sssm_rows)} filas escritas desde row {nr}")
+
+        # ── Changes ───────────────────────────────────────────────────────────────
+        if recent_changes:
+            change_rows = [
+                [
+                    c.get("fecha", fecha),
+                    c.get("sssm", ""),
+                    c.get("dsr", ""),
+                    c.get("oppName", c.get("oppId", "")),
+                    c.get("campo", ""),
+                    c.get("antes", ""),
+                    c.get("ahora", ""),
+                ]
+                for c in recent_changes
+            ]
+            nr = _sheet_next_row("Changes")
+            _mcp_call("modify_sheet_values", {
+                "spreadsheet_id": SHEET_ID,
+                "range_name": f"'Changes'!A{nr}:G{nr + len(change_rows) - 1}",
+                "values": change_rows,
+            })
+            log(f"📊 Changes: {len(change_rows)} filas escritas desde row {nr}")
+        else:
+            log("📊 Changes: sin cambios detectados, no se escribió.")
+
+    except Exception as e:
+        log(f"⚠️  Google Sheet write skipped: {e}")
+
+
 # ── Main ───────────────────────────────────────────────────────────────────────
+
+def git_push():
+    today = datetime.now().strftime("%Y-%m-%d")
+    cmds = [
+        ["git", "-C", DASHBOARD_DIR, "add", "index.html"],
+        ["git", "-C", DASHBOARD_DIR, "commit", "-m", f"Refresh data {today}"],
+        ["git", "-C", DASHBOARD_DIR, "push", "origin", "master"],
+    ]
+    for cmd in cmds:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            # commit fails with code 1 when there's nothing to commit — skip silently
+            if "nothing to commit" in result.stdout + result.stderr:
+                log("Git: sin cambios, no se hizo commit.")
+                return
+            raise RuntimeError(f"Git error ({' '.join(cmd[2:])}): {result.stderr[:300]}")
+    log("🚀 Push a origin master OK.")
+
 
 if __name__ == "__main__":
     try:
@@ -321,6 +513,8 @@ if __name__ == "__main__":
             log(f"⚡ {len(recent_changes)} cambios detectados: " +
                 ", ".join(f"{c['campo']}:{c['dsr']}" for c in recent_changes[:6]))
         update_html(dsr_data, estimate_map, rr_data, recent_changes)
+        write_to_sheet(dsr_data, estimate_map, rr_data, recent_changes)
+        git_push()
     except Exception as e:
         print(f"❌ Error: {e}", file=sys.stderr)
         sys.exit(1)

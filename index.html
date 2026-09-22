@@ -364,6 +364,30 @@
       <div class="ms-container" id="ms_dContract"></div>
     </div>
     <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Territory</label>
+      <div class="ms-container" id="ms_dTerr"></div>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">DSR Status</label>
+      <div class="ms-container" id="ms_dStatus"></div>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Stage Oportunidad</label>
+      <div class="ms-container" id="ms_dStage"></div>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Mgr Judgement</label>
+      <div class="ms-container" id="ms_dMgr"></div>
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Buscar DSR</label>
+      <input id="d6-fSearchDSR" type="text" placeholder="Buscar DSR..." oninput="renderTab6()" style="height:32px;padding:0 8px;border:1px solid #C9E4F7;border-radius:6px;font-size:0.82rem;width:140px;">
+    </div>
+    <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">Buscar oportunidad</label>
+      <input id="d6-fSearchOpp" type="text" placeholder="Buscar oportunidad..." oninput="renderTab6()" style="height:32px;padding:0 8px;border:1px solid #C9E4F7;border-radius:6px;font-size:0.82rem;width:160px;">
+    </div>
+    <div>
       <div style="font-size:0.72rem;margin-bottom:3px;visibility:hidden;">x</div>
       <div style="display:flex;flex-direction:row;gap:0.35rem;align-items:center;">
         <button onclick="resetDetailFilters()" class="btn-sm" title="Reset filtros" style="padding:2px 7px;font-size:0.82rem;">↺</button>
@@ -27254,8 +27278,8 @@ function selectSSSM(name) {
 }
 
 function resetDetailFilters() {
-  ['ms_dSSSM','ms_dAP','ms_dForecast','ms_dContract'].forEach(id => { if (_msSel[id]) { _msSel[id] = new Set(); _msRender(id); } });
-  ['d_fDateFrom','d_fDateTo','d_fAmtMin','d_fAmtMax'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['ms_dSSSM','ms_dAP','ms_dForecast','ms_dContract','ms_dTerr','ms_dStatus','ms_dStage','ms_dMgr'].forEach(id => { if (_msSel[id]) { _msSel[id] = new Set(); _msRender(id); } });
+  ['d_fDateFrom','d_fDateTo','d_fAmtMin','d_fAmtMax','d6-fSearchDSR','d6-fSearchOpp'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   renderTab6();
 }
 
@@ -27394,6 +27418,32 @@ function initFilters() {
   msInit('ms_dSSSM', sssms.map(s => ({value:s, label:s})), renderTab6);
   msInit('ms_dContract', contracts.map(v => ({value:v, label:v})), renderTab6);
   msInit('ms_dAP',   aps.map(a => ({value:a, label:a})),   renderTab6);
+  msInit('ms_dTerr', [
+    {value:'Mexico', label:'Mexico'},
+    {value:'Growth Norte', label:'Growth Norte'},
+    {value:'Growth Sur', label:'Growth Sur'},
+    {value:'Brazil', label:'Brazil'},
+  ], renderTab6);
+  msInit('ms_dStatus', [
+    {value:'Working',  label:'Working'},
+    {value:'On Hold',  label:'On Hold'},
+    {value:'In Queue', label:'In Queue'},
+    {value:'Waiting',  label:'Waiting'},
+  ], renderTab6);
+  msInit('ms_dStage', [
+    {value:'01 - Discovery',         label:'01 - Discovery'},
+    {value:'02 - Scoping',           label:'02 - Scoping'},
+    {value:'03 - Initial Proposal',  label:'03 - Initial Proposal'},
+    {value:'04 - Active Negotiation',label:'04 - Active Negotiation'},
+    {value:'05 - Proposal Presented',label:'05 - Proposal Presented'},
+  ], renderTab6);
+  msInit('ms_dMgr', [
+    {value:'IN',       label:'IN'},
+    {value:'UP+',      label:'UP+'},
+    {value:'UP-',      label:'UP-'},
+    {value:'OUT',      label:'OUT'},
+    {value:'__none__', label:'🚩 Sin Judgement'},
+  ], renderTab6);
   applyTranslations();
   applyFilters();
 }
@@ -27666,7 +27716,7 @@ function renderTab2() {
     const pipePerDsr = m.total ? fmt$(Math.round(m.arr / m.total)) : '$0';
     const zCount = zombieMap[name] || 0;
     return `<tr class="table-row">
-      <td style="${rowStyle};cursor:pointer;text-decoration:underline;color:${overload?'#C23934':warn?'#C56200':'#0176D3'};" onclick="renderSSSmDonut('${name}')" title="Ver distribución · ${name}">${name}${warn?' ⚠️':''}</td>
+      <td style="${rowStyle};cursor:pointer;text-decoration:underline;color:${overload?'#C23934':warn?'#C56200':'#0176D3'};" onclick="selectSSSM('${name}')" title="Ver deals de ${name} en SSSM View">${name}${warn?' ⚠️':''}</td>
       <td class="text-right font-bold" style="color:#04844B;">${m.working}</td>
       <td class="text-right" style="color:#C56200;">${m.onhold}</td>
       <td class="text-right" style="color:#9EA1A3;">${m.inqueue}</td>
@@ -27969,6 +28019,21 @@ function renderTab6() {
   if (dAmtMax < Infinity) data = data.filter(d => (d.amount||0) <= dAmtMax);
   const dContractSel = msGet('ms_dContract');
   if (dContractSel.length) data = data.filter(d => dContractSel.includes(d.contractType));
+  const dTerrSel = msGet('ms_dTerr');
+  if (dTerrSel.length) data = data.filter(d => dTerrSel.includes(getTerritory(d.country)));
+  const dStatusSel = msGet('ms_dStatus');
+  if (dStatusSel.length) data = data.filter(d => dStatusSel.includes(d.status));
+  const dStageSel = msGet('ms_dStage');
+  if (dStageSel.length) data = data.filter(d => dStageSel.includes(d.stage));
+  const dMgrSel = msGet('ms_dMgr');
+  if (dMgrSel.length) data = data.filter(d => dMgrSel.includes(d.mgrJudgement || '__none__'));
+  const fSearchDSR = ((document.getElementById('d6-fSearchDSR')||{}).value||'').toLowerCase();
+  if (fSearchDSR) data = data.filter(d => (d.dsr||'').toLowerCase().includes(fSearchDSR));
+  const fSearchOpp = ((document.getElementById('d6-fSearchOpp')||{}).value||'').toLowerCase();
+  if (fSearchOpp) data = data.filter(d =>
+    (d.oppName||'').toLowerCase().includes(fSearchOpp) ||
+    (d.account||'').toLowerCase().includes(fSearchOpp)
+  );
   data.sort((a,b) => {
     let av = a[sortField] ?? a['_'+sortField] ?? '';
     let bv = b[sortField] ?? b['_'+sortField] ?? '';
