@@ -27241,7 +27241,35 @@ function renderSSSmLoadBars() {
   const noRRStage3 = filtered.filter(d=>(d.stage||'').match(/^0[3-9]/)&&!allRROppIds.has(d.oppId)&&(d.closeDate||'')>=sssmNow);
   const noEstimate = filtered.filter(d=>(d.stage||'').match(/^0[3-9]/)&&!ESTIMATE_MAP[d.oppId]&&(d.closeDate||'')>=sssmNow);
   const overloadedSSSMs = sorted.filter(([n])=>(wCounts[n]||0)>10).map(([n])=>n.split(' ')[0]);
-  const sssmItems = [];
+  // ── 🎯 Foco Q ──────────────────────────────────────────────────────────────
+  const _todayStr = new Date().toISOString().slice(0,10);
+  const _yr = new Date().getFullYear();
+  // Salesforce fiscal quarters end: Jan 31, Apr 30, Jul 31, Oct 31
+  const _qEnds = [`${_yr}-01-31`,`${_yr}-04-30`,`${_yr}-07-31`,`${_yr}-10-31`,`${_yr+1}-01-31`];
+  const _qEnd = _qEnds.find(d => d >= _todayStr) || `${_yr}-10-31`;
+  const _focoQ = filtered.filter(d =>
+    (d.mgrJudgement === 'IN' || d.mgrJudgement === 'UP+') &&
+    d.closeDate && d.closeDate >= _todayStr && d.closeDate <= _qEnd
+  );
+  const _focoArr = _focoQ.reduce((s,d) => s + (d.amount||0), 0);
+  const _noJudgQ = filtered.filter(d =>
+    !d.mgrJudgement &&
+    d.closeDate && d.closeDate >= _todayStr && d.closeDate <= _qEnd
+  );
+  const focoItems = [];
+  if (_focoQ.length > 0) {
+    const _bySSSM = {};
+    _focoQ.forEach(d => { if (!_bySSSM[d.sssm]) _bySSSM[d.sssm]={count:0,arr:0}; _bySSSM[d.sssm].count++; _bySSSM[d.sssm].arr+=(d.amount||0); });
+    const _sssmList = Object.entries(_bySSSM).sort((a,b)=>b[1].arr-a[1].arr)
+      .map(([n,v]) => `<span style="cursor:pointer;color:#0176D3;text-decoration:underline;" onclick="selectSSSM('${n}')">${n.split(' ')[0]}</span>: ${v.count}d · $${(v.arr/1e6).toFixed(1)}M`)
+      .join('<br>');
+    focoItems.push(`<div style="margin-bottom:0.6rem;padding:0.5rem 0.65rem;background:#EEF8FF;border-radius:6px;border-left:3px solid #0176D3;"><div style="font-weight:700;color:#032D60;font-size:0.76rem;margin-bottom:0.25rem;">🎯 Foco Q · ${_focoQ.length} deals · $${(_focoArr/1e6).toFixed(1)}M</div><div style="font-size:0.68rem;color:#3E3E3C;line-height:1.7;">${_sssmList}</div><div style="font-size:0.65rem;color:#706E6B;margin-top:0.2rem;">IN / UP+ · cierra antes ${_qEnd}</div></div>`);
+  } else {
+    focoItems.push(`<div style="margin-bottom:0.5rem;color:#706E6B;font-size:0.75rem;">🎯 Sin deals IN/UP+ este Q.</div>`);
+  }
+  if (_noJudgQ.length > 0) focoItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠️ ${_noJudgQ.length} cierran este Q sin Mgr Judgement</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(_noJudgQ.map(d=>d.account||''))].filter(Boolean).slice(0,3).join(', ')}${_noJudgQ.length>3?` +${_noJudgQ.length-3}`:''}</span></div>`);
+  // ── Fin Foco Q ─────────────────────────────────────────────────────────────
+  const sssmItems = [...focoItems];
   if (urgentDSRs.length) sssmItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">⚡ ${urgentDSRs.length} DSR${urgentDSRs.length>1?'s':''} close &lt; 30d</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(urgentDSRs.map(d=>d.account||''))].filter(Boolean).slice(0,2).join(', ')}${urgentDSRs.length>2?` +${urgentDSRs.length-2}`:''}</span></div>`);
   if (noRRStage3.length) sssmItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠ ${noRRStage3.length} opp${noRRStage3.length>1?'s':''} Stage 03+ sin RR</span><br><span style="font-size:0.7rem;color:#706E6B">${[...new Set(noRRStage3.map(d=>d.account||''))].filter(Boolean).slice(0,2).join(', ')}${noRRStage3.length>2?` +${noRRStage3.length-2}`:''}</span></div>`);
   if (noEstimate.length) sssmItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">📋 ${noEstimate.length} Stage 03+ sin estimate</span></div>`);
