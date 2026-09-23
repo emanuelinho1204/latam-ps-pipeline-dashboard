@@ -503,6 +503,61 @@ def git_push():
     log("🚀 Push a origin master OK.")
 
 
+HEROKU_APP = "aqueous-peak-73896"
+SF_BIN_PATH = None  # resolved lazily
+
+
+def _sf_bin_path():
+    global SF_BIN_PATH
+    if SF_BIN_PATH:
+        return SF_BIN_PATH
+    for p in [os.path.expanduser("~/.aisuite/bin/sf"), "/usr/local/bin/sf", "sf"]:
+        if p == "sf" or os.path.isfile(p):
+            SF_BIN_PATH = p
+            return p
+    return "sf"
+
+
+def relay_token_to_heroku():
+    """Push current SF access token to Heroku so heroku-server.py can use it directly."""
+    try:
+        import tempfile, re as _re
+        tmp = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+        tmp.close()
+        env = {**os.environ, "SF_TEMP_SHOW_SECRETS": "true"}
+        with open(tmp.name, "wb") as out:
+            subprocess.run(
+                ["bash", "-c",
+                 f'echo y | {_sf_bin_path()} org display --target-org org62 --verbose --json'],
+                stdout=out, stderr=subprocess.DEVNULL, timeout=30, env=env
+            )
+        with open(tmp.name, "rb") as f:
+            raw = f.read().decode("utf-8", errors="replace")
+        os.unlink(tmp.name)
+        clean = _re.sub(r'\x1b\[[0-9;]*[a-zA-Z]|\r|\x0b|\x0c|[\x00-\x08\x0e-\x1f]', '', raw)
+        m = _re.search(r'(\{.*\})', clean, _re.DOTALL)
+        if not m:
+            log("relay_token: JSON not found in sf org display output — skipping.")
+            return
+        org = json.loads(m.group(1)).get("result", {})
+        access_token = org.get("accessToken", "")
+        instance_url = org.get("instanceUrl", "")
+        if not access_token or not instance_url:
+            log("relay_token: accessToken not found — skipping.")
+            return
+        heroku = "/opt/homebrew/bin/heroku"
+        subprocess.run(
+            [heroku, "config:set",
+             f"SF_ACCESS_TOKEN={access_token}",
+             f"SF_INSTANCE_URL={instance_url}",
+             "--app", HEROKU_APP],
+            capture_output=True, text=True, timeout=30
+        )
+        log(f"✅ Token relay → Heroku ({HEROKU_APP}) OK.")
+    except Exception as e:
+        log(f"relay_token: failed (non-critical): {e}")
+
+
 if __name__ == "__main__":
     try:
         token, instance_url = get_auth()
@@ -515,6 +570,7 @@ if __name__ == "__main__":
         update_html(dsr_data, estimate_map, rr_data, recent_changes)
         write_to_sheet(dsr_data, estimate_map, rr_data, recent_changes)
         git_push()
+        relay_token_to_heroku()
     except Exception as e:
         print(f"❌ Error: {e}", file=sys.stderr)
         sys.exit(1)

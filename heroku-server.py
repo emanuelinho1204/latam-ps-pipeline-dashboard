@@ -17,7 +17,7 @@ Deploy:
 import http.server
 import json
 import os
-import re
+import socketserver
 import threading
 import time
 import urllib.request
@@ -35,35 +35,15 @@ def log(msg):
 
 
 # ── Auth ───────────────────────────────────────────────────────────────────────
+# Uses SF_ACCESS_TOKEN + SF_INSTANCE_URL set by refresh-data.py relay (every 30 min).
+# Tokens expire in ~2h; relay keeps Heroku current well within that window.
 
 def get_token():
-    sfdx_url = os.environ.get("ORG62_SFDX_URL", "").strip()
-    if not sfdx_url:
-        raise RuntimeError("ORG62_SFDX_URL env var not set.")
-    m = re.match(r'force://[^:]+::([^@]+)@(.+)', sfdx_url)
-    if not m:
-        raise ValueError("ORG62_SFDX_URL format unrecognized.")
-    refresh_token = m.group(1)
-    instance_url  = f"https://{m.group(2).rstrip('/')}"
-    data = urllib.parse.urlencode({
-        'grant_type':    'refresh_token',
-        'client_id':     'PlatformCLI',
-        'refresh_token': refresh_token,
-    }).encode()
-    req = urllib.request.Request(
-        f"{instance_url}/services/oauth2/token", data=data, method='POST'
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            result = json.loads(resp.read())
-    except urllib.error.HTTPError as e:
-        body = e.read().decode('utf-8', errors='replace')
-        log(f"Token refresh HTTP {e.code}: {body}")
-        raise RuntimeError(f"Token refresh {e.code}: {body}")
-    token = result.get('access_token')
-    if not token:
-        raise RuntimeError(f"Token refresh failed: {result}")
-    return token, result.get('instance_url', instance_url)
+    token = os.environ.get("SF_ACCESS_TOKEN", "").strip()
+    instance_url = os.environ.get("SF_INSTANCE_URL", "").strip()
+    if not token or not instance_url:
+        raise RuntimeError("SF_ACCESS_TOKEN or SF_INSTANCE_URL not set — relay not yet run.")
+    return token, instance_url
 
 
 # ── SOQL ───────────────────────────────────────────────────────────────────────
@@ -240,7 +220,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
         pass
 
 
+class ThreadingHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
+    daemon_threads = True
+
+
 if __name__ == "__main__":
     log(f"LATAM PS Proxy starting on port {PORT}")
-    server = http.server.HTTPServer(("0.0.0.0", PORT), Handler)
+    server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
     server.serve_forever()
