@@ -101,7 +101,7 @@ def fetch_data():
         "AND Opportunity__r.CloseDate >= 2026-02-01 "
         "AND Opportunity__r.CloseDate <= 2028-01-31 "
         "ORDER BY Owner.Name, Opportunity__r.StageName, Status__c "
-        "LIMIT 250"
+        "LIMIT 500"
     )
 
     dsr_data = []
@@ -180,12 +180,36 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        if self.path == "/health":
+        path = self.path.split('?')[0].rstrip('/')
+        if path == "/health":
             self._json({"ok": True})
-        elif self.path in ("/data", "/data/"):
+        elif path == "/data":
             try:
                 data = get_cached()
                 self._json({"ok": True, **data})
+            except Exception as e:
+                self._json({"ok": False, "error": str(e)}, status=500)
+        elif path in ("", "/", "/index.html"):
+            try:
+                data = get_cached()
+                html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'index.html')
+                with open(html_path, 'r', encoding='utf-8') as f:
+                    html = f.read()
+                injection = (
+                    '<script>'
+                    f'window.__LIVE_DSR__={json.dumps(data["dsrData"], ensure_ascii=False)};'
+                    f'window.__LIVE_EST__={json.dumps(data["estimateMap"], ensure_ascii=False)};'
+                    f'window.__LIVE_GEN__="{data["generated"]}";'
+                    '</script>\n</head>'
+                )
+                html = html.replace('</head>', injection, 1)
+                body = html.encode('utf-8')
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/html; charset=utf-8')
+                self.send_header('Content-Length', str(len(body)))
+                self._cors()
+                self.end_headers()
+                self.wfile.write(body)
             except Exception as e:
                 self._json({"ok": False, "error": str(e)}, status=500)
         else:
