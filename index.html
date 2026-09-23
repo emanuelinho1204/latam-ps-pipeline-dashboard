@@ -127,12 +127,15 @@
     </div>
   </div>
   <div class="flex items-center gap-3">
+    <div style="text-align:right;line-height:1.3;">
+      <div style="font-size:0.68rem;color:rgba(255,255,255,0.55);" data-i18n="lbl_actualizado">Actualizado</div>
+      <div style="font-size:0.8rem;color:rgba(255,255,255,0.85);font-weight:600;" id="genDateNav">—</div>
+    </div>
     <div class="flex gap-1">
       <button onclick="setLang('en')" id="langEN" class="lang-btn active">EN</button>
       <button onclick="setLang('es')" id="langES" class="lang-btn">ES</button>
       <button onclick="setLang('pt')" id="langPT" class="lang-btn">PT</button>
     </div>
-
   </div>
 </div>
 <div id="copyToast" class="hidden">✅ <span data-i18n="toast_copied">Copied! Paste in Slack: @Claude ps-dashboard</span></div>
@@ -20868,6 +20871,7 @@ function statusBadge(s) {
 
 function initFilters() {
   document.getElementById('genDate').textContent = GENERATED;
+  document.getElementById('genDateNav').textContent = GENERATED;
   const sssms = [...new Set(DSR_DATA.map(d => d.sssm))].sort();
   // SSSM View multi-selects
   initSSSmMultiSelects();
