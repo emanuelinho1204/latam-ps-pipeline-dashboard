@@ -297,6 +297,20 @@ def update_html(dsr_data, estimate_map, rr_data, recent_changes=None):
                           f'let ESTIMATE_MAP = {est_json};', content, flags=re.DOTALL)
     content, n3 = re.subn(r'let GENERATED = "[^"]*"',
                           f'let GENERATED = "{today}"', content)
+    re.subn(r'let GEN_DSR\s*=\s*window\.__LIVE_GEN_DSR__\s*\|\|\s*"[^"]*"',
+            f'let GEN_DSR       = window.__LIVE_GEN_DSR__   || "{today}"', content)
+    content = re.sub(r'let GEN_DSR\s*=.*$',
+                     f'let GEN_DSR       = window.__LIVE_GEN_DSR__   || "{today}";',
+                     content, flags=re.MULTILINE)
+    content = re.sub(r'let GEN_EST\s*=.*$',
+                     f'let GEN_EST       = window.__LIVE_GEN_EST__   || "{today}";',
+                     content, flags=re.MULTILINE)
+    content = re.sub(r'let GEN_RR\s*=.*$',
+                     f'let GEN_RR        = window.__LIVE_GEN_RR__    || "{today}";',
+                     content, flags=re.MULTILINE)
+    content = re.sub(r'let GEN_QUALI\s*=.*$',
+                     f'let GEN_QUALI     = window.__LIVE_GEN_QUALI__ || "{today}";',
+                     content, flags=re.MULTILINE)
     content, n4 = re.subn(r'const RR_DATA = \[.*?\];',
                           f'const RR_DATA = {rr_json};', content, flags=re.DOTALL)
     content, n5 = re.subn(r'const RECENT_CHANGES = \[.*?\];',
