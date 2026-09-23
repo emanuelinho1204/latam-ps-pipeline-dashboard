@@ -21911,10 +21911,16 @@ function renderEstimatesTab() {
   const tmCount = ESTIMATE_DATA.filter(e=>e.billingType==='Time and Materials').length;
   const noEstDSRs = DSR_DATA.filter(d=>(d.stage||'').match(/^0[3-9]/)&&!ESTIMATE_MAP[d.oppId]&&(d.closeDate||'')>=estNow);
   const noEstOpps = [...new Set(noEstDSRs.map(d=>d.account||''))].filter(Boolean);
+  // Stage 03+ con estimate pero sin horas
+  const noHours = ESTIMATE_DATA.filter(e=>(e.stage||'').match(/^0[3-9]/)&&!(e.totalHours>0));
+  // Estimates sin T&E
+  const noTE = ESTIMATE_DATA.filter(e=>!(e.tAndE>0)&&(e.totalHours>0||e.amount>0));
   const estItems = [];
   if (urgentEstClose.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">⚡ ${urgentEstClose.length} estimate${urgentEstClose.length>1?'s':''} close &lt; 30d</span><br><span style="font-size:0.7rem;color:#706E6B">${urgentEstClose.slice(0,2).map(e=>e.account||e.oppName||'').filter(Boolean).join(', ')}${urgentEstClose.length>2?` +${urgentEstClose.length-2}`:''}</span></div>`);
-  if (highDisc.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠ ${highDisc.length} con descuento ≥15%</span><br><span style="font-size:0.7rem;color:#706E6B">Máx: ${Math.max(...highDisc.map(e=>e.discountPct||0))}%</span></div>`);
   if (noEstOpps.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">📋 ${noEstOpps.length} acct Stage 03+ sin estimate</span><br><span style="font-size:0.7rem;color:#706E6B">${noEstOpps.slice(0,2).join(', ')}${noEstOpps.length>2?` +${noEstOpps.length-2}`:''}</span></div>`);
+  if (noHours.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">🕐 ${noHours.length} estimate${noHours.length>1?'s':''} Stage 03+ sin horas</span><br><span style="font-size:0.7rem;color:#706E6B">${noHours.slice(0,2).map(e=>e.account||e.name||'').filter(Boolean).join(', ')}${noHours.length>2?` +${noHours.length-2}`:''}</span></div>`);
+  if (noTE.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#706E6B;font-weight:700">✈ ${noTE.length} estimate${noTE.length>1?'s':''} sin T&amp;E</span><br><span style="font-size:0.7rem;color:#706E6B">${noTE.slice(0,2).map(e=>e.account||e.name||'').filter(Boolean).join(', ')}${noTE.length>2?` +${noTE.length-2}`:''}</span></div>`);
+  if (highDisc.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠ ${highDisc.length} con descuento ≥15%</span><br><span style="font-size:0.7rem;color:#706E6B">Máx: ${Math.max(...highDisc.map(e=>e.discountPct||0))}%</span></div>`);
   estItems.push(`<div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid #E8E8E8;font-size:0.7rem;color:#706E6B">Fixed Price: ${fpCount} &nbsp;·&nbsp; T&amp;M: ${tmCount}</div>`);
   setInsights('Estimates', estItems);
   // Table
