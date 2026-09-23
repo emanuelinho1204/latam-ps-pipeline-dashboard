@@ -285,7 +285,7 @@ def update_html(dsr_data, estimate_map, rr_data, recent_changes=None):
     with open(INDEX_HTML, "r", encoding="utf-8") as f:
         content = f.read()
 
-    today      = datetime.now().strftime("%Y-%m-%d %H:%M")
+    today      = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %Z")
     dsr_json   = json.dumps(dsr_data,            ensure_ascii=False, indent=2)
     est_json   = json.dumps(estimate_map,         ensure_ascii=False, indent=2)
     rr_json    = json.dumps(rr_data,              ensure_ascii=False, indent=2)

@@ -155,7 +155,7 @@ def fetch_data():
     log(f"Done — {len(dsr_data)} DSRs, {len(estimate_map)} estimates. BRL/USD: {brl_usd_rate:.5f}")
     return {"dsrData": dsr_data, "estimateMap": estimate_map,
             "brlUsdRate": brl_usd_rate,
-            "generated": datetime.now().strftime("%Y-%m-%d %H:%M")}
+            "generated": datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %Z")}
 
 
 def get_cached():
