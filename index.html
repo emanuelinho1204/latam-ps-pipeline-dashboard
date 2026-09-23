@@ -403,9 +403,9 @@
       <button onclick="nextPage()" class="btn-sm" data-i18n="btn_next">Next →</button>
     </div>
   </div>
-  <div class="overflow-x-auto bg-white border border-[#DDDBDA] rounded-xl shadow-sm">
+  <div class="overflow-x-auto bg-white border border-[#DDDBDA] rounded-xl shadow-sm" style="max-height:75vh;overflow-y:auto;">
   <table class="w-full" style="font-size:0.78rem;">
-    <thead><tr>
+    <thead style="position:sticky;top:0;z-index:2;"><tr>
       <th style="width:28px;background:#EEF8FF;"></th>
       <th class="th-std s text-center" onclick="sortTable('heat')">Heat <span class="sort-icon" id="d6-si-heat">▲▼</span></th>
       <th class="th-std s text-center" onclick="sortTable('priority')">Qual <span class="sort-icon" id="d6-si-priority">▲▼</span></th>
@@ -460,9 +460,9 @@
       </div>
     </div>
   </div>
-  <div class="card-panel overflow-auto" style="padding:0">
+  <div class="card-panel overflow-auto" style="padding:0;max-height:75vh;overflow-y:auto;">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
-      <thead><tr>
+      <thead style="position:sticky;top:0;z-index:2;"><tr>
         <th style="width:28px;background:#EEF8FF;"></th>
         <th class="th-std s" onclick="estSortBy('name')">Estimate <span class="sort-icon" id="est-si-name">▲▼</span></th>
         <th class="th-std s" onclick="estSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="est-si-oppName">▲▼</span></th>
@@ -504,9 +504,9 @@
       </div>
     </div>
   </div>
-  <div class="card-panel overflow-auto" style="padding:0">
+  <div class="card-panel overflow-auto" style="padding:0;max-height:75vh;overflow-y:auto;">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
-      <thead><tr>
+      <thead style="position:sticky;top:0;z-index:2;"><tr>
         <th style="width:28px;background:#EEF8FF;"></th>
         <th class="th-std s" onclick="wonSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="won-si-oppName">▲▼</span></th>
         <th class="th-std s" onclick="wonSortBy('account')" data-i18n="th_cuenta">Cuenta <span class="sort-icon" id="won-si-account">▲▼</span></th>
@@ -565,9 +565,9 @@
       </table>
     </div>
   </details>
-  <div class="card-panel overflow-auto" style="padding:0">
+  <div class="card-panel overflow-auto" style="padding:0;max-height:75vh;overflow-y:auto;">
     <table class="rr-table border-collapse" style="font-size:0.78rem;color:#3E3E3C;">
-      <thead><tr>
+      <thead style="position:sticky;top:0;z-index:2;"><tr>
         <th style="width:28px;background:#EEF8FF;"></th>
         <th class="th-std s text-center" style="min-width:80px;cursor:pointer;" onclick="rrSortBy('flag')" data-i18n="th_bandera">Flag <span class="sort-icon" id="rr-si-flag">▲▼</span></th>
         <th class="th-std s" style="min-width:170px;" onclick="rrSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="rr-si-oppName">▲▼</span></th>
@@ -609,9 +609,9 @@
       </div>
     </div>
   </div>
-  <div class="card-panel overflow-auto" style="padding:0">
+  <div class="card-panel overflow-auto" style="padding:0;max-height:75vh;overflow-y:auto;">
     <table class="w-full border-collapse" style="font-size:0.78rem;color:#3E3E3C;white-space:nowrap">
-      <thead><tr>
+      <thead style="position:sticky;top:0;z-index:2;"><tr>
         <th class="th-std s" onclick="zombieSortBy('sssm')">SSSM <span class="sort-icon" id="z-si-sssm">▲▼</span></th>
         <th class="th-std s" onclick="zombieSortBy('dsr')">DSR <span class="sort-icon" id="z-si-dsr">▲▼</span></th>
         <th class="th-std s" onclick="zombieSortBy('oppName')" data-i18n="th_oportunidad">Oportunidad <span class="sort-icon" id="z-si-oppName">▲▼</span></th>
