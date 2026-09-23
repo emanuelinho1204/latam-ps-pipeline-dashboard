@@ -2434,20 +2434,8 @@ const ESTIMATE_DATA = [
   {id:"aH2ed000000SCB7CAO",name:"v2_Atendimento Corp",oppId:"006ed00000cNDpuAAG",oppName:"Porto Seguro - Core Atendimento Corp - SOW - CSG",account:"PORTO SEGURO COMPANHIA DE SEGUROS GERAIS",ap:"Ricardo de Oliveira",em:"Amanda Basílio",stage:"03 - Initial Proposal",closeDate:"2026-10-30",amount:7943869,cost:6894002,marginPct:13.22,discountPct:0,avgBillRate:710.92,totalHours:11174,billingType:"Time and Materials",approvalStatus:"Draft",startDate:"2026-08-03",endDate:"2027-03-21",durationWeeks:33,tAndE:150000.0,rateCardRegion:"LATAM"},
   {id:"aH2ed000000AVAL",name:"AVAL - Agentic Banking Implementation",oppId:"006ed00000Jwx3FAAR",oppName:"AVAL (COL) - Agentic Banking Implementation - New",account:"Banco de Bogotá",ap:"Aaron Araiza",em:null,stage:"03 - Initial Proposal",closeDate:"2027-03-31",amount:0,cost:0,marginPct:0,discountPct:0,avgBillRate:0,totalHours:0,billingType:"Time and Materials",approvalStatus:"Draft",startDate:"2026-10-01",endDate:"2027-06-30",durationWeeks:39,tAndE:null,rateCardRegion:"LATAM"}
 ];
-// BRL→USD live exchange rate (fetched at load; fallback ≈ 0.18)
-let _brlUsdRate = 0.18;
-(function() {
-  fetch('https://api.frankfurter.app/latest?from=BRL&to=USD')
-    .then(function(r){return r.json();})
-    .then(function(j){
-      if(j&&j.rates&&j.rates.USD){
-        _brlUsdRate = j.rates.USD;
-        var el = document.getElementById('est-brl-badge');
-        if(el) el.textContent = 'R$1=US$'+_brlUsdRate.toFixed(4);
-      }
-    })
-    .catch(function(){});
-})();
+// BRL→USD rate from org62 CurrencyType (1 USD = 5.383354 BRL as of 2026-09-23)
+let _brlUsdRate = window.__LIVE_BRL_RATE__ || (1 / 5.383354);
 
 const RR_DATA = [
   {
@@ -21887,6 +21875,9 @@ function renderEstimatesTab() {
     return va < vb ? estSortDir : va > vb ? -estSortDir : 0;
   });
   _estExportData = data;
+  // Show exchange rate in column header
+  const _brlBadge = document.getElementById('est-brl-badge');
+  if(_brlBadge) _brlBadge.textContent = 'R$1=US$'+_brlUsdRate.toFixed(4);
   // Currency helpers — join EST with DSR_DATA on oppId for country
   const _oppCtry = {};
   DSR_DATA.forEach(function(d){if(d.oppId&&d.country)_oppCtry[d.oppId]=d.country;});

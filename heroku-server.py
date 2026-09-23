@@ -140,8 +140,21 @@ def fetch_data():
                         "billingType": e.get("ffscpq__Billing_Type__c", ""),
                     }
 
-    log(f"Done — {len(dsr_data)} DSRs, {len(estimate_map)} estimates.")
+    log("Fetching BRL exchange rate...")
+    brl_usd_rate = 1 / 5.383354  # fallback
+    try:
+        ct_records = soql(instance_url, token,
+            "SELECT IsoCode, ConversionRate FROM CurrencyType WHERE IsoCode = 'BRL' LIMIT 1"
+        )
+        if ct_records:
+            conversion_rate = ct_records[0].get("ConversionRate", 5.383354)
+            brl_usd_rate = 1 / conversion_rate
+    except Exception as e:
+        log(f"CurrencyType query failed: {e}")
+
+    log(f"Done — {len(dsr_data)} DSRs, {len(estimate_map)} estimates. BRL/USD: {brl_usd_rate:.5f}")
     return {"dsrData": dsr_data, "estimateMap": estimate_map,
+            "brlUsdRate": brl_usd_rate,
             "generated": datetime.now().strftime("%Y-%m-%d")}
 
 
@@ -184,6 +197,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     '<script>'
                     f'window.__LIVE_DSR__={json.dumps(data["dsrData"], ensure_ascii=False)};'
                     f'window.__LIVE_EST__={json.dumps(data["estimateMap"], ensure_ascii=False)};'
+                    f'window.__LIVE_BRL_RATE__={data["brlUsdRate"]};'
                     f'window.__LIVE_GEN__="{data["generated"]}";'
                     '</script>\n</head>'
                 )
