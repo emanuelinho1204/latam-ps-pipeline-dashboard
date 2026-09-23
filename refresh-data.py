@@ -291,12 +291,12 @@ def update_html(dsr_data, estimate_map, rr_data, recent_changes=None):
     rr_json    = json.dumps(rr_data,              ensure_ascii=False, indent=2)
     chg_json   = json.dumps(recent_changes or [], ensure_ascii=False, indent=2)
 
-    content, n1 = re.subn(r'let DSR_DATA = \[.*?\];',
-                          f'let DSR_DATA = {dsr_json};', content, flags=re.DOTALL)
-    content, n2 = re.subn(r'let ESTIMATE_MAP = \{.*?\};',
-                          f'let ESTIMATE_MAP = {est_json};', content, flags=re.DOTALL)
-    content, n3 = re.subn(r'let GENERATED = "[^"]*"',
-                          f'let GENERATED = "{today}"', content)
+    content, n1 = re.subn(r'let DSR_DATA = (?:window\.__LIVE_DSR__\s*\|\|\s*)?\[.*?\];',
+                          f'let DSR_DATA = window.__LIVE_DSR__ || {dsr_json};', content, flags=re.DOTALL)
+    content, n2 = re.subn(r'let ESTIMATE_MAP = (?:window\.__LIVE_EST__\s*\|\|\s*)?\{.*?\};',
+                          f'let ESTIMATE_MAP = window.__LIVE_EST__ || {est_json};', content, flags=re.DOTALL)
+    content, n3 = re.subn(r'let GENERATED\s*=.*?;',
+                          f'let GENERATED     = window.__LIVE_GEN__       || "{today}";', content)
     re.subn(r'let GEN_DSR\s*=\s*window\.__LIVE_GEN_DSR__\s*\|\|\s*"[^"]*"',
             f'let GEN_DSR       = window.__LIVE_GEN_DSR__   || "{today}"', content)
     content = re.sub(r'let GEN_DSR\s*=.*$',
