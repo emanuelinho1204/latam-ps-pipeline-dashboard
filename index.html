@@ -20694,10 +20694,16 @@ function renderSSSmLoadBars(sssmData) {
   if (staleEntries.length) {
     const detail = staleEntries.map(([n]) => {
       const staleOpps = filtered.filter(d => d.sssm===n && d.status==='Working' && d.closeDate && d.closeDate < sssmNow);
-      const uniqueOpps = [...new Set(staleOpps.map(d=>d.oppName||d.dsr))].filter(Boolean);
-      return `<b>${sssmLabel(n)}</b>: ${uniqueOpps.slice(0,2).join(', ')}${uniqueOpps.length>2?` +${uniqueOpps.length-2}`:''}`;
+      const oppLinks = staleOpps.slice(0,2).map(d => {
+        const label = (d.oppName||d.dsr||'').length > 45 ? (d.oppName||d.dsr).substring(0,45)+'…' : (d.oppName||d.dsr||d.dsrId);
+        const href = d.oppId ? `https://org62.lightning.force.com/lightning/r/Opportunity/${d.oppId}/view` : '#';
+        const ap = d.ap ? ` <span style="color:#706E6B;font-size:0.67rem;">(AP: ${d.ap})</span>` : '';
+        return `<a href="${href}" target="_blank" style="color:#C23934;text-decoration:underline;">${label}</a>${ap}`;
+      });
+      const extra = staleOpps.length > 2 ? ` <span style="color:#706E6B">+${staleOpps.length-2}</span>` : '';
+      return `<b>${sssmLabel(n)}</b>:<br>${oppLinks.join('<br>')}${extra}`;
     }).join('<br>');
-    sssmItems.unshift(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 Working con opp vencida</span><br><span style="font-size:0.7rem;color:#706E6B">${detail}</span></div>`);
+    sssmItems.unshift(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 Working con opp vencida</span> <span style="font-size:0.67rem;color:#706E6B;font-weight:400">(close date no actualizado por el AP)</span><br><span style="font-size:0.7rem;color:#3E3E3C">${detail}</span></div>`);
   }
   const _sssmChgHtml = _changesInsightHtml(); if (_sssmChgHtml) sssmItems.push(_sssmChgHtml);
   setInsights('SSSM View', sssmItems.length ? sssmItems : ['<span style="color:#706E6B;font-size:0.75rem">Sin alertas activas.</span>']);
