@@ -27304,12 +27304,12 @@ function applySSSmFilters() {
   if (fSearch) data = data.filter(d => (d.oppName||'').toLowerCase().includes(fSearch) || (d.account||'').toLowerCase().includes(fSearch));
   const fSearchDSR = ((document.getElementById('sssm-fSearchDSR')||{}).value||'').toLowerCase();
   if (fSearchDSR) data = data.filter(d => (d.dsr||'').toLowerCase().includes(fSearchDSR));
-  renderSSSmLoadBars();
+  renderSSSmLoadBars(data);
   setTimeout(function() { renderSSSmGroupedView(data); }, 0);
 }
 
-function renderSSSmLoadBars() {
-  const filtered = activeFiltered; // solo pipeline activo
+function renderSSSmLoadBars(sssmData) {
+  const filtered = sssmData || activeFiltered;
   const el = document.getElementById('sssmLoadBars');
   if (!el) return;
   const wCounts = {}, totalCounts = {}, staleCounts = {};
