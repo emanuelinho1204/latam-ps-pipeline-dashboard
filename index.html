@@ -21919,7 +21919,11 @@ function renderEstimatesTab() {
   if (urgentEstClose.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">⚡ ${urgentEstClose.length} estimate${urgentEstClose.length>1?'s':''} close &lt; 30d</span><br><span style="font-size:0.7rem;color:#706E6B">${urgentEstClose.slice(0,2).map(e=>e.account||e.oppName||'').filter(Boolean).join(', ')}${urgentEstClose.length>2?` +${urgentEstClose.length-2}`:''}</span></div>`);
   if (noEstOpps.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">📋 ${noEstOpps.length} acct Stage 03+ sin estimate</span><br><span style="font-size:0.7rem;color:#706E6B">${noEstOpps.slice(0,2).join(', ')}${noEstOpps.length>2?` +${noEstOpps.length-2}`:''}</span></div>`);
   if (noHours.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">🕐 ${noHours.length} estimate${noHours.length>1?'s':''} Stage 03+ sin horas</span><br><span style="font-size:0.7rem;color:#706E6B">${noHours.slice(0,2).map(e=>e.account||e.name||'').filter(Boolean).join(', ')}${noHours.length>2?` +${noHours.length-2}`:''}</span></div>`);
-  if (noTE.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#706E6B;font-weight:700">✈ ${noTE.length} estimate${noTE.length>1?'s':''} sin T&amp;E</span><br><span style="font-size:0.7rem;color:#706E6B">${noTE.slice(0,2).map(e=>e.account||e.name||'').filter(Boolean).join(', ')}${noTE.length>2?` +${noTE.length-2}`:''}</span></div>`);
+  if (noTE.length) {
+    const sfEstBase = 'https://org62.lightning.force.com/lightning/r/ffscpq__Estimate__c';
+    const noTELinks = noTE.map(e=>`<a href="${sfEstBase}/${e.id}/view" target="_blank" style="color:#C23934;text-decoration:underline">${(e.account||e.name||'').substring(0,32)}</a>`).join('<br>');
+    estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C23934;font-weight:700">🚩 ${noTE.length} estimate${noTE.length>1?'s':''} sin T&amp;E</span><br><span style="font-size:0.7rem;color:#3E3E3C">${noTELinks}</span></div>`);
+  }
   if (highDisc.length) estItems.push(`<div style="margin-bottom:0.5rem"><span style="color:#C56200;font-weight:700">⚠ ${highDisc.length} con descuento ≥15%</span><br><span style="font-size:0.7rem;color:#706E6B">Máx: ${Math.max(...highDisc.map(e=>e.discountPct||0))}%</span></div>`);
   estItems.push(`<div style="margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid #E8E8E8;font-size:0.7rem;color:#706E6B">Fixed Price: ${fpCount} &nbsp;·&nbsp; T&amp;M: ${tmCount}</div>`);
   setInsights('Estimates', estItems);
@@ -21951,7 +21955,7 @@ function renderEstimatesTab() {
       <td class="px-3 py-2 text-right" style="color:#706E6B">${d.durationWeeks?d.durationWeeks+'w':'--'}</td>
       <td class="px-3 py-2 text-right" style="font-weight:600">${d.avgBillRate>0?`<span style="${curr==='BRL'?'color:#C56200':''}">${currSymbol}${Math.round(d.avgBillRate)}/hr</span>`:'<span style="color:#AEACAB">--</span>'}</td>
       <td class="px-3 py-2 text-right" style="color:#706E6B">${rateUsd>0?'$'+rateUsd+'/hr':'<span style="color:#AEACAB">--</span>'}</td>
-      <td class="px-3 py-2 text-right" style="color:#706E6B">${d.tAndE!=null&&d.tAndE>0?fmtAmt(d.tAndE):'<span style="color:#AEACAB">--</span>'}</td>
+      <td class="px-3 py-2 text-right">${d.tAndE>0?`<span style="color:#706E6B">${fmtAmt(d.tAndE)}</span>`:(d.totalHours>0||d.amount>0)?'<span style="color:#C23934;font-weight:700" title="Sin T&E registrado">🚩</span>':'<span style="color:#AEACAB">--</span>'}</td>
       <td class="px-3 py-2 text-right" style="color:${d.discountPct>0?'#C56200':'#AEACAB'}">${d.discountPct>0?d.discountPct+'%':'--'}</td>
       <td class="px-3 py-2 text-center">${billingBadge(d.billingType)}</td>
       <td class="px-3 py-2 text-center"><span style="background:#EAF5FE;color:#032D60;padding:1px 7px;border-radius:12px;font-size:0.68rem;font-weight:600">${d.rateCardRegion||'LATAM'}</span></td>
