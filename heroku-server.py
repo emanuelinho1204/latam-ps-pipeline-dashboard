@@ -53,8 +53,13 @@ def get_token():
     req = urllib.request.Request(
         f"{instance_url}/services/oauth2/token", data=data, method='POST'
     )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        result = json.loads(resp.read())
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            result = json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode('utf-8', errors='replace')
+        log(f"Token refresh HTTP {e.code}: {body}")
+        raise RuntimeError(f"Token refresh {e.code}: {body}")
     token = result.get('access_token')
     if not token:
         raise RuntimeError(f"Token refresh failed: {result}")
