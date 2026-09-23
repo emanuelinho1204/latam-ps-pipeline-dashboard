@@ -476,6 +476,7 @@
         <th class="th-std s text-right" onclick="estSortBy('totalHours')">Horas <span class="sort-icon" id="est-si-totalHours">▲▼</span></th>
         <th class="th-std s text-right" onclick="estSortBy('durationWeeks')">Semanas <span class="sort-icon" id="est-si-durationWeeks">▲▼</span></th>
         <th class="th-std s text-right" onclick="estSortBy('avgBillRate')">Bill Rate <span class="sort-icon" id="est-si-avgBillRate">▲▼</span></th>
+        <th class="th-std s text-right" style="white-space:nowrap">Bill Rate USD <span id="est-brl-badge" style="font-size:0.58rem;color:#706E6B;font-weight:400"></span></th>
         <th class="th-std s text-right" onclick="estSortBy('tAndE')">T&amp;E <span class="sort-icon" id="est-si-tAndE">▲▼</span></th>
         <th class="th-std s text-right" onclick="estSortBy('discountPct')">Descuento <span class="sort-icon" id="est-si-discountPct">▲▼</span></th>
         <th class="th-std s text-center" onclick="estSortBy('billingType')">Contrato <span class="sort-icon" id="est-si-billingType">▲▼</span></th>
@@ -2433,6 +2434,21 @@ const ESTIMATE_DATA = [
   {id:"aH2ed000000SCB7CAO",name:"v2_Atendimento Corp",oppId:"006ed00000cNDpuAAG",oppName:"Porto Seguro - Core Atendimento Corp - SOW - CSG",account:"PORTO SEGURO COMPANHIA DE SEGUROS GERAIS",ap:"Ricardo de Oliveira",em:"Amanda Basílio",stage:"03 - Initial Proposal",closeDate:"2026-10-30",amount:7943869,cost:6894002,marginPct:13.22,discountPct:0,avgBillRate:710.92,totalHours:11174,billingType:"Time and Materials",approvalStatus:"Draft",startDate:"2026-08-03",endDate:"2027-03-21",durationWeeks:33,tAndE:150000.0,rateCardRegion:"LATAM"},
   {id:"aH2ed000000AVAL",name:"AVAL - Agentic Banking Implementation",oppId:"006ed00000Jwx3FAAR",oppName:"AVAL (COL) - Agentic Banking Implementation - New",account:"Banco de Bogotá",ap:"Aaron Araiza",em:null,stage:"03 - Initial Proposal",closeDate:"2027-03-31",amount:0,cost:0,marginPct:0,discountPct:0,avgBillRate:0,totalHours:0,billingType:"Time and Materials",approvalStatus:"Draft",startDate:"2026-10-01",endDate:"2027-06-30",durationWeeks:39,tAndE:null,rateCardRegion:"LATAM"}
 ];
+// BRL→USD live exchange rate (fetched at load; fallback ≈ 0.18)
+let _brlUsdRate = 0.18;
+(function() {
+  fetch('https://api.frankfurter.app/latest?from=BRL&to=USD')
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(j&&j.rates&&j.rates.USD){
+        _brlUsdRate = j.rates.USD;
+        var el = document.getElementById('est-brl-badge');
+        if(el) el.textContent = 'R$1=US$'+_brlUsdRate.toFixed(4);
+      }
+    })
+    .catch(function(){});
+})();
+
 const RR_DATA = [
   {
     "id": "a9Ded0000010vnJEAQ",
@@ -21871,18 +21887,27 @@ function renderEstimatesTab() {
     return va < vb ? estSortDir : va > vb ? -estSortDir : 0;
   });
   _estExportData = data;
+  // Currency helpers — join EST with DSR_DATA on oppId for country
+  const _oppCtry = {};
+  DSR_DATA.forEach(function(d){if(d.oppId&&d.country)_oppCtry[d.oppId]=d.country;});
+  const estCurr = function(d){
+    var c = (_oppCtry[d.oppId]||'').toUpperCase();
+    if(c==='BR') return 'BRL';
+    if(c) return 'USD';
+    return d.avgBillRate>400?'BRL':'USD'; // fallback heuristic
+  };
   // KPIs
   const totalAmt = data.reduce((s,d)=>s+(d.amount||0),0);
   const margins = data.filter(d=>d.marginPct!==0&&d.marginPct!==null);
   const avgMargin = margins.length ? (margins.reduce((s,d)=>s+d.marginPct,0)/margins.length).toFixed(1) : '--';
-  const rates = data.filter(d=>d.avgBillRate>0);
-  const avgRate = rates.length ? Math.round(rates.reduce((s,d)=>s+d.avgBillRate,0)/rates.length) : '--';
+  const ratesUsd = data.filter(d=>d.avgBillRate>0).map(d=>estCurr(d)==='BRL'?d.avgBillRate*_brlUsdRate:d.avgBillRate);
+  const avgRate = ratesUsd.length ? Math.round(ratesUsd.reduce((a,b)=>a+b,0)/ratesUsd.length) : '--';
   const fmtAmt = v => v>=1e6 ? '$'+(v/1e6).toFixed(1)+'M' : v>=1e3 ? '$'+(v/1e3).toFixed(0)+'K' : '$'+v;
   const totalTE = data.reduce((s,d)=>s+(d.tAndE||0),0);
   document.getElementById('est-kpiTotal').textContent = data.length;
   document.getElementById('est-kpiAmount').textContent = fmtAmt(totalAmt);
   document.getElementById('est-kpiMargin').textContent = avgMargin !== '--' ? avgMargin+'%' : '--';
-  document.getElementById('est-kpiBillRate').textContent = avgRate !== '--' ? '$'+avgRate+'/hr' : '--';
+  document.getElementById('est-kpiBillRate').textContent = avgRate !== '--' ? '$'+avgRate+'/hr USD' : '--';
   document.getElementById('est-kpiTE').textContent = totalTE > 0 ? fmtAmt(totalTE) : '--';
   document.getElementById('est-rowCount').textContent = data.length + ' ' + _t('lbl_registros');
   // Insights sidebar (siempre desde ESTIMATE_DATA completo, no filtrado)
@@ -21910,6 +21935,9 @@ function renderEstimatesTab() {
   let rows = '';
   data.forEach(d => {
     const stCol = stageColors[d.stage]||'#706E6B';
+    const curr = estCurr(d);
+    const currSymbol = curr==='BRL'?'R$':'$';
+    const rateUsd = d.avgBillRate>0 ? Math.round(curr==='BRL'?d.avgBillRate*_brlUsdRate:d.avgBillRate) : 0;
     _shareData[d.id] = {estId:d.id, oppId:d.oppId, name:d.name, oppName:d.oppName, account:d.account, ap:d.ap, em:d.em, stage:d.stage, closeDate:d.closeDate, amount:d.amount, status:d.approvalStatus, billingType:d.billingType, sssm:null};
     rows += `<tr>
       <td class="px-1 text-center" style="width:28px;"><button class="share-btn" onclick="showShareMenu(this,'${d.id}');event.stopPropagation();" title="Compartir">⋮</button></td>
@@ -21924,7 +21952,8 @@ function renderEstimatesTab() {
       <td class="px-3 py-2 text-right" style="${marginStyle(d.marginPct)}">${d.marginPct!=null?d.marginPct+'%':'--'}</td>
       <td class="px-3 py-2 text-right">${d.totalHours||'--'}</td>
       <td class="px-3 py-2 text-right" style="color:#706E6B">${d.durationWeeks?d.durationWeeks+'w':'--'}</td>
-      <td class="px-3 py-2 text-right" style="font-weight:600">${d.avgBillRate>0?'$'+Math.round(d.avgBillRate)+'/hr':'<span style="color:#AEACAB">--</span>'}</td>
+      <td class="px-3 py-2 text-right" style="font-weight:600">${d.avgBillRate>0?`<span style="${curr==='BRL'?'color:#C56200':''}">${currSymbol}${Math.round(d.avgBillRate)}/hr</span>`:'<span style="color:#AEACAB">--</span>'}</td>
+      <td class="px-3 py-2 text-right" style="color:#706E6B">${rateUsd>0?'$'+rateUsd+'/hr':'<span style="color:#AEACAB">--</span>'}</td>
       <td class="px-3 py-2 text-right" style="color:#706E6B">${d.tAndE!=null&&d.tAndE>0?fmtAmt(d.tAndE):'<span style="color:#AEACAB">--</span>'}</td>
       <td class="px-3 py-2 text-right" style="color:${d.discountPct>0?'#C56200':'#AEACAB'}">${d.discountPct>0?d.discountPct+'%':'--'}</td>
       <td class="px-3 py-2 text-center">${billingBadge(d.billingType)}</td>
