@@ -28217,9 +28217,9 @@ function initFilters() {
   // Contract Type filter (shared values)
   const contracts = [...new Set(DSR_DATA.map(d => d.contractType).filter(Boolean))].sort();
   msInit('ms_sssmContract', contracts.map(v => ({value:v, label:v})), applySSSmFilters);
-  msInit('ms_sssmAP', aps.map(a => ({value:a, label:a})), applySSSmFilters);
   // DSR Detail multi-selects
   const aps = [...new Set(DSR_DATA.map(d => d.ap).filter(Boolean))].sort();
+  msInit('ms_sssmAP', aps.map(a => ({value:a, label:a})), applySSSmFilters);
   msInit('ms_dSSSM', sssms.map(s => ({value:s, label:s})), renderTab6);
   msInit('ms_dContract', contracts.map(v => ({value:v, label:v})), renderTab6);
   msInit('ms_dAP',   aps.map(a => ({value:a, label:a})),   renderTab6);
