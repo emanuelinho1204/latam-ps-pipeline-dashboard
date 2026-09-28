@@ -253,6 +253,10 @@
       <div class="ms-container" id="ms_sssmContract"></div>
     </div>
     <div>
+      <label class="block text-xs mb-1" style="color:#706E6B;">AP</label>
+      <div class="ms-container" id="ms_sssmAP"></div>
+    </div>
+    <div>
       <label class="block text-xs mb-1" style="color:#706E6B;" data-i18n="lbl_buscar">Buscar</label>
       <input id="sssm-fSearch" type="text" placeholder="Buscar oportunidad..." oninput="applySSSmFilters()" style="height:32px;padding:0 8px;border:1px solid #C9E4F7;border-radius:6px;font-size:0.82rem;width:160px;">
     </div>
@@ -27947,6 +27951,8 @@ function applySSSmFilters() {
   if (amtMax < Infinity) data = data.filter(d => (d.amount||0) <= amtMax);
   const contractSel = msGet('ms_sssmContract');
   if (contractSel.length) data = data.filter(d => contractSel.includes(d.contractType));
+  const apSel = msGet('ms_sssmAP');
+  if (apSel.length) data = data.filter(d => apSel.includes(d.ap));
   const fSearch = ((document.getElementById('sssm-fSearch')||{}).value||'').toLowerCase();
   if (fSearch) data = data.filter(d => (d.oppName||'').toLowerCase().includes(fSearch) || (d.account||'').toLowerCase().includes(fSearch));
   const fSearchDSR = ((document.getElementById('sssm-fSearchDSR')||{}).value||'').toLowerCase();
@@ -28045,7 +28051,7 @@ function renderSSSmLoadBars(sssmData) {
 }
 
 function resetSSSmFilters() {
-  ['ms_sssm','ms_terr','ms_status','ms_stage','ms_mgr','ms_sForecast','ms_sssmContract'].forEach(id => {
+  ['ms_sssm','ms_terr','ms_status','ms_stage','ms_mgr','ms_sForecast','ms_sssmContract','ms_sssmAP'].forEach(id => {
     if (_msSel[id]) { _msSel[id] = new Set(); _msRender(id); }
   });
   ['sssm_fDateFrom','sssm_fDateTo','sssm_fAmtMin','sssm_fAmtMax','sssm-fSearch','sssm-fSearchDSR'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -28211,6 +28217,7 @@ function initFilters() {
   // Contract Type filter (shared values)
   const contracts = [...new Set(DSR_DATA.map(d => d.contractType).filter(Boolean))].sort();
   msInit('ms_sssmContract', contracts.map(v => ({value:v, label:v})), applySSSmFilters);
+  msInit('ms_sssmAP', aps.map(a => ({value:a, label:a})), applySSSmFilters);
   // DSR Detail multi-selects
   const aps = [...new Set(DSR_DATA.map(d => d.ap).filter(Boolean))].sort();
   msInit('ms_dSSSM', sssms.map(s => ({value:s, label:s})), renderTab6);
